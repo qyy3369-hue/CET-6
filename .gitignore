@@ -1,0 +1,6 @@
+.DS_Store
+CET6DesktopWidget01/.env
+CET6DesktopWidget01/.build/
+CET6DesktopWidget01/Build/
+CET6DesktopWidget01/Scripts/__pycache__/
+*.pyc

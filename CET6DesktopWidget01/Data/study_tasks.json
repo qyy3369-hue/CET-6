@@ -1,0 +1,205 @@
+[
+  {
+    "date" : "2026-06-02",
+    "id" : "EE2E268C-1C44-4338-9AED-93E34A3F643F",
+    "isDone" : true,
+    "source" : "plan",
+    "title" : "做一套完整六级真题，但不用太在意分数"
+  },
+  {
+    "date" : "2026-06-02",
+    "id" : "4D91A6B2-F02F-4A9D-9C74-1BC33205C518",
+    "isDone" : true,
+    "source" : "plan",
+    "title" : "专项练 听力 Section B\/C"
+  },
+  {
+    "date" : "2026-06-02",
+    "id" : "848257D8-09FD-4A7D-BB61-396AB5DFAF2C",
+    "isDone" : true,
+    "source" : "plan",
+    "title" : "专项练 仔细阅读 2 篇 + 匹配题 1 篇"
+  },
+  {
+    "date" : "2026-06-02",
+    "id" : "6D8D99D7-DBF0-49ED-9D49-1F41FA889B55",
+    "isDone" : true,
+    "source" : "plan",
+    "title" : "做一套真题的 听力 + 阅读，限时做"
+  },
+  {
+    "date" : "2026-07-01",
+    "id" : "7E821D2C-7021-4476-A21D-49753E9E1A17",
+    "isDone" : false,
+    "source" : "plan",
+    "title" : "写作 + 翻译专项"
+  },
+  {
+    "date" : "2026-07-01",
+    "id" : "25174687-97BF-4359-BB0F-3A74395F1C18",
+    "isDone" : false,
+    "source" : "plan",
+    "title" : "完整模拟一套真题"
+  },
+  {
+    "date" : "2026-07-01",
+    "id" : "8F2519AF-5E6E-4556-A156-BCA035078B4C",
+    "isDone" : false,
+    "source" : "plan",
+    "title" : "复盘前面所有错题"
+  },
+  {
+    "date" : "2026-07-01",
+    "id" : "9B5977F7-B771-4372-81E0-232A8C387309",
+    "isDone" : false,
+    "source" : "plan",
+    "title" : "轻量复习，不要硬熬"
+  },
+  {
+    "date" : "2026-05-25",
+    "id" : "378C58D4-560E-4E0E-8C64-47A0C8C48263",
+    "isDone" : true,
+    "source" : "plan",
+    "title" : "轻量复习，不要硬熬"
+  },
+  {
+    "date" : "2026-06-02",
+    "id" : "FD252CDF-A8AA-48E9-97B9-A3284EAE83DB",
+    "isDone" : true,
+    "source" : "plan",
+    "title" : "轻量复习，不要硬熬"
+  },
+  {
+    "date" : "2026-06-02",
+    "id" : "68ED1356-681A-483E-8095-9DD1EE80FC53",
+    "isDone" : true,
+    "source" : "plan",
+    "title" : "轻量复习，不要硬熬"
+  },
+  {
+    "date" : "2026-06-02",
+    "id" : "05532E93-3BB5-48E3-9C6A-F916DB46A851",
+    "isDone" : true,
+    "source" : "plan",
+    "title" : "轻量复习，不要硬熬"
+  },
+  {
+    "date" : "2026-07-01",
+    "id" : "E7D95863-ACD1-41EF-9F46-4A05DC092DCC",
+    "isDone" : false,
+    "source" : "plan",
+    "title" : "轻量复习，不要硬熬"
+  },
+  {
+    "date" : "2026-07-01",
+    "id" : "5779827B-60AC-4014-9FDC-0A3E7A5F9936",
+    "isDone" : false,
+    "source" : "plan",
+    "title" : "轻量复习，不要硬熬"
+  },
+  {
+    "date" : "2026-07-01",
+    "id" : "AAD10506-3A79-4BE8-80C2-BF670FC7A920",
+    "isDone" : false,
+    "source" : "plan",
+    "title" : "轻量复习，不要硬熬"
+  },
+  {
+    "date" : "2026-06-02",
+    "id" : "63FEBAC8-7365-42BE-B8DB-8E6F1A82D111",
+    "isDone" : true,
+    "source" : "manual",
+    "title" : "闪卡复习：今日新增 20 个词（manuscript, speculate, superstitious, diversion, atmospheric 等）"
+  },
+  {
+    "date" : "2026-06-02",
+    "id" : "2481926D-2A5F-48C9-A7FF-DDFA63F22CB8",
+    "isDone" : true,
+    "source" : "manual",
+    "title" : "闪卡复习：今日新增 20 个词（tempt, administration, lump, expertise, seduce 等）"
+  },
+  {
+    "date" : "2026-06-02",
+    "id" : "E3A9D331-E27E-43EE-B680-D5AF7D744404",
+    "isDone" : true,
+    "source" : "manual",
+    "title" : "闪卡复习：今日新增 20 个词（idealism, allocation, invasive, successor, beforehand 等）"
+  },
+  {
+    "date" : "2026-06-02",
+    "id" : "07ABE780-8A22-411D-8EA4-4CF8C1342E60",
+    "isDone" : true,
+    "source" : "manual",
+    "title" : "闪卡复习：今日新增 20 个词（efficient, respectively, reference, state, scholastic 等）"
+  },
+  {
+    "date" : "2026-06-02",
+    "id" : "1951078F-5638-46CE-88BB-E144817B625A",
+    "isDone" : true,
+    "source" : "manual",
+    "title" : "闪卡复习：今日新增 20 个词（survive, description, renaissance, manual, prisoner 等）"
+  },
+  {
+    "date" : "2026-06-02",
+    "id" : "DEDDED4A-B995-4434-AC0C-43D85F188E1D",
+    "isDone" : true,
+    "source" : "manual",
+    "title" : "闪卡复习：今日新增 20 个词（subscription, descendant, loyal, subscribe, deduct 等）"
+  },
+  {
+    "date" : "2026-07-01",
+    "id" : "FDE0F8D5-1720-4C00-9334-F1E3A5991DEE",
+    "isDone" : false,
+    "source" : "manual",
+    "title" : "闪卡复习：今日新增 20 个词（pop, imperial, commission, institution, precede 等）"
+  },
+  {
+    "date" : "2026-07-01",
+    "id" : "6751EC60-158C-411B-AD74-9171D6FE2405",
+    "isDone" : false,
+    "source" : "manual",
+    "title" : "闪卡复习：今日新增 20 个词（supersonic, project, loyalty, scholarly, reflective 等）"
+  },
+  {
+    "date" : "2026-07-01",
+    "id" : "4152847E-AB5B-4C2C-AF89-429B0A8290E7",
+    "isDone" : false,
+    "source" : "manual",
+    "title" : "闪卡复习：今日新增 20 个词（proceed, statement, excessive, invader, ancestor 等）"
+  },
+  {
+    "date" : "2026-07-01",
+    "id" : "F661F6BB-DB13-4CBD-9FFA-59715A5088BB",
+    "isDone" : false,
+    "source" : "manual",
+    "title" : "闪卡复习：今日新增 20 个词（deductive, misery, procedure, convert, revolution 等）"
+  },
+  {
+    "date" : "2026-07-01",
+    "id" : "F17D9A40-4324-4A64-95BD-74AB7CA264F7",
+    "isDone" : false,
+    "source" : "manual",
+    "title" : "闪卡复习：今日新增 20 个词（submission, commitment, suspicion, genetically, locate 等）"
+  },
+  {
+    "date" : "2026-07-01",
+    "id" : "AD7227AD-E66E-42B7-81E1-3DC8FBA55549",
+    "isDone" : false,
+    "source" : "manual",
+    "title" : "闪卡复习：今日新增 20 个词（chaotic, provocation, irrigate, evolution, aspect 等）"
+  },
+  {
+    "date" : "2026-07-01",
+    "id" : "FCF1582B-6302-4430-90D2-61AF6976EA9F",
+    "isDone" : false,
+    "source" : "manual",
+    "title" : "闪卡复习：今日新增 19 个词（script, renovate, innovate, afflict, subjective 等）"
+  },
+  {
+    "date" : "2026-07-01",
+    "id" : "63A03067-D208-4EAE-9B0B-ACB3D8610EF5",
+    "isDone" : false,
+    "source" : "manual",
+    "title" : "闪卡复习：今日新增 20 个词（controversy, surface, diversity, emitter, practicable 等）"
+  }
+]

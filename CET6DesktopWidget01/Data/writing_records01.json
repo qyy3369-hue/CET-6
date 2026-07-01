@@ -1,0 +1,52 @@
+[
+  {
+    "createdAt" : 801980932.166621,
+    "essay" : "In recent years, there has been a noticeable increase in people's concern over their physical appearance. This phenomenon can be attributed to several factors, including the pervasive influence of social media, the emphasis on image in modern society, and the rise of the beauty industry. Social media platforms, such as Instagram and TikTok, constantly expose users to idealized images of beauty, creating unrealistic standards that many strive to meet. Moreover, in a competitive job market, a good appearance is often perceived as an advantage, further fueling this obsession. However, this preoccupation with looks can have negative consequences. It may lead to low self-esteem, anxiety, and even eating disorders, especially among young people. To address this issue, it is crucial to promote a more inclusive definition of beauty and encourage self-acceptance. Education and media literacy can help individuals critically evaluate the images they see and resist the pressure to conform to narrow standards. Ultimately, while taking care of one's appearance is natural, it should not come at the cost of mental well-being.",
+    "id" : "879AF8F5-F6E8-46DD-955E-1DC824762179",
+    "notes" : [
+      {
+        "explanation" : "adj. 普遍的，无处不在的",
+        "target" : "pervasive"
+      },
+      {
+        "explanation" : "adj. 理想化的",
+        "target" : "idealized"
+      },
+      {
+        "explanation" : "努力达到（标准）",
+        "target" : "strive to meet"
+      },
+      {
+        "explanation" : "n. 痴迷，执念",
+        "target" : "obsession"
+      },
+      {
+        "explanation" : "对……的过度关注",
+        "target" : "preoccupation with"
+      },
+      {
+        "explanation" : "低自尊，自卑",
+        "target" : "low self-esteem"
+      },
+      {
+        "explanation" : "媒体素养，指理解、分析媒体内容的能力",
+        "target" : "media literacy"
+      },
+      {
+        "explanation" : "符合狭隘的标准",
+        "target" : "conform to narrow standards"
+      }
+    ],
+    "prompt" : "人们越来越在意自己的外貌。",
+    "title" : "The Growing Concern Over Physical Appearance",
+    "usefulExpressions" : [
+      "There has been a noticeable increase in...",
+      "This phenomenon can be attributed to...",
+      "expose users to...",
+      "create unrealistic standards",
+      "fuel this obsession",
+      "promote a more inclusive definition of beauty"
+    ],
+    "wordCount" : 159
+  }
+]

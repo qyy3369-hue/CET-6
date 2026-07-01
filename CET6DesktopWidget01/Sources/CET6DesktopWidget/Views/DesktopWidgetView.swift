@@ -1,0 +1,2998 @@
+import Foundation
+import AppKit
+import SwiftUI
+
+struct DesktopWidgetView: View {
+    @ObservedObject var store: TaskStore
+    var onOpenStudyWindow: () -> Void = {}
+    @State private var newTaskTitle = ""
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            header
+                .background(WindowDragArea())
+            openWindowButton
+            inputRow
+            taskList
+        }
+        .padding(18)
+        .frame(width: 360, alignment: .topLeading)
+        .frame(minHeight: 260, alignment: .topLeading)
+        .background {
+            ZStack {
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    .fill(.ultraThinMaterial)
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    .fill(Color(red: 0.08, green: 0.12, blue: 0.15).opacity(0.08))
+            }
+        }
+        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .overlay {
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .stroke(.white.opacity(0.22), lineWidth: 1)
+        }
+        .shadow(color: .black.opacity(0.22), radius: 24, x: 0, y: 12)
+        .preferredColorScheme(.light)
+    }
+
+    private var header: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            HStack(alignment: .firstTextBaseline) {
+                Button(action: onOpenStudyWindow) {
+                    Text("CET-6 今日计划")
+                        .font(.system(size: 22, weight: .semibold, design: .rounded))
+                        .foregroundStyle(.primary)
+                }
+                .buttonStyle(.plain)
+                .help("打开学习窗口")
+                Spacer()
+                Button(action: onOpenStudyWindow) {
+                    Image(systemName: "rectangle.inset.filled.and.person.filled")
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundStyle(.teal)
+                        .frame(width: 26, height: 24)
+                }
+                .buttonStyle(.plain)
+                .help("打开学习窗口")
+            }
+
+            HStack(spacing: 8) {
+                Text(DateKey.today())
+                Text("学习控制台")
+            }
+            .font(.system(size: 13, weight: .medium))
+            .foregroundStyle(.secondary)
+        }
+    }
+
+    private var openWindowButton: some View {
+        Button(action: onOpenStudyWindow) {
+            HStack(spacing: 8) {
+                Image(systemName: "arrow.up.forward.app")
+                    .font(.system(size: 13, weight: .bold))
+                Text("打开学习窗口")
+                    .font(.system(size: 13, weight: .bold))
+                Spacer()
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 9)
+            .background(Color.teal.opacity(0.14))
+            .foregroundStyle(Color.teal)
+            .clipShape(RoundedRectangle(cornerRadius: 9, style: .continuous))
+        }
+        .buttonStyle(.plain)
+        .help("打开计划书、日程和单词页面")
+    }
+
+    private var inputRow: some View {
+        HStack(spacing: 8) {
+            TextField("输入任何任务，回车后显示", text: $newTaskTitle)
+                .textFieldStyle(.plain)
+                .font(.system(size: 14))
+                .padding(.horizontal, 12)
+                .padding(.vertical, 9)
+                .background(.black.opacity(0.08))
+                .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                .onSubmit(addTask)
+
+            Button(action: addTask) {
+                Image(systemName: "plus")
+                    .font(.system(size: 14, weight: .bold))
+                    .frame(width: 30, height: 30)
+            }
+            .buttonStyle(.borderless)
+            .background(.blue)
+            .foregroundStyle(.white)
+            .clipShape(Circle())
+        }
+    }
+
+    private var taskList: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                Text("今日任务")
+                    .font(.system(size: 15, weight: .semibold))
+                Spacer()
+                Text("\(store.todayTasks.filter { !$0.isDone }.count) 待完成")
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundStyle(.secondary)
+            }
+
+            if store.todayTasks.isEmpty {
+                Text("今天还没有任务。输入一条内容，它会保存到本地 JSON 并显示在这里。")
+                    .font(.system(size: 14))
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            } else {
+                ScrollView {
+                    LazyVStack(alignment: .leading, spacing: 9) {
+                        ForEach(store.todayTasks) { task in
+                            Button {
+                                store.toggleDone(task)
+                            } label: {
+                                HStack(alignment: .top, spacing: 9) {
+                                    Image(systemName: task.isDone ? "checkmark.circle.fill" : "circle")
+                                        .foregroundStyle(task.isDone ? .green : .secondary)
+                                        .font(.system(size: 16, weight: .medium))
+                                        .frame(width: 20)
+                                    Text(task.title)
+                                        .font(.system(size: 14))
+                                        .foregroundStyle(task.isDone ? .secondary : .primary)
+                                        .strikethrough(task.isDone)
+                                        .multilineTextAlignment(.leading)
+                                    Spacer(minLength: 0)
+                                }
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .contentShape(Rectangle())
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
+                }
+                .frame(maxHeight: 132)
+            }
+        }
+    }
+
+    private func addTask() {
+        store.addTaskForToday(newTaskTitle)
+        newTaskTitle = ""
+    }
+}
+
+private struct WindowDragArea: NSViewRepresentable {
+    func makeNSView(context: Context) -> DragView {
+        DragView()
+    }
+
+    func updateNSView(_ nsView: DragView, context: Context) {}
+
+    final class DragView: NSView {
+        override func mouseDown(with event: NSEvent) {
+            window?.performDrag(with: event)
+        }
+    }
+}
+
+private struct SelectableEssayTextView: NSViewRepresentable {
+    let text: String
+    let onSelectionChange: (String) -> Void
+
+    func makeNSView(context: Context) -> NSTextView {
+        let textView = NSTextView()
+        textView.delegate = context.coordinator
+        textView.isEditable = false
+        textView.isSelectable = true
+        textView.drawsBackground = false
+        textView.textContainerInset = .zero
+        textView.textContainer?.lineFragmentPadding = 0
+        textView.textContainer?.widthTracksTextView = true
+        textView.isHorizontallyResizable = false
+        textView.isVerticallyResizable = true
+        textView.autoresizingMask = [.width]
+        textView.font = NSFont.systemFont(ofSize: 15, weight: .medium)
+        textView.textColor = NSColor.labelColor
+        textView.defaultParagraphStyle = Self.paragraphStyle
+        textView.string = text
+        textView.setContentHuggingPriority(.required, for: .vertical)
+        textView.setContentCompressionResistancePriority(.required, for: .vertical)
+        return textView
+    }
+
+    func updateNSView(_ textView: NSTextView, context: Context) {
+        context.coordinator.onSelectionChange = onSelectionChange
+        if textView.string != text {
+            textView.string = text
+        }
+        textView.font = NSFont.systemFont(ofSize: 15, weight: .medium)
+        textView.defaultParagraphStyle = Self.paragraphStyle
+        textView.textContainer?.containerSize = NSSize(width: textView.bounds.width, height: CGFloat.greatestFiniteMagnitude)
+        textView.textContainer?.widthTracksTextView = true
+        textView.invalidateIntrinsicContentSize()
+    }
+
+    func sizeThatFits(_ proposal: ProposedViewSize, nsView textView: NSTextView, context: Context) -> CGSize? {
+        let width = max(proposal.width ?? 640, 320)
+        guard let textContainer = textView.textContainer, let layoutManager = textView.layoutManager else {
+            return CGSize(width: width, height: 24)
+        }
+
+        textContainer.containerSize = NSSize(width: width, height: CGFloat.greatestFiniteMagnitude)
+        textContainer.widthTracksTextView = true
+        layoutManager.ensureLayout(for: textContainer)
+        let usedRect = layoutManager.usedRect(for: textContainer)
+        return CGSize(width: width, height: max(ceil(usedRect.height) + 4, 24))
+    }
+
+    private static var paragraphStyle: NSParagraphStyle {
+        let style = NSMutableParagraphStyle()
+        style.lineSpacing = 2
+        style.paragraphSpacing = 0
+        return style
+    }
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator(onSelectionChange: onSelectionChange)
+    }
+
+    final class Coordinator: NSObject, NSTextViewDelegate {
+        var onSelectionChange: (String) -> Void
+
+        init(onSelectionChange: @escaping (String) -> Void) {
+            self.onSelectionChange = onSelectionChange
+        }
+
+        func textViewDidChangeSelection(_ notification: Notification) {
+            guard let textView = notification.object as? NSTextView else { return }
+            let ranges = textView.selectedRanges.compactMap { $0.rangeValue }
+            let selectedText = ranges
+                .filter { $0.length > 0 && NSMaxRange($0) <= (textView.string as NSString).length }
+                .map { (textView.string as NSString).substring(with: $0) }
+                .joined(separator: " ")
+            onSelectionChange(selectedText)
+        }
+    }
+}
+
+#Preview {
+    DesktopWidgetView(store: TaskStore()) {}
+}
+
+private enum StudyCategory: String, CaseIterable, Identifiable {
+    case plan
+    case today
+    case words
+    case translation
+    case writing
+    case roots
+    case flashcards
+    case mistakes
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .plan: "计划书"
+        case .today: "今日日程"
+        case .words: "单词本"
+        case .translation: "翻译训练"
+        case .writing: "写作训练"
+        case .roots: "词根词缀"
+        case .flashcards: "闪卡复习"
+        case .mistakes: "错词收藏"
+        }
+    }
+
+    var subtitle: String {
+        switch self {
+        case .plan: "手动输入与 AI 生成"
+        case .today: "任务进度与勾选"
+        case .words: "高频词与例句"
+        case .translation: "中译英与英文润色"
+        case .writing: "150-200 词范文"
+        case .roots: "按构词法记忆"
+        case .flashcards: "正反面快速过"
+        case .mistakes: "收藏与薄弱项"
+        }
+    }
+
+    var icon: String {
+        switch self {
+        case .plan: "doc.text.magnifyingglass"
+        case .today: "calendar.badge.clock"
+        case .words: "book.closed.fill"
+        case .translation: "character.book.closed"
+        case .writing: "pencil.and.outline"
+        case .roots: "point.3.connected.trianglepath.dotted"
+        case .flashcards: "rectangle.stack"
+        case .mistakes: "bookmark"
+        }
+    }
+
+    var tint: Color {
+        switch self {
+        case .plan: Color(red: 0.19, green: 0.47, blue: 0.76)
+        case .today: Color(red: 0.10, green: 0.55, blue: 0.48)
+        case .words: Color(red: 0.72, green: 0.28, blue: 0.26)
+        case .translation: Color(red: 0.24, green: 0.50, blue: 0.62)
+        case .writing: Color(red: 0.65, green: 0.38, blue: 0.18)
+        case .roots: Color(red: 0.55, green: 0.42, blue: 0.18)
+        case .flashcards: Color(red: 0.37, green: 0.34, blue: 0.70)
+        case .mistakes: Color(red: 0.78, green: 0.43, blue: 0.16)
+        }
+    }
+}
+
+struct ScheduleBlock: Identifiable {
+    let id = UUID()
+    let dateKey: String
+    let timeLabel: String
+    let title: String
+    let note: String
+    let category: String
+
+    var dateLabel: String {
+        DateKey.displayLabel(for: dateKey)
+    }
+}
+
+private struct VocabularyWord: Codable, Equatable, Identifiable {
+    let id: String
+    let word: String
+    let phonetic: String
+    let partOfSpeech: String
+    let meaning: String
+    let example: String
+    let exampleTranslation: String
+    let phrases: [String]
+    let phraseTranslations: [String]
+    let mnemonic: String
+    let tag: String
+    let difficulty: Int
+
+    init(
+        id: String,
+        word: String,
+        phonetic: String,
+        partOfSpeech: String = "未标注",
+        meaning: String,
+        example: String,
+        exampleTranslation: String = "",
+        phrases: [String] = [],
+        phraseTranslations: [String] = [],
+        mnemonic: String = "",
+        tag: String,
+        difficulty: Int
+    ) {
+        self.id = id
+        self.word = word
+        self.phonetic = phonetic
+        self.partOfSpeech = partOfSpeech
+        self.meaning = meaning
+        self.example = example
+        self.exampleTranslation = exampleTranslation
+        self.phrases = phrases
+        self.phraseTranslations = phraseTranslations
+        self.mnemonic = mnemonic
+        self.tag = tag
+        self.difficulty = difficulty
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.id = try container.decode(String.self, forKey: .id)
+        self.word = try container.decode(String.self, forKey: .word)
+        self.phonetic = try container.decodeIfPresent(String.self, forKey: .phonetic) ?? ""
+        self.partOfSpeech = try container.decodeIfPresent(String.self, forKey: .partOfSpeech) ?? "未标注"
+        self.meaning = try container.decode(String.self, forKey: .meaning)
+        self.example = try container.decodeIfPresent(String.self, forKey: .example) ?? ""
+        self.exampleTranslation = try container.decodeIfPresent(String.self, forKey: .exampleTranslation) ?? ""
+        self.phrases = try container.decodeIfPresent([String].self, forKey: .phrases) ?? []
+        self.phraseTranslations = try container.decodeIfPresent([String].self, forKey: .phraseTranslations) ?? []
+        self.mnemonic = try container.decodeIfPresent(String.self, forKey: .mnemonic) ?? ""
+        self.tag = try container.decodeIfPresent(String.self, forKey: .tag) ?? "自定义"
+        self.difficulty = try container.decodeIfPresent(Int.self, forKey: .difficulty) ?? 3
+    }
+
+    var trimmedExampleTranslation: String {
+        exampleTranslation.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    var phraseTranslationLine: String {
+        let translations = phraseTranslations
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty }
+        guard !translations.isEmpty else { return "" }
+
+        if translations.count == phrases.count {
+            return zip(phrases, translations)
+                .map { phrase, translation in
+                    "\(phrase)：\(translation)"
+                }
+                .joined(separator: " · ")
+        }
+
+        return translations.joined(separator: " · ")
+    }
+}
+
+private struct RootItem: Identifiable {
+    let id = UUID()
+    let root: String
+    let meaning: String
+    let pattern: String
+    let examples: String
+    let cue: String
+}
+
+private struct PlanChatMessage: Identifiable {
+    let id = UUID()
+    let isUser: Bool
+    let text: String
+}
+
+private struct TranslationPracticeRecord: Codable, Identifiable, Equatable {
+    let id: UUID
+    let createdAt: Date
+    let input: String
+    let mode: String
+    let title: String
+    let versions: [TranslationVersion]
+    let notes: [String]
+
+    init(id: UUID = UUID(), createdAt: Date = Date(), result: TranslationPracticeResult) {
+        self.id = id
+        self.createdAt = createdAt
+        self.input = result.input
+        self.mode = result.mode
+        self.title = result.title
+        self.versions = result.versions
+        self.notes = result.notes
+    }
+}
+
+private struct WritingPracticeRecord: Codable, Identifiable, Equatable {
+    let id: UUID
+    let createdAt: Date
+    let prompt: String
+    let title: String
+    let essay: String
+    let wordCount: Int
+    let notes: [WritingPracticeNote]
+    let usefulExpressions: [String]
+
+    init(id: UUID = UUID(), createdAt: Date = Date(), result: WritingPracticeResult) {
+        self.id = id
+        self.createdAt = createdAt
+        self.prompt = result.prompt
+        self.title = result.title
+        self.essay = result.essay
+        self.wordCount = result.wordCount
+        self.notes = result.notes
+        self.usefulExpressions = result.usefulExpressions
+    }
+}
+
+private enum WordReviewMode: String, CaseIterable, Identifiable {
+    case all
+    case favorites
+    case hard
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .all: "全部"
+        case .favorites: "收藏"
+        case .hard: "高难"
+        }
+    }
+}
+
+private enum MistakeMode: String, CaseIterable, Identifiable {
+    case favorites
+    case hard
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .favorites: "已收藏"
+        case .hard: "高难候选"
+        }
+    }
+}
+
+private enum PlanWorkspaceMode: String, CaseIterable, Identifiable {
+    case manual
+    case ai
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .manual: "计划书"
+        case .ai: "AI 定计划"
+        }
+    }
+}
+
+private enum StudyTheme {
+    static let windowBase = Color(red: 0.89, green: 0.90, blue: 0.90).opacity(0.78)
+    static let sidebarBase = Color(red: 0.82, green: 0.83, blue: 0.84).opacity(0.46)
+    static let panelBase = Color.white.opacity(0.58)
+    static let panelStrong = Color.white.opacity(0.76)
+    static let hairline = Color.black.opacity(0.12)
+    static let ink = Color(red: 0.12, green: 0.13, blue: 0.14)
+    static let sidebarInk = Color(red: 0.20, green: 0.21, blue: 0.22)
+    static let secondaryInk = Color(red: 0.34, green: 0.36, blue: 0.38)
+    static let mutedInk = Color(red: 0.55, green: 0.57, blue: 0.59)
+    static let blue = Color(red: 0.18, green: 0.47, blue: 0.76)
+}
+
+private struct FloatingWindowSwitchStyle: ToggleStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        Button {
+            withAnimation(.spring(response: 0.24, dampingFraction: 0.82)) {
+                configuration.isOn.toggle()
+            }
+        } label: {
+            ZStack(alignment: configuration.isOn ? .trailing : .leading) {
+                Capsule()
+                    .fill(configuration.isOn ? StudyTheme.blue : Color.black.opacity(0.12))
+                    .overlay {
+                        Capsule()
+                            .stroke(Color.white.opacity(configuration.isOn ? 0.46 : 0.62), lineWidth: 1)
+                    }
+                    .shadow(color: .black.opacity(0.10), radius: 4, x: 0, y: 2)
+
+                Circle()
+                    .fill(Color.white)
+                    .frame(width: 24, height: 24)
+                    .padding(3)
+                    .shadow(color: .black.opacity(0.20), radius: 3, x: 0, y: 1)
+            }
+            .frame(width: 52, height: 30)
+            .contentShape(Capsule())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("悬浮窗")
+        .accessibilityValue(configuration.isOn ? "已打开" : "已关闭")
+    }
+}
+
+struct StudyWindowView: View {
+    @ObservedObject var store: TaskStore
+    @ObservedObject var widgetVisibility: WidgetVisibilityController
+    @State private var selectedCategory: StudyCategory = .plan
+    @State private var planWorkspaceMode: PlanWorkspaceMode = .manual
+    @State private var planText: String
+    @State private var scheduleBlocks: [ScheduleBlock]
+    @State private var isGeneratingSchedule = false
+    @State private var scheduleStatus = "本地规则预览"
+    @State private var aiPlanPrompt = ""
+    @State private var aiPlanDraft = ""
+    @State private var aiPlanStatus = "填写备考情况后，AI 会生成一份可保存、可同步的 CET-6 计划。"
+    @State private var isRevisingPlan = false
+    @State private var quickTaskTitle = ""
+    @State private var wordSearch = ""
+    @State private var newWordText = ""
+    @State private var wordBankStatus = "回车即可加入单词本"
+    @State private var isCompletingWord = false
+    @State private var customWords: [VocabularyWord]
+    @State private var favoriteWordIDs: Set<String> = []
+    @State private var deletedWordIDs: Set<String>
+    @State private var revealedDeleteWordID: String?
+    @State private var translationInput = ""
+    @State private var translationStatus = "输入中文句子生成多个六级译法；输入英文句子生成润色版本"
+    @State private var isGeneratingTranslation = false
+    @State private var translationRecords: [TranslationPracticeRecord]
+    @State private var revealedDeleteTranslationID: UUID?
+    @State private var writingPrompt = ""
+    @State private var writingStatus = "输入主题、句子或六级写作原题，生成 150-200 词范文和注释"
+    @State private var isGeneratingWriting = false
+    @State private var writingRecords: [WritingPracticeRecord]
+    @State private var revealedDeleteWritingID: UUID?
+    @State private var collapsedWritingRecordIDs: Set<UUID> = []
+    @State private var selectedWritingRecordID: UUID?
+    @State private var selectedEssayText = ""
+    @State private var selectedEssayTranslation = ""
+    @State private var translatingSelectionFor = ""
+    @State private var essaySelectionTranslationTask: Task<Void, Never>?
+    @State private var reviewIndex = 0
+    @State private var showsCardBack = false
+    @State private var reviewMode: WordReviewMode = .all
+    @State private var rootSearch = ""
+    @State private var mistakeSearch = ""
+    @State private var mistakeMode: MistakeMode = .favorites
+
+    init(store: TaskStore, widgetVisibility: WidgetVisibilityController = WidgetVisibilityController()) {
+        self.store = store
+        self.widgetVisibility = widgetVisibility
+        let plan = PlanStore.load() ?? Self.defaultPlanText
+        _planText = State(initialValue: plan)
+        _scheduleBlocks = State(initialValue: Self.generateSchedule(from: plan))
+        _customWords = State(initialValue: Self.loadCustomWords())
+        _favoriteWordIDs = State(initialValue: Self.loadFavoriteWordIDs())
+        _deletedWordIDs = State(initialValue: Self.loadDeletedWordIDs())
+        _translationRecords = State(initialValue: Self.loadTranslationRecords())
+        _writingRecords = State(initialValue: Self.loadWritingRecords())
+    }
+
+    var body: some View {
+        HStack(spacing: 0) {
+            sidebar
+                .frame(width: 236)
+
+            Rectangle()
+                .fill(StudyTheme.hairline)
+                .frame(width: 1)
+
+            detailPane
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+        }
+        .frame(minWidth: 900, minHeight: 560)
+        .background(shellBackground)
+        .foregroundStyle(StudyTheme.ink)
+        .preferredColorScheme(.light)
+        .onChange(of: planText) { _, newValue in
+            guard !isGeneratingSchedule else { return }
+            scheduleBlocks = Self.generateSchedule(from: newValue)
+            scheduleStatus = "本地规则预览"
+        }
+        .onChange(of: customWords) { _, newValue in
+            Self.saveCustomWords(newValue)
+        }
+        .onChange(of: favoriteWordIDs) { _, newValue in
+            Self.saveFavoriteWordIDs(newValue)
+        }
+        .onChange(of: deletedWordIDs) { _, newValue in
+            Self.saveDeletedWordIDs(newValue)
+        }
+        .onChange(of: translationRecords) { _, newValue in
+            Self.saveTranslationRecords(newValue)
+        }
+        .onChange(of: writingRecords) { _, newValue in
+            Self.saveWritingRecords(newValue)
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .dailyVocabularyDidImport)) { _ in
+            customWords = Self.loadCustomWords()
+            wordBankStatus = "已自动导入今日 20 个词"
+            reviewIndex = 0
+            showsCardBack = false
+        }
+    }
+
+    private var sidebar: some View {
+        VStack(alignment: .leading, spacing: 18) {
+            VStack(alignment: .leading, spacing: 6) {
+                HStack(alignment: .center, spacing: 12) {
+                    Text("CET-6")
+                        .font(.system(size: 30, weight: .bold, design: .serif))
+                    Spacer(minLength: 0)
+                    Toggle(isOn: $widgetVisibility.isVisible) {}
+                        .labelsHidden()
+                        .toggleStyle(FloatingWindowSwitchStyle())
+                        .help(widgetVisibility.isVisible ? "关闭悬浮窗" : "打开悬浮窗")
+                }
+                Text("计划 · 词汇 · 复习")
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundStyle(StudyTheme.secondaryInk)
+            }
+            .padding(.top, 26)
+            .padding(.horizontal, 22)
+
+            ScrollView {
+                VStack(spacing: 7) {
+                    ForEach(StudyCategory.allCases) { category in
+                        sidebarButton(for: category)
+                    }
+                }
+                .padding(.horizontal, 12)
+            }
+
+            Spacer()
+
+            progressSummary
+                .padding(.horizontal, 16)
+                .padding(.bottom, 18)
+        }
+        .background {
+            ZStack {
+                Rectangle().fill(.regularMaterial)
+                StudyTheme.sidebarBase
+            }
+        }
+    }
+
+    private var detailPane: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            HStack(alignment: .center) {
+                VStack(alignment: .leading, spacing: 5) {
+                    Text(selectedCategory.title)
+                        .font(.system(size: 28, weight: .bold, design: .rounded))
+                    Text(selectedCategory.subtitle)
+                        .font(.system(size: 13, weight: .medium))
+                        .foregroundStyle(StudyTheme.secondaryInk)
+                }
+                Spacer()
+                statusPill
+            }
+            .padding(.horizontal, 28)
+            .padding(.top, 24)
+            .padding(.bottom, 18)
+
+            Group {
+                switch selectedCategory {
+                case .plan:
+                    combinedPlanWorkspace
+                case .today:
+                    todayWorkspace
+                case .words:
+                    wordBankWorkspace
+                case .translation:
+                    translationWorkspace
+                case .writing:
+                    writingWorkspace
+                case .roots:
+                    rootsWorkspace
+                case .flashcards:
+                    flashcardWorkspace
+                case .mistakes:
+                    mistakeWorkspace
+                }
+            }
+            .padding(.horizontal, 28)
+            .padding(.bottom, 28)
+        }
+    }
+
+    private var shellBackground: some View {
+        ZStack {
+            StudyTheme.windowBase
+            Color.white.opacity(0.22)
+            LinearGradient(
+                colors: [
+                    selectedCategory.tint.opacity(0.08),
+                    Color.white.opacity(0.06)
+                ],
+                startPoint: .topTrailing,
+                endPoint: .center
+            )
+        }
+    }
+
+    private var progressSummary: some View {
+        let total = max(store.todayTasks.count, 1)
+        let done = store.todayTasks.filter(\.isDone).count
+
+        return VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                Text("今日完成")
+                    .font(.system(size: 13, weight: .semibold))
+                Spacer()
+                Text("\(done)/\(store.todayTasks.count)")
+                    .font(.system(size: 13, weight: .bold))
+                    .foregroundStyle(StudyTheme.secondaryInk)
+            }
+
+            GeometryReader { proxy in
+                ZStack(alignment: .leading) {
+                    Capsule().fill(Color.black.opacity(0.12))
+                    Capsule()
+                        .fill(Color(red: 0.10, green: 0.55, blue: 0.48))
+                        .frame(width: proxy.size.width * CGFloat(done) / CGFloat(total))
+                }
+            }
+            .frame(height: 7)
+        }
+        .padding(13)
+        .background(StudyTheme.panelBase)
+        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+        .overlay {
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                .stroke(StudyTheme.hairline, lineWidth: 1)
+        }
+    }
+
+    private var statusPill: some View {
+        HStack(spacing: 8) {
+            Circle()
+                .fill(selectedCategory.tint)
+                .frame(width: 8, height: 8)
+            Text(DateKey.today())
+                .font(.system(size: 13, weight: .semibold))
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 8)
+        .foregroundStyle(StudyTheme.ink)
+        .background(StudyTheme.panelStrong)
+        .clipShape(Capsule())
+        .overlay {
+            Capsule().stroke(StudyTheme.hairline, lineWidth: 1)
+        }
+    }
+
+    private func sidebarButton(for category: StudyCategory) -> some View {
+        let isSelected = selectedCategory == category
+
+        return Button {
+            selectedCategory = category
+        } label: {
+            HStack(spacing: 12) {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 7, style: .continuous)
+                        .fill(isSelected ? category.tint : Color.white.opacity(0.68))
+                        .frame(width: 40, height: 40)
+                    Image(systemName: category.icon)
+                        .font(.system(size: 17, weight: .bold))
+                        .foregroundStyle(isSelected ? .white : category.tint.opacity(0.94))
+                }
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(category.title)
+                        .font(.system(size: 15, weight: .bold))
+                        .foregroundStyle(isSelected ? StudyTheme.ink : StudyTheme.sidebarInk)
+                    Text(category.subtitle)
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundStyle(isSelected ? StudyTheme.secondaryInk : StudyTheme.sidebarInk.opacity(0.74))
+                }
+
+                Spacer(minLength: 0)
+            }
+            .frame(maxWidth: .infinity, minHeight: 58, alignment: .leading)
+            .padding(.horizontal, 12)
+            .background(isSelected ? StudyTheme.panelStrong : Color.white.opacity(0.001))
+            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+            .contentShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+            .overlay {
+                if isSelected {
+                    RoundedRectangle(cornerRadius: 8, style: .continuous)
+                        .stroke(StudyTheme.hairline, lineWidth: 1)
+                }
+            }
+            .overlay(alignment: .trailing) {
+                if isSelected {
+                    RoundedRectangle(cornerRadius: 2, style: .continuous)
+                        .fill(category.tint)
+                        .frame(width: 4, height: 26)
+                        .padding(.trailing, 1)
+                }
+            }
+        }
+        .buttonStyle(.plain)
+    }
+
+    private var combinedPlanWorkspace: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            HStack {
+                Picker("计划模式", selection: $planWorkspaceMode) {
+                    ForEach(PlanWorkspaceMode.allCases) { mode in
+                        Text(mode.title).tag(mode)
+                    }
+                }
+                .pickerStyle(.segmented)
+                .labelsHidden()
+                .frame(width: 260)
+
+                Spacer()
+            }
+
+            Group {
+                switch planWorkspaceMode {
+                case .manual:
+                    planWorkspace
+                case .ai:
+                    aiPlanWorkspace
+                }
+            }
+        }
+    }
+
+    private var planWorkspace: some View {
+        HStack(alignment: .top, spacing: 18) {
+            VStack(alignment: .leading, spacing: 12) {
+                HStack {
+                    Text("计划书原文")
+                        .font(.system(size: 16, weight: .bold))
+                        .foregroundStyle(StudyTheme.ink)
+                    Spacer()
+                    Button {
+                        pastePlanFromPasteboard()
+                    } label: {
+                        Label("粘贴", systemImage: "doc.on.clipboard")
+                    }
+                    .buttonStyle(.bordered)
+
+                    Button {
+                        savePlan()
+                    } label: {
+                        Label("保存计划书", systemImage: "square.and.arrow.down")
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .tint(StudyCategory.plan.tint)
+                }
+                TextEditor(text: $planText)
+                    .font(.system(size: 14, weight: .regular, design: .serif))
+                    .foregroundStyle(StudyTheme.ink)
+                    .scrollContentBackground(.hidden)
+                    .padding(12)
+                    .background(StudyTheme.panelStrong)
+                    .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 8, style: .continuous)
+                            .stroke(StudyTheme.hairline, lineWidth: 1)
+                    }
+            }
+            .frame(width: 360)
+
+            VStack(alignment: .leading, spacing: 12) {
+                HStack {
+                    VStack(alignment: .leading, spacing: 3) {
+                        Text("生成日程")
+                            .font(.system(size: 16, weight: .bold))
+                            .foregroundStyle(StudyTheme.ink)
+                        Text(scheduleStatus)
+                            .font(.system(size: 12, weight: .semibold))
+                            .foregroundStyle(StudyTheme.secondaryInk)
+                    }
+                    Spacer()
+                    Button {
+                        generateScheduleWithAI()
+                    } label: {
+                        Label(isGeneratingSchedule ? "拆解中" : "AI 拆解", systemImage: isGeneratingSchedule ? "hourglass" : "sparkles")
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .tint(StudyCategory.plan.tint)
+                    .disabled(isGeneratingSchedule)
+
+                    Button {
+                        copyScheduleToPasteboard()
+                    } label: {
+                        Label("复制", systemImage: "doc.on.doc")
+                    }
+                    .buttonStyle(.bordered)
+
+                    Button {
+                        syncPlanTasks()
+                    } label: {
+                        Label("同步到任务库", systemImage: "arrow.triangle.2.circlepath")
+                    }
+                    .buttonStyle(.borderless)
+                    .foregroundStyle(StudyCategory.plan.tint)
+                }
+
+                ScrollView {
+                    LazyVStack(spacing: 10) {
+                        ForEach(scheduleBlocks) { block in
+                            scheduleCard(block)
+                        }
+                    }
+                    .padding(.vertical, 2)
+                }
+            }
+        }
+    }
+
+    private func copyScheduleToPasteboard() {
+        let text = scheduleBlocks
+            .map { block in
+                "\(block.dateLabel) \(block.timeLabel) \(block.title)（\(block.category)）\n\(block.note)"
+            }
+            .joined(separator: "\n\n")
+
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(text, forType: .string)
+        scheduleStatus = "已复制 \(scheduleBlocks.count) 项日程"
+    }
+
+    private func pastePlanFromPasteboard() {
+        guard let text = NSPasteboard.general.string(forType: .string), !text.isEmpty else {
+            scheduleStatus = "剪贴板里没有可粘贴的文本"
+            return
+        }
+
+        planText = text
+        scheduleBlocks = Self.generateSchedule(from: text)
+        scheduleStatus = "已粘贴计划书，本地规则预览"
+    }
+
+    private func syncPlanTasks() {
+        store.syncPlanTasks(scheduleBlocks)
+        let todayCount = scheduleBlocks.filter { $0.dateKey == DateKey.today() }.count
+        scheduleStatus = "已同步到任务库，今天 \(todayCount) 项"
+    }
+
+    private func savePlan() {
+        do {
+            try PlanStore.save(planText)
+            scheduleBlocks = Self.generateSchedule(from: planText)
+            store.syncPlanTasks(scheduleBlocks)
+            let todayCount = scheduleBlocks.filter { $0.dateKey == DateKey.today() }.count
+            scheduleStatus = "计划书已保存并同步，今天 \(todayCount) 项"
+        } catch {
+            scheduleStatus = "保存失败：\(error.localizedDescription)"
+        }
+    }
+
+    private func generateScheduleWithAI() {
+        let trimmedPlan = planText.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedPlan.isEmpty else {
+            scheduleStatus = "请先输入计划书"
+            return
+        }
+
+        isGeneratingSchedule = true
+        scheduleStatus = "正在调用 DeepSeek 拆解..."
+
+        Task {
+            do {
+                let service = try DeepSeekPlanService()
+                let generatedSchedule = try await service.generateSchedule(from: trimmedPlan)
+
+                await MainActor.run {
+                    scheduleBlocks = generatedSchedule
+                    scheduleStatus = "DeepSeek 已生成 \(generatedSchedule.count) 项"
+                    isGeneratingSchedule = false
+                }
+            } catch {
+                let fallback = Self.generateSchedule(from: trimmedPlan)
+
+                await MainActor.run {
+                    scheduleBlocks = fallback
+                    scheduleStatus = "AI 拆解失败，已回退本地规则：\(error.localizedDescription)"
+                    isGeneratingSchedule = false
+                }
+            }
+        }
+    }
+
+    private func scheduleCard(_ block: ScheduleBlock) -> some View {
+        let task = store.task(for: block)
+        let isDone = task?.isDone ?? false
+
+        return HStack(alignment: .top, spacing: 13) {
+            Button {
+                store.toggleDone(for: block)
+                scheduleStatus = isDone ? "已标记为未完成" : "已标记完成"
+            } label: {
+                Image(systemName: isDone ? "checkmark.circle.fill" : "circle")
+                    .font(.system(size: 22, weight: .semibold))
+                    .foregroundStyle(isDone ? StudyCategory.today.tint : StudyTheme.mutedInk)
+                    .frame(width: 28, height: 28)
+            }
+            .buttonStyle(.plain)
+            .help(isDone ? "标记为未完成" : "标记完成")
+
+            VStack {
+                Text(block.dateLabel)
+                    .font(.system(size: 12, weight: .bold))
+                    .foregroundStyle(.white)
+                    .frame(width: 104, height: 28)
+                    .background(StudyCategory.plan.tint)
+                    .clipShape(RoundedRectangle(cornerRadius: 7, style: .continuous))
+            }
+
+            VStack(alignment: .leading, spacing: 5) {
+                HStack {
+                    Text(block.title)
+                        .font(.system(size: 15, weight: .bold))
+                        .foregroundStyle(isDone ? StudyTheme.mutedInk : StudyTheme.ink)
+                        .strikethrough(isDone)
+                    Spacer()
+                    Text(block.category)
+                        .font(.system(size: 11, weight: .bold))
+                        .foregroundStyle(StudyCategory.plan.tint)
+                }
+                Text(block.note)
+                    .font(.system(size: 13))
+                    .foregroundStyle(StudyTheme.secondaryInk)
+                    .strikethrough(isDone)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .padding(13)
+        .background(StudyTheme.panelStrong)
+        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+        .overlay {
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                .stroke(StudyTheme.hairline, lineWidth: 1)
+        }
+    }
+
+    private var aiPlanWorkspace: some View {
+        HStack(alignment: .top, spacing: 18) {
+            VStack(alignment: .leading, spacing: 12) {
+                VStack(alignment: .leading, spacing: 5) {
+                    Text("告诉 AI 你的备考情况")
+                        .font(.system(size: 16, weight: .bold))
+                        .foregroundStyle(StudyTheme.ink)
+                    Text("例如：距离考试 18 天，每天 2 小时，听力弱，词汇每天 40 个，周末能多学。")
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundStyle(StudyTheme.secondaryInk)
+                }
+
+                TextEditor(text: $aiPlanPrompt)
+                    .font(.system(size: 14, weight: .regular))
+                    .foregroundStyle(StudyTheme.ink)
+                    .scrollContentBackground(.hidden)
+                    .frame(minHeight: 230)
+                    .padding(10)
+                    .background(StudyTheme.panelStrong)
+                    .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 8, style: .continuous)
+                            .stroke(StudyTheme.hairline, lineWidth: 1)
+                    }
+
+                HStack {
+                    Text(aiPlanStatus)
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundStyle(StudyTheme.secondaryInk)
+                    Spacer()
+                    Button {
+                        generateAIStudyPlan()
+                    } label: {
+                        Label(isRevisingPlan ? "定制中" : "AI 定计划", systemImage: isRevisingPlan ? "hourglass" : "sparkles")
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .tint(StudyCategory.plan.tint)
+                    .disabled(isRevisingPlan)
+                }
+            }
+            .frame(width: 360)
+
+            VStack(alignment: .leading, spacing: 12) {
+                HStack {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("AI 计划预览")
+                            .font(.system(size: 16, weight: .bold))
+                            .foregroundStyle(StudyTheme.ink)
+                        Text(aiPlanDraft.isEmpty ? "生成后会在这里显示完整计划和日程拆分。" : "\(Self.generateSchedule(from: aiPlanDraft).count) 项可同步日程")
+                            .font(.system(size: 12, weight: .semibold))
+                            .foregroundStyle(StudyTheme.secondaryInk)
+                    }
+                    Spacer()
+                    Button {
+                        saveAIPlanDraft()
+                    } label: {
+                        Label("保存到计划书", systemImage: "square.and.arrow.down")
+                    }
+                    .buttonStyle(.bordered)
+                    .disabled(aiPlanDraft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+
+                    Button {
+                        syncAIPlanDraft()
+                    } label: {
+                        Label("同步任务", systemImage: "arrow.triangle.2.circlepath")
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .tint(StudyCategory.plan.tint)
+                    .disabled(aiPlanDraft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                }
+
+                if aiPlanDraft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                    emptyPanel("还没有 AI 计划", hint: "在左侧写清楚考试时间、每天可用时间、薄弱项和偏好，点击“AI 定计划”。")
+                } else {
+                    ScrollView {
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text(aiPlanDraft)
+                                .font(.system(size: 13, weight: .regular, design: .serif))
+                                .foregroundStyle(StudyTheme.ink)
+                                .textSelection(.enabled)
+                                .padding(12)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .background(StudyTheme.panelStrong)
+                                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+
+                            ForEach(Self.generateSchedule(from: aiPlanDraft)) { block in
+                                scheduleCard(block)
+                            }
+                        }
+                    }
+                }
+            }
+            .frame(maxWidth: .infinity)
+        }
+    }
+
+    private func aiPlanBubble(_ message: PlanChatMessage) -> some View {
+        Text(message.text)
+            .font(.system(size: 14, weight: .medium))
+            .foregroundStyle(StudyTheme.ink)
+            .padding(.horizontal, 14)
+            .padding(.vertical, 11)
+            .background(StudyTheme.panelStrong)
+            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+            .overlay {
+                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                    .stroke(StudyTheme.hairline, lineWidth: 1)
+            }
+            .textSelection(.enabled)
+    }
+
+    private func generateAIStudyPlan() {
+        let request = aiPlanPrompt.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !request.isEmpty else {
+            aiPlanStatus = "请先输入你的备考情况。"
+            return
+        }
+
+        isRevisingPlan = true
+        aiPlanStatus = "AI 正在定制计划..."
+
+        Task {
+            do {
+                let service = try DeepSeekPlanService()
+                let generated = try await service.createStudyPlan(userProfile: request)
+
+                await MainActor.run {
+                    aiPlanDraft = generated.planText
+                    scheduleBlocks = Self.generateSchedule(from: generated.planText)
+                    scheduleStatus = "AI 已生成计划，待保存或同步"
+                    aiPlanStatus = generated.reply
+                    isRevisingPlan = false
+                }
+            } catch {
+                await MainActor.run {
+                    aiPlanStatus = "定计划失败：\(error.localizedDescription)"
+                    isRevisingPlan = false
+                }
+            }
+        }
+    }
+
+    private func saveAIPlanDraft() {
+        let draft = aiPlanDraft.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !draft.isEmpty else { return }
+
+        do {
+            try PlanStore.save(draft)
+            planText = draft
+            scheduleBlocks = Self.generateSchedule(from: draft)
+            aiPlanStatus = "AI 计划已保存到“计划书”。"
+        } catch {
+            aiPlanStatus = "保存失败：\(error.localizedDescription)"
+        }
+    }
+
+    private func syncAIPlanDraft() {
+        let draft = aiPlanDraft.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !draft.isEmpty else { return }
+
+        planText = draft
+        scheduleBlocks = Self.generateSchedule(from: draft)
+        store.syncPlanTasks(scheduleBlocks)
+        aiPlanStatus = "已同步 \(scheduleBlocks.count) 项任务到任务库。"
+    }
+
+    private func sendPlanRevisionRequest() {
+        generateAIStudyPlan()
+    }
+
+    private var todayWorkspace: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            HStack(spacing: 10) {
+                TextField("添加今日任务", text: $quickTaskTitle)
+                    .textFieldStyle(.plain)
+                    .font(.system(size: 15))
+                    .foregroundStyle(StudyTheme.ink)
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 10)
+                    .background(StudyTheme.panelStrong)
+                    .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 8, style: .continuous)
+                            .stroke(StudyTheme.hairline, lineWidth: 1)
+                    }
+                    .onSubmit(addQuickTask)
+
+                Button(action: addQuickTask) {
+                    Label("添加", systemImage: "plus")
+                        .padding(.horizontal, 6)
+                }
+                .buttonStyle(.borderedProminent)
+                .tint(StudyCategory.today.tint)
+            }
+
+            ScrollView {
+                if store.todayTasks.isEmpty {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("今天还没有同步到任务库的计划。")
+                            .font(.system(size: 15, weight: .bold))
+                            .foregroundStyle(StudyTheme.ink)
+                        Text("如果计划书里有今天的日期，请回到“计划书”页点“同步到任务库”。")
+                            .font(.system(size: 13, weight: .semibold))
+                            .foregroundStyle(StudyTheme.secondaryInk)
+                    }
+                    .padding(16)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(StudyTheme.panelStrong)
+                    .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 8, style: .continuous)
+                            .stroke(StudyTheme.hairline, lineWidth: 1)
+                    }
+                } else {
+                    LazyVStack(spacing: 9) {
+                        ForEach(store.todayTasks) { task in
+                            Button {
+                                store.toggleDone(task)
+                            } label: {
+                                HStack(spacing: 12) {
+                                    Image(systemName: task.isDone ? "checkmark.circle.fill" : "circle")
+                                        .font(.system(size: 18, weight: .semibold))
+                                        .foregroundStyle(task.isDone ? StudyCategory.today.tint : StudyTheme.mutedInk)
+                                    Text(task.title)
+                                        .font(.system(size: 15, weight: .medium))
+                                        .strikethrough(task.isDone)
+                                        .foregroundStyle(task.isDone ? StudyTheme.mutedInk : StudyTheme.ink)
+                                    Spacer()
+                                }
+                                .padding(13)
+                                .background(StudyTheme.panelStrong)
+                                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                                .overlay {
+                                    RoundedRectangle(cornerRadius: 8, style: .continuous)
+                                        .stroke(StudyTheme.hairline, lineWidth: 1)
+                                }
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private var wordBankWorkspace: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            HStack(spacing: 10) {
+                TextField("输入新单词，回车加入单词本", text: $newWordText)
+                    .textFieldStyle(.plain)
+                    .font(.system(size: 15))
+                    .foregroundStyle(StudyTheme.ink)
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 10)
+                    .background(StudyTheme.panelStrong)
+                    .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 8, style: .continuous)
+                            .stroke(StudyTheme.hairline, lineWidth: 1)
+                    }
+                    .onSubmit(addCustomWord)
+
+                Button(action: addCustomWord) {
+                    Label(isCompletingWord ? "补全中" : "加入", systemImage: isCompletingWord ? "hourglass" : "plus")
+                        .padding(.horizontal, 6)
+                }
+                .buttonStyle(.borderedProminent)
+                .tint(StudyCategory.words.tint)
+                .disabled(isCompletingWord)
+            }
+
+            HStack(spacing: 10) {
+                TextField("搜索单词、释义或标签", text: $wordSearch)
+                    .textFieldStyle(.plain)
+                    .font(.system(size: 15))
+                    .foregroundStyle(StudyTheme.ink)
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 10)
+                    .background(StudyTheme.panelStrong)
+                    .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 8, style: .continuous)
+                            .stroke(StudyTheme.hairline, lineWidth: 1)
+                    }
+                Text("\(filteredWords.count) 词")
+                    .font(.system(size: 13, weight: .bold))
+                    .foregroundStyle(StudyTheme.secondaryInk)
+            }
+
+            Text(wordBankStatus)
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundStyle(StudyTheme.secondaryInk)
+
+            ScrollView {
+                if filteredWords.isEmpty {
+                    emptyPanel("没有匹配的单词")
+                } else {
+                    LazyVStack(spacing: 10) {
+                        ForEach(filteredWords) { word in
+                            wordRow(word)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private func wordRow(_ word: VocabularyWord) -> some View {
+        let isRevealed = revealedDeleteWordID == word.id
+
+        return HStack(spacing: 8) {
+            HStack(alignment: .top, spacing: 14) {
+                VStack(alignment: .leading, spacing: 5) {
+                    HStack(spacing: 8) {
+                        Text(word.word)
+                            .font(.system(size: 20, weight: .bold, design: .serif))
+                            .foregroundStyle(StudyTheme.ink)
+                        if !word.phonetic.isEmpty {
+                            Text(word.phonetic)
+                                .font(.system(size: 12, weight: .semibold))
+                                .foregroundStyle(StudyTheme.secondaryInk)
+                        }
+                        Text(word.partOfSpeech)
+                            .font(.system(size: 11, weight: .bold))
+                            .foregroundStyle(StudyTheme.secondaryInk)
+                        Text(word.tag)
+                            .font(.system(size: 11, weight: .bold))
+                            .foregroundStyle(StudyCategory.words.tint)
+                    }
+
+                    Text(word.meaning)
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundStyle(StudyTheme.ink)
+                    if !word.phrases.isEmpty {
+                        Text(word.phrases.joined(separator: " · "))
+                            .font(.system(size: 12, weight: .semibold))
+                            .foregroundStyle(StudyCategory.words.tint)
+                    }
+                    Text(word.example)
+                        .font(.system(size: 13, design: .serif))
+                        .foregroundStyle(StudyTheme.secondaryInk)
+                    if !word.mnemonic.isEmpty {
+                        Text(word.mnemonic)
+                            .font(.system(size: 12))
+                            .foregroundStyle(StudyTheme.secondaryInk)
+                    }
+                }
+
+                Spacer()
+
+                Button {
+                    toggleFavorite(word)
+                } label: {
+                    Image(systemName: favoriteWordIDs.contains(word.id) ? "bookmark.fill" : "bookmark")
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundStyle(StudyCategory.words.tint)
+                        .frame(width: 32, height: 32)
+                }
+                .buttonStyle(.plain)
+                .help(favoriteWordIDs.contains(word.id) ? "从错词收藏移除" : "加入错词收藏")
+            }
+            .padding(14)
+            .frame(maxWidth: .infinity, minHeight: 86, alignment: .leading)
+            .background(StudyTheme.panelStrong)
+            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+            .overlay {
+                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                    .stroke(StudyTheme.hairline, lineWidth: 1)
+            }
+            .contentShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+            .gesture(
+                DragGesture(minimumDistance: 12)
+                    .onEnded { value in
+                        withAnimation(.spring(response: 0.24, dampingFraction: 0.86)) {
+                            if value.translation.width < -28 {
+                                revealedDeleteWordID = word.id
+                            } else if value.translation.width > 20 {
+                                revealedDeleteWordID = nil
+                            }
+                        }
+                    }
+            )
+            .onTapGesture {
+                if isRevealed {
+                    withAnimation(.spring(response: 0.22, dampingFraction: 0.9)) {
+                        revealedDeleteWordID = nil
+                    }
+                }
+            }
+
+            if isRevealed {
+                Button(role: .destructive) {
+                    deleteWord(word)
+                } label: {
+                    VStack(spacing: 4) {
+                        Image(systemName: "trash")
+                            .font(.system(size: 15, weight: .bold))
+                        Text("删除")
+                            .font(.system(size: 12, weight: .bold))
+                    }
+                    .foregroundStyle(.white)
+                    .frame(width: 78)
+                    .frame(minHeight: 86)
+                    .background(Color.red.opacity(0.88))
+                    .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                }
+                .buttonStyle(.plain)
+                .transition(.move(edge: .trailing).combined(with: .opacity))
+            }
+        }
+        .animation(.spring(response: 0.24, dampingFraction: 0.86), value: isRevealed)
+        .frame(maxWidth: .infinity, minHeight: 86, alignment: .leading)
+        .contentShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+        .contextMenu {
+            Button(role: .destructive) {
+                deleteWord(word)
+            } label: {
+                Label("删除", systemImage: "trash")
+            }
+        }
+        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+    }
+
+    private var translationWorkspace: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            VStack(alignment: .leading, spacing: 10) {
+                TextField("输入一句中文回车生成译法；输入一句英文回车润色", text: $translationInput)
+                    .textFieldStyle(.plain)
+                    .font(.system(size: 15))
+                    .foregroundStyle(StudyTheme.ink)
+                    .frame(minHeight: 44)
+                    .padding(12)
+                    .background(StudyTheme.panelStrong)
+                    .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 8, style: .continuous)
+                            .stroke(StudyTheme.hairline, lineWidth: 1)
+                    }
+                    .onSubmit(generateTranslationPractice)
+
+                HStack {
+                    Text(translationStatus)
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundStyle(StudyTheme.secondaryInk)
+                    Spacer()
+                    Button {
+                        generateTranslationPractice()
+                    } label: {
+                        Label(isGeneratingTranslation ? "生成中" : "生成表达", systemImage: isGeneratingTranslation ? "hourglass" : "sparkles")
+                            .padding(.horizontal, 6)
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .tint(StudyCategory.translation.tint)
+                    .disabled(isGeneratingTranslation)
+                    .keyboardShortcut(.return, modifiers: [.command])
+                }
+            }
+
+            ScrollView {
+                if translationRecords.isEmpty {
+                    emptyPanel("还没有翻译或润色记录", hint: "输入一句中文或英文，回车后会自动保存训练记录。")
+                } else {
+                    LazyVStack(spacing: 10) {
+                        ForEach(translationRecords) { record in
+                            translationRecordRow(record)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private func translationRecordRow(_ record: TranslationPracticeRecord) -> some View {
+        let isRevealed = revealedDeleteTranslationID == record.id
+
+        return deletableRecordRow(
+            isRevealed: isRevealed,
+            reveal: { revealedDeleteTranslationID = record.id },
+            hide: { revealedDeleteTranslationID = nil },
+            delete: { deleteTranslationRecord(record) }
+        ) {
+            VStack(alignment: .leading, spacing: 10) {
+                HStack(alignment: .firstTextBaseline) {
+                    Text(record.title)
+                        .font(.system(size: 17, weight: .bold))
+                        .foregroundStyle(StudyTheme.ink)
+                    Text(record.mode)
+                        .font(.system(size: 11, weight: .bold))
+                        .foregroundStyle(StudyCategory.translation.tint)
+                    Spacer()
+                    Text(Self.displayDate(record.createdAt))
+                        .font(.system(size: 11, weight: .semibold))
+                        .foregroundStyle(StudyTheme.mutedInk)
+                }
+
+                Text("原句：\(record.input)")
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(StudyTheme.secondaryInk)
+
+                ForEach(record.versions) { version in
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(version.label)
+                            .font(.system(size: 12, weight: .bold))
+                            .foregroundStyle(StudyCategory.translation.tint)
+                        Text(version.text)
+                            .font(.system(size: 15, weight: .semibold, design: .serif))
+                            .foregroundStyle(StudyTheme.ink)
+                            .textSelection(.enabled)
+                        if !version.reason.isEmpty {
+                            Text(version.reason)
+                                .font(.system(size: 12))
+                                .foregroundStyle(StudyTheme.secondaryInk)
+                        }
+                    }
+                    .padding(10)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(Color.white.opacity(0.48))
+                    .clipShape(RoundedRectangle(cornerRadius: 7, style: .continuous))
+                }
+
+                if !record.notes.isEmpty {
+                    Text("提醒：" + record.notes.joined(separator: "；"))
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundStyle(StudyTheme.secondaryInk)
+                }
+            }
+            .padding(14)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(StudyTheme.panelStrong)
+            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+            .overlay {
+                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                    .stroke(StudyTheme.hairline, lineWidth: 1)
+            }
+        }
+    }
+
+    private var writingWorkspace: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            VStack(alignment: .leading, spacing: 10) {
+                TextField("输入作文主题、提示句或六级原题，回车生成范文", text: $writingPrompt)
+                    .textFieldStyle(.plain)
+                    .font(.system(size: 15))
+                    .foregroundStyle(StudyTheme.ink)
+                    .frame(minHeight: 44)
+                    .padding(12)
+                    .background(StudyTheme.panelStrong)
+                    .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 8, style: .continuous)
+                            .stroke(StudyTheme.hairline, lineWidth: 1)
+                    }
+                    .onSubmit(generateWritingPractice)
+
+                HStack {
+                    Text(writingStatus)
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundStyle(StudyTheme.secondaryInk)
+                    Spacer()
+                    Button {
+                        generateWritingPractice()
+                    } label: {
+                        Label(isGeneratingWriting ? "生成中" : "生成作文", systemImage: isGeneratingWriting ? "hourglass" : "doc.text")
+                            .padding(.horizontal, 6)
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .tint(StudyCategory.writing.tint)
+                    .disabled(isGeneratingWriting)
+                    .keyboardShortcut(.return, modifiers: [.command])
+                }
+            }
+
+            ScrollView {
+                if writingRecords.isEmpty {
+                    emptyPanel("还没有写作记录", hint: "输入主题、提示句或六级原题，回车后会自动保存作文和注释。")
+                } else {
+                    LazyVStack(spacing: 10) {
+                        ForEach(writingRecords) { record in
+                            writingRecordRow(record)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private func writingRecordRow(_ record: WritingPracticeRecord) -> some View {
+        let isRevealed = revealedDeleteWritingID == record.id
+        let isCollapsed = collapsedWritingRecordIDs.contains(record.id)
+
+        return deletableRecordRow(
+            isRevealed: isRevealed,
+            reveal: { revealedDeleteWritingID = record.id },
+            hide: { revealedDeleteWritingID = nil },
+            delete: { deleteWritingRecord(record) }
+        ) {
+            VStack(alignment: .leading, spacing: 10) {
+                HStack(alignment: .firstTextBaseline) {
+                    Text(record.title)
+                        .font(.system(size: 18, weight: .bold, design: .serif))
+                        .foregroundStyle(StudyTheme.ink)
+                    Text("\(record.wordCount) words")
+                        .font(.system(size: 11, weight: .bold))
+                        .foregroundStyle(StudyCategory.writing.tint)
+                    Spacer()
+                    Text(Self.displayDate(record.createdAt))
+                        .font(.system(size: 11, weight: .semibold))
+                        .foregroundStyle(StudyTheme.mutedInk)
+                    Button {
+                        toggleWritingRecordCollapse(record.id)
+                    } label: {
+                        Label(isCollapsed ? "展开" : "收起", systemImage: isCollapsed ? "chevron.down.circle" : "chevron.up.circle")
+                    }
+                    .font(.system(size: 12, weight: .bold))
+                    .buttonStyle(.borderless)
+                    .foregroundStyle(StudyCategory.writing.tint)
+                }
+
+                Text("题目：\(record.prompt)")
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(StudyTheme.secondaryInk)
+
+                if isCollapsed {
+                    Text(Self.essayPreview(record.essay))
+                        .font(.system(size: 13, weight: .medium, design: .serif))
+                        .foregroundStyle(StudyTheme.secondaryInk)
+                        .lineLimit(2)
+                } else {
+                    SelectableEssayTextView(text: record.essay) { selectedText in
+                        handleEssaySelection(recordID: record.id, selectedText: selectedText)
+                    }
+
+                    if selectedWritingRecordID == record.id, !selectedEssayText.isEmpty {
+                        essaySelectionPanel
+                    }
+
+                    if !record.usefulExpressions.isEmpty {
+                        Text("可迁移表达：" + record.usefulExpressions.joined(separator: " · "))
+                            .font(.system(size: 12, weight: .bold))
+                            .foregroundStyle(StudyCategory.writing.tint)
+                    }
+
+                    if !record.notes.isEmpty {
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text("注释")
+                                .font(.system(size: 13, weight: .bold))
+                                .foregroundStyle(StudyTheme.ink)
+                            ForEach(record.notes) { note in
+                                HStack(alignment: .top, spacing: 8) {
+                                    Text("• \(note.target)：\(note.explanation)")
+                                        .font(.system(size: 12))
+                                        .foregroundStyle(StudyTheme.secondaryInk)
+                                        .fixedSize(horizontal: false, vertical: true)
+                                    Spacer(minLength: 8)
+                                    if let word = Self.extractSingleEnglishWord(from: note.target) {
+                                        Button {
+                                            addWordToBook(word)
+                                        } label: {
+                                            Label("加入单词本", systemImage: "plus.circle")
+                                                .labelStyle(.titleAndIcon)
+                                        }
+                                        .font(.system(size: 11, weight: .bold))
+                                        .buttonStyle(.borderless)
+                                        .foregroundStyle(StudyCategory.writing.tint)
+                                    }
+                                }
+                            }
+                        }
+                        .padding(10)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .background(Color.white.opacity(0.48))
+                        .clipShape(RoundedRectangle(cornerRadius: 7, style: .continuous))
+                    }
+                }
+            }
+            .padding(14)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(StudyTheme.panelStrong)
+            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+            .overlay {
+                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                    .stroke(StudyTheme.hairline, lineWidth: 1)
+            }
+        }
+    }
+
+    private var essaySelectionPanel: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(alignment: .firstTextBaseline) {
+                Text("已选中")
+                    .font(.system(size: 12, weight: .bold))
+                    .foregroundStyle(StudyTheme.secondaryInk)
+                Text(selectedEssayText)
+                    .font(.system(size: 13, weight: .semibold, design: .serif))
+                    .lineLimit(2)
+                    .foregroundStyle(StudyTheme.ink)
+                Spacer()
+                if let word = Self.extractSingleEnglishWord(from: selectedEssayText) {
+                    Button {
+                        addWordToBook(word)
+                    } label: {
+                        Label("加入单词本", systemImage: "plus.circle")
+                    }
+                    .buttonStyle(.bordered)
+                    .tint(StudyCategory.writing.tint)
+                }
+            }
+
+            if translatingSelectionFor == selectedEssayText {
+                Label("正在翻译选中内容...", systemImage: "hourglass")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(StudyTheme.secondaryInk)
+            } else if !selectedEssayTranslation.isEmpty {
+                Text("翻译：\(selectedEssayTranslation)")
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(StudyTheme.secondaryInk)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .padding(10)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(StudyCategory.writing.tint.opacity(0.10))
+        .clipShape(RoundedRectangle(cornerRadius: 7, style: .continuous))
+        .overlay {
+            RoundedRectangle(cornerRadius: 7, style: .continuous)
+                .stroke(StudyCategory.writing.tint.opacity(0.25), lineWidth: 1)
+        }
+    }
+
+    private func deletableRecordRow<Content: View>(
+        isRevealed: Bool,
+        reveal: @escaping () -> Void,
+        hide: @escaping () -> Void,
+        delete: @escaping () -> Void,
+        @ViewBuilder content: () -> Content
+    ) -> some View {
+        HStack(spacing: 8) {
+            content()
+                .contentShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                .gesture(
+                    DragGesture(minimumDistance: 12)
+                        .onEnded { value in
+                            withAnimation(.spring(response: 0.24, dampingFraction: 0.86)) {
+                                if value.translation.width < -28 {
+                                    reveal()
+                                } else if value.translation.width > 20 {
+                                    hide()
+                                }
+                            }
+                        }
+                )
+                .onTapGesture {
+                    if isRevealed {
+                        withAnimation(.spring(response: 0.22, dampingFraction: 0.9)) {
+                            hide()
+                        }
+                    }
+                }
+
+            if isRevealed {
+                Button(role: .destructive) {
+                    delete()
+                } label: {
+                    VStack(spacing: 4) {
+                        Image(systemName: "trash")
+                            .font(.system(size: 15, weight: .bold))
+                        Text("删除")
+                            .font(.system(size: 12, weight: .bold))
+                    }
+                    .foregroundStyle(.white)
+                    .frame(width: 78)
+                    .frame(maxHeight: .infinity)
+                    .background(Color.red.opacity(0.88))
+                    .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                }
+                .buttonStyle(.plain)
+                .transition(.move(edge: .trailing).combined(with: .opacity))
+            }
+        }
+        .animation(.spring(response: 0.24, dampingFraction: 0.86), value: isRevealed)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .contextMenu {
+            Button(role: .destructive) {
+                delete()
+            } label: {
+                Label("删除", systemImage: "trash")
+            }
+        }
+        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+    }
+
+    private var rootsWorkspace: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            TextField("搜索词根、含义或例词", text: $rootSearch)
+                .textFieldStyle(.plain)
+                .font(.system(size: 15))
+                .foregroundStyle(StudyTheme.ink)
+                .padding(.horizontal, 14)
+                .padding(.vertical, 10)
+                .background(StudyTheme.panelStrong)
+                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                .overlay {
+                    RoundedRectangle(cornerRadius: 8, style: .continuous)
+                        .stroke(StudyTheme.hairline, lineWidth: 1)
+                }
+
+            ScrollView {
+                if filteredRoots.isEmpty {
+                    emptyPanel("没有匹配的词根词缀")
+                } else {
+                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 250), spacing: 12)], spacing: 12) {
+                        ForEach(filteredRoots) { root in
+                            rootCard(root)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private func rootCard(_ root: RootItem) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(alignment: .firstTextBaseline) {
+                Text(root.root)
+                    .font(.system(size: 22, weight: .bold, design: .serif))
+                    .foregroundStyle(StudyCategory.roots.tint)
+                Spacer()
+                Text(root.pattern)
+                    .font(.system(size: 11, weight: .bold))
+                    .foregroundStyle(StudyTheme.secondaryInk)
+            }
+
+            Text(root.meaning)
+                .font(.system(size: 14, weight: .semibold))
+                .foregroundStyle(StudyTheme.ink)
+            Text(root.examples)
+                .font(.system(size: 13))
+                .foregroundStyle(StudyTheme.secondaryInk)
+                .fixedSize(horizontal: false, vertical: true)
+            Text(root.cue)
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundStyle(StudyCategory.roots.tint)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(16)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(StudyTheme.panelStrong)
+        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+        .overlay {
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                .stroke(StudyTheme.hairline, lineWidth: 1)
+        }
+    }
+
+    private var flashcardWorkspace: some View {
+        let words = reviewWords
+
+        return AnyView(VStack(spacing: 18) {
+            Picker("复习范围", selection: $reviewMode) {
+                ForEach(WordReviewMode.allCases) { mode in
+                    Text(mode.title).tag(mode)
+                }
+            }
+            .pickerStyle(.segmented)
+            .frame(maxWidth: 360)
+
+            if words.isEmpty {
+                Spacer(minLength: 10)
+                emptyPanel("当前模式没有可复习的单词")
+                Spacer()
+            } else {
+                let word = words[reviewIndex % words.count]
+
+            Text("\(reviewIndex % words.count + 1) / \(words.count) · \(word.tag)")
+                .font(.system(size: 12, weight: .bold))
+                .foregroundStyle(StudyTheme.secondaryInk)
+
+            Spacer(minLength: 10)
+
+            Button {
+                withAnimation(.spring(response: 0.32, dampingFraction: 0.86)) {
+                    showsCardBack.toggle()
+                }
+            } label: {
+                VStack(spacing: 14) {
+                    Text(showsCardBack ? word.meaning : word.word)
+                        .font(.system(size: showsCardBack ? 28 : 50, weight: .bold, design: .serif))
+                        .foregroundStyle(StudyTheme.ink)
+                        .multilineTextAlignment(.center)
+                    Text(showsCardBack ? word.example : (frontCardMeta(for: word).isEmpty ? "点击翻面" : frontCardMeta(for: word)))
+                        .font(.system(size: 16, weight: .medium, design: .serif))
+                        .foregroundStyle(StudyTheme.secondaryInk)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, 26)
+                    if showsCardBack {
+                        if !word.trimmedExampleTranslation.isEmpty {
+                            Text(word.trimmedExampleTranslation)
+                                .font(.system(size: 13, weight: .semibold))
+                                .foregroundStyle(StudyTheme.secondaryInk)
+                                .multilineTextAlignment(.center)
+                                .padding(.horizontal, 26)
+                        }
+                        if !word.phrases.isEmpty {
+                            Text(word.phrases.joined(separator: " · "))
+                                .font(.system(size: 13, weight: .bold))
+                                .foregroundStyle(StudyCategory.flashcards.tint)
+                                .multilineTextAlignment(.center)
+                                .padding(.horizontal, 26)
+                        }
+                        if !word.phraseTranslationLine.isEmpty {
+                            Text(word.phraseTranslationLine)
+                                .font(.system(size: 12, weight: .semibold))
+                                .foregroundStyle(StudyTheme.secondaryInk)
+                                .multilineTextAlignment(.center)
+                                .padding(.horizontal, 26)
+                        }
+                        if !word.mnemonic.isEmpty {
+                            Text(word.mnemonic)
+                                .font(.system(size: 13))
+                                .foregroundStyle(StudyTheme.secondaryInk)
+                                .multilineTextAlignment(.center)
+                                .padding(.horizontal, 26)
+                        }
+                        Text("难度 \(word.difficulty)")
+                            .font(.system(size: 12, weight: .bold))
+                            .foregroundStyle(StudyCategory.flashcards.tint)
+                    }
+                }
+                .frame(maxWidth: 560, minHeight: 300)
+                .background(StudyTheme.panelStrong)
+                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                .overlay {
+                    RoundedRectangle(cornerRadius: 8, style: .continuous)
+                        .stroke(StudyTheme.hairline, lineWidth: 1)
+                }
+            }
+            .buttonStyle(.plain)
+
+            HStack(spacing: 12) {
+                Button {
+                    previousCard()
+                } label: {
+                    Label("上一个", systemImage: "chevron.left")
+                }
+                .buttonStyle(.bordered)
+
+                Button {
+                    markCardAsHard(word)
+                } label: {
+                    Label(favoriteWordIDs.contains(word.id) ? "已收藏" : "不熟收藏", systemImage: "bookmark")
+                }
+                .buttonStyle(.bordered)
+                .tint(StudyCategory.flashcards.tint)
+
+                Button {
+                    nextCard()
+                } label: {
+                    Label("认识", systemImage: "checkmark")
+                }
+                .buttonStyle(.bordered)
+
+                Button {
+                    nextCard()
+                } label: {
+                    Label("下一个", systemImage: "chevron.right")
+                }
+                .buttonStyle(.borderedProminent)
+                .tint(StudyCategory.flashcards.tint)
+            }
+
+            Spacer()
+            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .onChange(of: reviewMode) { _, _ in
+            reviewIndex = 0
+            showsCardBack = false
+        })
+    }
+
+    private var mistakeWorkspace: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            HStack(spacing: 12) {
+                Picker("错词范围", selection: $mistakeMode) {
+                    ForEach(MistakeMode.allCases) { mode in
+                        Text(mode.title).tag(mode)
+                    }
+                }
+                .pickerStyle(.segmented)
+                .frame(width: 230)
+
+                TextField("搜索错词", text: $mistakeSearch)
+                    .textFieldStyle(.plain)
+                    .font(.system(size: 15))
+                    .foregroundStyle(StudyTheme.ink)
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 10)
+                    .background(StudyTheme.panelStrong)
+                    .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 8, style: .continuous)
+                            .stroke(StudyTheme.hairline, lineWidth: 1)
+                    }
+            }
+
+            ScrollView {
+                if mistakeWords.isEmpty {
+                    emptyPanel(mistakeMode == .favorites ? "还没有收藏错词" : "没有匹配的高难词")
+                } else {
+                    LazyVStack(spacing: 10) {
+                        ForEach(mistakeWords) { word in
+                            mistakeRow(word)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private func mistakeRow(_ word: VocabularyWord) -> some View {
+        HStack(alignment: .top, spacing: 12) {
+            Image(systemName: favoriteWordIDs.contains(word.id) ? "bookmark.fill" : "exclamationmark.circle")
+                .font(.system(size: 17, weight: .semibold))
+                .foregroundStyle(StudyCategory.mistakes.tint)
+                .frame(width: 24, height: 24)
+
+            VStack(alignment: .leading, spacing: 5) {
+                HStack(spacing: 8) {
+                    Text(word.word)
+                        .font(.system(size: 18, weight: .bold, design: .serif))
+                        .foregroundStyle(StudyTheme.ink)
+                    Text(word.tag)
+                        .font(.system(size: 11, weight: .bold))
+                        .foregroundStyle(StudyCategory.mistakes.tint)
+                }
+                Text(word.meaning)
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundStyle(StudyTheme.ink)
+                Text(word.example)
+                    .font(.system(size: 13, design: .serif))
+                    .foregroundStyle(StudyTheme.secondaryInk)
+            }
+
+            Spacer()
+
+            VStack(alignment: .trailing, spacing: 8) {
+                Text("难度 \(word.difficulty)")
+                    .font(.system(size: 12, weight: .bold))
+                    .foregroundStyle(StudyTheme.secondaryInk)
+                Button {
+                    toggleFavorite(word)
+                } label: {
+                    Image(systemName: favoriteWordIDs.contains(word.id) ? "xmark.circle" : "plus.circle")
+                        .font(.system(size: 18, weight: .semibold))
+                        .foregroundStyle(StudyCategory.mistakes.tint)
+                }
+                .buttonStyle(.plain)
+                .help(favoriteWordIDs.contains(word.id) ? "移出错词收藏" : "加入错词收藏")
+            }
+        }
+        .padding(14)
+        .background(StudyTheme.panelStrong)
+        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+        .overlay {
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                .stroke(StudyTheme.hairline, lineWidth: 1)
+        }
+    }
+
+    private var filteredWords: [VocabularyWord] {
+        let query = wordSearch.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        guard !query.isEmpty else { return allWords }
+
+        return allWords.filter { word in
+            word.word.lowercased().contains(query)
+                || word.meaning.lowercased().contains(query)
+                || word.partOfSpeech.lowercased().contains(query)
+                || word.phrases.joined(separator: " ").lowercased().contains(query)
+                || word.mnemonic.lowercased().contains(query)
+                || word.tag.lowercased().contains(query)
+        }
+    }
+
+    private var allWords: [VocabularyWord] {
+        (customWords + Self.words).filter { !deletedWordIDs.contains($0.id) }
+    }
+
+    private var reviewWords: [VocabularyWord] {
+        switch reviewMode {
+        case .all:
+            return allWords
+        case .favorites:
+            return allWords.filter { favoriteWordIDs.contains($0.id) }
+        case .hard:
+            return allWords.filter { $0.difficulty >= 4 }
+        }
+    }
+
+    private var filteredRoots: [RootItem] {
+        let query = rootSearch.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        guard !query.isEmpty else { return Self.roots }
+
+        return Self.roots.filter { root in
+            root.root.lowercased().contains(query)
+                || root.meaning.lowercased().contains(query)
+                || root.pattern.lowercased().contains(query)
+                || root.examples.lowercased().contains(query)
+                || root.cue.lowercased().contains(query)
+        }
+    }
+
+    private var mistakeWords: [VocabularyWord] {
+        let source: [VocabularyWord]
+        switch mistakeMode {
+        case .favorites:
+            source = allWords.filter { favoriteWordIDs.contains($0.id) }
+        case .hard:
+            source = allWords.filter { $0.difficulty >= 4 }
+        }
+
+        let query = mistakeSearch.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        guard !query.isEmpty else { return source }
+
+        return source.filter { word in
+            word.word.lowercased().contains(query)
+                || word.meaning.lowercased().contains(query)
+                || word.partOfSpeech.lowercased().contains(query)
+                || word.phrases.joined(separator: " ").lowercased().contains(query)
+                || word.mnemonic.lowercased().contains(query)
+                || word.tag.lowercased().contains(query)
+        }
+    }
+
+    private func addQuickTask() {
+        store.addTaskForToday(quickTaskTitle)
+        quickTaskTitle = ""
+    }
+
+    private func addCustomWord() {
+        guard let newWord = Self.customWord(from: newWordText) else {
+            wordBankStatus = "请输入一个英文单词"
+            return
+        }
+
+        guard !allWords.contains(where: { $0.id == newWord.id || $0.word.caseInsensitiveCompare(newWord.word) == .orderedSame }) else {
+            wordBankStatus = "\(newWord.word) 已在单词本里"
+            newWordText = ""
+            return
+        }
+
+        isCompletingWord = true
+        wordSearch = ""
+        newWordText = ""
+        wordBankStatus = "正在用 API 补全 \(newWord.word)..."
+
+        Task {
+            do {
+                let service = try DeepSeekPlanService()
+                let result = try await service.completeVocabularyWord(newWord.word)
+                let completedWord = Self.customWord(from: result)
+
+                await MainActor.run {
+                    insertCustomWord(completedWord)
+                    wordBankStatus = "已补全并加入 \(completedWord.word)"
+                    isCompletingWord = false
+                }
+            } catch {
+                await MainActor.run {
+                    insertCustomWord(newWord)
+                    wordBankStatus = "API 补全失败，已先加入 \(newWord.word)：\(error.localizedDescription)"
+                    isCompletingWord = false
+                }
+            }
+        }
+    }
+
+    private func generateTranslationPractice() {
+        let input = translationInput.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !input.isEmpty else {
+            translationStatus = "请先输入一句中文或英文"
+            return
+        }
+
+        isGeneratingTranslation = true
+        translationStatus = "正在生成六级高分表达..."
+
+        Task {
+            do {
+                let service = try DeepSeekPlanService()
+                let result = try await service.generateTranslationPractice(for: input)
+
+                await MainActor.run {
+                    translationRecords.insert(TranslationPracticeRecord(result: result), at: 0)
+                    translationInput = ""
+                    translationStatus = "已保存 1 条\(result.mode)记录"
+                    isGeneratingTranslation = false
+                }
+            } catch {
+                await MainActor.run {
+                    translationStatus = "生成失败：\(error.localizedDescription)"
+                    isGeneratingTranslation = false
+                }
+            }
+        }
+    }
+
+    private func generateWritingPractice() {
+        let prompt = writingPrompt.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !prompt.isEmpty else {
+            writingStatus = "请先输入作文主题、句子或原题"
+            return
+        }
+
+        isGeneratingWriting = true
+        writingStatus = "正在生成 150-200 词六级范文..."
+
+        Task {
+            do {
+                let service = try DeepSeekPlanService()
+                let result = try await service.generateCET6Essay(for: prompt)
+
+                await MainActor.run {
+                    writingRecords.insert(WritingPracticeRecord(result: result), at: 0)
+                    writingPrompt = ""
+                    writingStatus = "已保存 1 篇作文，约 \(result.wordCount) 词"
+                    isGeneratingWriting = false
+                }
+            } catch {
+                await MainActor.run {
+                    writingStatus = "生成失败：\(error.localizedDescription)"
+                    isGeneratingWriting = false
+                }
+            }
+        }
+    }
+
+    private func handleEssaySelection(recordID: UUID, selectedText: String) {
+        let cleaned = Self.cleanedSelection(selectedText)
+        essaySelectionTranslationTask?.cancel()
+
+        guard !cleaned.isEmpty else {
+            selectedWritingRecordID = nil
+            selectedEssayText = ""
+            selectedEssayTranslation = ""
+            translatingSelectionFor = ""
+            return
+        }
+
+        selectedWritingRecordID = recordID
+        selectedEssayText = cleaned
+        selectedEssayTranslation = ""
+
+        translatingSelectionFor = cleaned
+        essaySelectionTranslationTask = Task {
+            do {
+                let service = try DeepSeekPlanService()
+                let translation = try await service.translateSelectionToChinese(cleaned)
+
+                await MainActor.run {
+                    guard selectedWritingRecordID == recordID, selectedEssayText == cleaned else { return }
+                    selectedEssayTranslation = translation
+                    translatingSelectionFor = ""
+                }
+            } catch {
+                await MainActor.run {
+                    guard selectedWritingRecordID == recordID, selectedEssayText == cleaned else { return }
+                    selectedEssayTranslation = "翻译失败：\(error.localizedDescription)"
+                    translatingSelectionFor = ""
+                }
+            }
+        }
+    }
+
+    private func addWordToBook(_ rawWord: String) {
+        guard let newWord = Self.customWord(from: rawWord) else {
+            writingStatus = "请选择一个英文单词"
+            return
+        }
+
+        guard !allWords.contains(where: { $0.id == newWord.id || $0.word.caseInsensitiveCompare(newWord.word) == .orderedSame }) else {
+            writingStatus = "\(newWord.word) 已在单词本里"
+            wordBankStatus = "\(newWord.word) 已在单词本里"
+            return
+        }
+
+        writingStatus = "正在加入单词本：\(newWord.word)..."
+
+        Task {
+            do {
+                let service = try DeepSeekPlanService()
+                let result = try await service.completeVocabularyWord(newWord.word)
+                let completedWord = Self.customWord(from: result)
+
+                await MainActor.run {
+                    insertCustomWord(completedWord)
+                    writingStatus = "已加入单词本：\(completedWord.word)"
+                    wordBankStatus = "已补全并加入 \(completedWord.word)"
+                }
+            } catch {
+                await MainActor.run {
+                    insertCustomWord(newWord)
+                    writingStatus = "已先加入单词本：\(newWord.word)"
+                    wordBankStatus = "API 补全失败，已先加入 \(newWord.word)：\(error.localizedDescription)"
+                }
+            }
+        }
+    }
+
+    private func insertCustomWord(_ word: VocabularyWord) {
+        guard !allWords.contains(where: { $0.id == word.id || $0.word.caseInsensitiveCompare(word.word) == .orderedSame }) else {
+            wordBankStatus = "\(word.word) 已在单词本里"
+            return
+        }
+
+        deletedWordIDs.remove(word.id)
+        customWords.insert(word, at: 0)
+    }
+
+    private func deleteWord(_ word: VocabularyWord) {
+        customWords.removeAll { $0.id == word.id }
+        favoriteWordIDs.remove(word.id)
+        deletedWordIDs.insert(word.id)
+        reviewIndex = min(reviewIndex, max(reviewWords.count - 1, 0))
+        wordBankStatus = "已删除 \(word.word)"
+    }
+
+    private func deleteTranslationRecord(_ record: TranslationPracticeRecord) {
+        translationRecords.removeAll { $0.id == record.id }
+        revealedDeleteTranslationID = nil
+        translationStatus = "已删除 1 条翻译训练记录"
+    }
+
+    private func deleteWritingRecord(_ record: WritingPracticeRecord) {
+        writingRecords.removeAll { $0.id == record.id }
+        revealedDeleteWritingID = nil
+        collapsedWritingRecordIDs.remove(record.id)
+        if selectedWritingRecordID == record.id {
+            selectedWritingRecordID = nil
+            selectedEssayText = ""
+            selectedEssayTranslation = ""
+            translatingSelectionFor = ""
+        }
+        writingStatus = "已删除 1 篇写作记录"
+    }
+
+    private func toggleWritingRecordCollapse(_ id: UUID) {
+        if collapsedWritingRecordIDs.contains(id) {
+            collapsedWritingRecordIDs.remove(id)
+        } else {
+            collapsedWritingRecordIDs.insert(id)
+            if selectedWritingRecordID == id {
+                essaySelectionTranslationTask?.cancel()
+                selectedWritingRecordID = nil
+                selectedEssayText = ""
+                selectedEssayTranslation = ""
+                translatingSelectionFor = ""
+            }
+        }
+    }
+
+    private func toggleFavorite(_ word: VocabularyWord) {
+        if favoriteWordIDs.contains(word.id) {
+            favoriteWordIDs.remove(word.id)
+        } else {
+            favoriteWordIDs.insert(word.id)
+        }
+    }
+
+    private func nextCard() {
+        let total = max(reviewWords.count, 1)
+        reviewIndex = (reviewIndex + 1) % total
+        showsCardBack = false
+    }
+
+    private func previousCard() {
+        let total = max(reviewWords.count, 1)
+        reviewIndex = (reviewIndex - 1 + total) % total
+        showsCardBack = false
+    }
+
+    private func markCardAsHard(_ word: VocabularyWord) {
+        favoriteWordIDs.insert(word.id)
+        nextCard()
+    }
+
+    private func frontCardMeta(for word: VocabularyWord) -> String {
+        [word.phonetic, word.partOfSpeech]
+            .filter { !$0.isEmpty && $0 != "未标注" }
+            .joined(separator: "  ")
+    }
+
+    private func emptyPanel(_ message: String, hint: String = "可以换个筛选条件，或先在单词本里添加新词。") -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(message)
+                .font(.system(size: 15, weight: .bold))
+                .foregroundStyle(StudyTheme.ink)
+            Text(hint)
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundStyle(StudyTheme.secondaryInk)
+        }
+        .padding(16)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(StudyTheme.panelStrong)
+        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+        .overlay {
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                .stroke(StudyTheme.hairline, lineWidth: 1)
+        }
+    }
+
+    private static func customWord(from text: String) -> VocabularyWord? {
+        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return nil }
+
+        let parts = trimmed.split(maxSplits: 1, whereSeparator: { $0.isWhitespace })
+        guard let first = parts.first else { return nil }
+        let word = String(first).trimmingCharacters(in: .whitespacesAndNewlines)
+        guard word.range(of: #"[A-Za-z]"#, options: .regularExpression) != nil else { return nil }
+
+        let normalized = word.lowercased()
+        let meaning = parts.count > 1
+            ? String(parts[1]).trimmingCharacters(in: .whitespacesAndNewlines)
+            : "自定义词，待补充释义"
+
+        return VocabularyWord(
+            id: "custom-\(normalized)",
+            word: normalized,
+            phonetic: "",
+            partOfSpeech: "未标注",
+            meaning: meaning.isEmpty ? "自定义词，待补充释义" : meaning,
+            example: "Write your own sentence with \(normalized).",
+            exampleTranslation: "",
+            phrases: [],
+            phraseTranslations: [],
+            mnemonic: "",
+            tag: "自定义",
+            difficulty: 3
+        )
+    }
+
+    private static func customWord(from result: WordLookupResult) -> VocabularyWord {
+        let normalized = result.word.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        return VocabularyWord(
+            id: "custom-\(normalized)",
+            word: normalized,
+            phonetic: result.phonetic,
+            partOfSpeech: result.partOfSpeech,
+            meaning: result.meaning,
+            example: result.example,
+            exampleTranslation: result.exampleTranslation,
+            phrases: result.phrases,
+            phraseTranslations: result.phraseTranslations,
+            mnemonic: result.mnemonic,
+            tag: result.tag,
+            difficulty: result.difficulty
+        )
+    }
+
+    private static func cleanedSelection(_ text: String) -> String {
+        text
+            .replacingOccurrences(of: #"\s+"#, with: " ", options: .regularExpression)
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    private static func extractSingleEnglishWord(from text: String) -> String? {
+        let cleaned = cleanedSelection(text)
+            .trimmingCharacters(in: CharacterSet(charactersIn: ".,;:!?()[]{}\"“”‘’"))
+        guard cleaned.range(of: #"^[A-Za-z][A-Za-z'-]*$"#, options: .regularExpression) != nil else {
+            return nil
+        }
+        return cleaned.lowercased()
+    }
+
+    private static func essayPreview(_ essay: String) -> String {
+        let cleaned = cleanedSelection(essay)
+        guard cleaned.count > 180 else { return cleaned }
+        return String(cleaned.prefix(180)) + "..."
+    }
+
+    private static func loadCustomWords() -> [VocabularyWord] {
+        let defaultsWords: [VocabularyWord]
+        if let data = UserDefaults.standard.data(forKey: customWordsKey),
+           let words = try? JSONDecoder().decode([VocabularyWord].self, from: data) {
+            defaultsWords = words
+        } else {
+            defaultsWords = []
+        }
+
+        guard let dataURL = customWordsFileURL(),
+              let fileData = try? Data(contentsOf: dataURL),
+              let fileWords = try? JSONDecoder().decode([VocabularyWord].self, from: fileData) else {
+            return defaultsWords
+        }
+
+        return mergeWords(fileWords + defaultsWords)
+    }
+
+    private static func saveCustomWords(_ words: [VocabularyWord]) {
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+        guard let data = try? encoder.encode(mergeWords(words)) else { return }
+        UserDefaults.standard.set(data, forKey: customWordsKey)
+        if let dataURL = customWordsFileURL() {
+            try? FileManager.default.createDirectory(at: dataURL.deletingLastPathComponent(), withIntermediateDirectories: true)
+            try? data.write(to: dataURL, options: .atomic)
+        }
+    }
+
+    private static func mergeWords(_ words: [VocabularyWord]) -> [VocabularyWord] {
+        var seen: Set<String> = []
+        var merged: [VocabularyWord] = []
+
+        for word in words {
+            let key = word.word.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+            guard !key.isEmpty, !seen.contains(key) else { continue }
+            seen.insert(key)
+            merged.append(word)
+        }
+
+        return merged
+    }
+
+    private static func customWordsFileURL() -> URL? {
+        let folderURL = FileManager.default.homeDirectoryForCurrentUser
+            .appendingPathComponent("Documents", isDirectory: true)
+            .appendingPathComponent("CET-6", isDirectory: true)
+            .appendingPathComponent("CET6DesktopWidget01", isDirectory: true)
+            .appendingPathComponent("Data", isDirectory: true)
+
+        let existing = (try? FileManager.default.contentsOfDirectory(
+            at: folderURL,
+            includingPropertiesForKeys: nil
+        )) ?? []
+
+        if let latest = existing
+            .filter({ $0.lastPathComponent.range(of: #"^custom_words\d+\.json$"#, options: .regularExpression) != nil })
+            .sorted(by: { $0.lastPathComponent > $1.lastPathComponent })
+            .first {
+            return latest
+        }
+
+        return folderURL.appendingPathComponent("custom_words01.json")
+    }
+
+    private static func loadTranslationRecords() -> [TranslationPracticeRecord] {
+        loadRecords(
+            defaultsKey: translationRecordsKey,
+            fileURL: numberedDataFileURL(prefix: "translation_records")
+        )
+    }
+
+    private static func saveTranslationRecords(_ records: [TranslationPracticeRecord]) {
+        saveRecords(records, defaultsKey: translationRecordsKey, fileURL: numberedDataFileURL(prefix: "translation_records"))
+    }
+
+    private static func loadWritingRecords() -> [WritingPracticeRecord] {
+        loadRecords(
+            defaultsKey: writingRecordsKey,
+            fileURL: numberedDataFileURL(prefix: "writing_records")
+        )
+    }
+
+    private static func saveWritingRecords(_ records: [WritingPracticeRecord]) {
+        saveRecords(records, defaultsKey: writingRecordsKey, fileURL: numberedDataFileURL(prefix: "writing_records"))
+    }
+
+    private static func loadRecords<T: Decodable>(defaultsKey: String, fileURL: URL?) -> [T] {
+        let defaultsRecords: [T]
+        if let data = UserDefaults.standard.data(forKey: defaultsKey),
+           let records = try? JSONDecoder().decode([T].self, from: data) {
+            defaultsRecords = records
+        } else {
+            defaultsRecords = []
+        }
+
+        guard let fileURL,
+              let fileData = try? Data(contentsOf: fileURL),
+              let fileRecords = try? JSONDecoder().decode([T].self, from: fileData) else {
+            return defaultsRecords
+        }
+
+        return fileRecords.isEmpty ? defaultsRecords : fileRecords
+    }
+
+    private static func saveRecords<T: Encodable>(_ records: [T], defaultsKey: String, fileURL: URL?) {
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+        guard let data = try? encoder.encode(records) else { return }
+        UserDefaults.standard.set(data, forKey: defaultsKey)
+        guard let fileURL else { return }
+        try? FileManager.default.createDirectory(at: fileURL.deletingLastPathComponent(), withIntermediateDirectories: true)
+        try? data.write(to: fileURL, options: .atomic)
+    }
+
+    private static func numberedDataFileURL(prefix: String) -> URL? {
+        let folderURL = FileManager.default.homeDirectoryForCurrentUser
+            .appendingPathComponent("Documents", isDirectory: true)
+            .appendingPathComponent("CET-6", isDirectory: true)
+            .appendingPathComponent("CET6DesktopWidget01", isDirectory: true)
+            .appendingPathComponent("Data", isDirectory: true)
+
+        let existing = (try? FileManager.default.contentsOfDirectory(
+            at: folderURL,
+            includingPropertiesForKeys: nil
+        )) ?? []
+
+        let pattern = "^\(NSRegularExpression.escapedPattern(for: prefix))\\d+\\.json$"
+        if let latest = existing
+            .filter({ $0.lastPathComponent.range(of: pattern, options: .regularExpression) != nil })
+            .sorted(by: { $0.lastPathComponent > $1.lastPathComponent })
+            .first {
+            return latest
+        }
+
+        return folderURL.appendingPathComponent("\(prefix)01.json")
+    }
+
+    private static func loadFavoriteWordIDs() -> Set<String> {
+        Set(UserDefaults.standard.stringArray(forKey: favoriteWordsKey) ?? [])
+    }
+
+    private static func saveFavoriteWordIDs(_ ids: Set<String>) {
+        UserDefaults.standard.set(Array(ids).sorted(), forKey: favoriteWordsKey)
+    }
+
+    private static func loadDeletedWordIDs() -> Set<String> {
+        Set(UserDefaults.standard.stringArray(forKey: deletedWordsKey) ?? [])
+    }
+
+    private static func saveDeletedWordIDs(_ ids: Set<String>) {
+        UserDefaults.standard.set(Array(ids).sorted(), forKey: deletedWordsKey)
+    }
+
+    private static func displayDate(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "zh_CN")
+        formatter.dateFormat = "M月d日 HH:mm"
+        return formatter.string(from: date)
+    }
+
+    private static let customWordsKey = "CET6DesktopWidget.customWords"
+    private static let favoriteWordsKey = "CET6DesktopWidget.favoriteWordIDs"
+    private static let deletedWordsKey = "CET6DesktopWidget.deletedWordIDs"
+    private static let translationRecordsKey = "CET6DesktopWidget.translationRecords"
+    private static let writingRecordsKey = "CET6DesktopWidget.writingRecords"
+
+    private static let defaultPlanText = """
+    第1天 08:00-08:40 高频词 60 个，重点看同义替换
+    第1天 20:30-21:10 听力 Section A 精听 2 篇
+    第2天 08:00-08:45 词根词缀复盘，整理错词
+    第2天 20:00-21:00 阅读长篇匹配 1 套并复盘
+    第3天 19:30-20:30 翻译与写作模板各 1 组
+    """
+
+    private static let words: [VocabularyWord] = [
+        VocabularyWord(id: "adequate", word: "adequate", phonetic: "/ˈædɪkwət/", meaning: "足够的；合格的", example: "The evidence is adequate to support the conclusion.", tag: "写作替换", difficulty: 3),
+        VocabularyWord(id: "allocate", word: "allocate", phonetic: "/ˈæləkeɪt/", meaning: "分配；拨出", example: "Students should allocate time for vocabulary review.", tag: "计划表达", difficulty: 4),
+        VocabularyWord(id: "consequence", word: "consequence", phonetic: "/ˈkɒnsɪkwəns/", meaning: "结果；后果", example: "Every decision has a long-term consequence.", tag: "阅读高频", difficulty: 4),
+        VocabularyWord(id: "derive", word: "derive", phonetic: "/dɪˈraɪv/", meaning: "获得；源自", example: "Many English words derive from Latin roots.", tag: "词根", difficulty: 3),
+        VocabularyWord(id: "eliminate", word: "eliminate", phonetic: "/ɪˈlɪmɪneɪt/", meaning: "消除；淘汰", example: "Good notes help eliminate repeated mistakes.", tag: "错题", difficulty: 4),
+        VocabularyWord(id: "notion", word: "notion", phonetic: "/ˈnəʊʃn/", meaning: "概念；看法", example: "The passage challenges the common notion of success.", tag: "阅读观点", difficulty: 3),
+        VocabularyWord(id: "substantial", word: "substantial", phonetic: "/səbˈstænʃl/", meaning: "大量的；实质性的", example: "A substantial improvement requires consistent practice.", tag: "写作升级", difficulty: 5),
+        VocabularyWord(id: "transition", word: "transition", phonetic: "/trænˈzɪʃn/", meaning: "转变；过渡", example: "The transition from input to output matters in language learning.", tag: "综合", difficulty: 4)
+    ]
+
+    private static let roots: [RootItem] = [
+        RootItem(root: "spect / spic", meaning: "看", pattern: "词根", examples: "inspect 检查 · perspective 视角 · conspicuous 显眼的", cue: "遇到 spect 先想“看见、观察、视角”。"),
+        RootItem(root: "duc / duct", meaning: "引导；带来", pattern: "词根", examples: "conduct 执行 · reduce 减少 · introduce 介绍", cue: "duce/duct 常和“带、引、导向某结果”有关。"),
+        RootItem(root: "form", meaning: "形状；形成", pattern: "词根", examples: "transform 转变 · uniform 统一的 · reform 改革", cue: "form 相关词优先抓“形态变化”。"),
+        RootItem(root: "ject", meaning: "投掷；抛出", pattern: "词根", examples: "project 项目 · reject 拒绝 · objective 客观的", cue: "ject 像把东西抛出去：投射、拒出、目标物。"),
+        RootItem(root: "port", meaning: "携带；运输", pattern: "词根", examples: "transport 运输 · import 进口 · portable 便携的", cue: "port 常指“带着走”或跨区域移动。"),
+        RootItem(root: "scrib / script", meaning: "写", pattern: "词根", examples: "describe 描述 · manuscript 手稿 · prescription 处方", cue: "script 看到就联想文字、记录、书写。"),
+        RootItem(root: "pre-", meaning: "在前；预先", pattern: "前缀", examples: "predict 预测 · preview 预览 · prejudice 偏见", cue: "pre- 先发生，常表示提前判断或预先处理。"),
+        RootItem(root: "sub-", meaning: "在下；次级；接近", pattern: "前缀", examples: "subway 地铁 · subconscious 潜意识 · substantial 实质性的", cue: "sub- 往下看：下面、隐藏、基础层。"),
+        RootItem(root: "-tion / -sion", meaning: "行为；状态；结果", pattern: "后缀", examples: "transition 转变 · conclusion 结论 · expansion 扩张", cue: "名词后缀，阅读里常是抽象概念或过程结果。"),
+        RootItem(root: "-ive", meaning: "具有某种倾向的", pattern: "后缀", examples: "effective 有效的 · objective 客观的 · productive 高产的", cue: "-ive 多把动词/名词变成形容词，表示属性。")
+    ]
+
+    private static func generateSchedule(from text: String) -> [ScheduleBlock] {
+        let sectionBlocks = scheduleBlocksFromSections(text)
+        if !sectionBlocks.isEmpty {
+            return sectionBlocks
+        }
+
+        let separators = CharacterSet(charactersIn: "\n;；")
+        let fragments = text
+            .components(separatedBy: separators)
+            .map { cleanPlanLine($0) }
+            .filter { !$0.isEmpty }
+
+        let source = fragments.isEmpty ? ["高频词 60 个", "听力精听 2 篇", "阅读真题 1 套", "写作翻译各 1 组"] : fragments
+
+        return source.prefix(12).enumerated().flatMap { index, line in
+            let title = titleFromPlanLine(line)
+            return dateKeys(from: line).map { dateKey in
+                ScheduleBlock(
+                    dateKey: dateKey,
+                    timeLabel: timeLabel(from: line, index: index),
+                    title: title,
+                    note: noteFromPlanLine(line, title: title),
+                    category: category(from: line)
+                )
+            }
+        }
+    }
+
+    private static func scheduleBlocksFromSections(_ text: String) -> [ScheduleBlock] {
+        let pattern = #"第\s*[0-9一二三四五六七八九十]+\s*次[:：]"#
+        guard let regex = try? NSRegularExpression(pattern: pattern) else { return [] }
+        let nsText = text as NSString
+        let matches = regex.matches(in: text, range: NSRange(location: 0, length: nsText.length))
+        guard !matches.isEmpty else { return [] }
+
+        return matches.enumerated().flatMap { index, match in
+            let start = match.range.location
+            let end = index + 1 < matches.count ? matches[index + 1].range.location : nsText.length
+            let section = nsText.substring(with: NSRange(location: start, length: end - start))
+            let keys = dateKeys(from: section)
+            let title = taskTitle(fromSection: section)
+            let note = sectionNote(fromSection: section)
+
+            return keys.map { dateKey in
+                ScheduleBlock(
+                    dateKey: dateKey,
+                    timeLabel: timeLabel(from: section, index: index),
+                    title: title,
+                    note: note,
+                    category: category(from: section)
+                )
+            }
+        }
+    }
+
+    private static func cleanPlanLine(_ line: String) -> String {
+        line
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .trimmingCharacters(in: CharacterSet(charactersIn: "-•* "))
+    }
+
+    private static func titleFromPlanLine(_ line: String) -> String {
+        var title = line
+        if let range = title.range(of: #"第?[0-9一二三四五六七八九十]+[天日周]"#, options: .regularExpression) {
+            title.removeSubrange(range)
+        }
+        if let range = title.range(of: #"[0-9一二三四五六七八九十]{1,3}\s*月\s*[0-9一二三四五六七八九十]{1,3}\s*[日号]?"#, options: .regularExpression) {
+            title.removeSubrange(range)
+        }
+        if let range = title.range(of: #"[0-2]?[0-9]:[0-5][0-9]([\-—~到][0-2]?[0-9]:[0-5][0-9])?"#, options: .regularExpression) {
+            title.removeSubrange(range)
+        }
+        title = title.trimmingCharacters(in: .whitespacesAndNewlines)
+        return title.isEmpty ? line : title
+    }
+
+    private static func taskTitle(fromSection section: String) -> String {
+        if let range = section.range(of: #"任务[:：]\s*([^\n。；;]+)"#, options: .regularExpression) {
+            var title = String(section[range])
+            title = title.replacingOccurrences(of: #"任务[:：]\s*"#, with: "", options: .regularExpression)
+            title = title.trimmingCharacters(in: CharacterSet(charactersIn: " 。；;\n\t"))
+            return title.isEmpty ? "复习任务" : title
+        }
+
+        return titleFromPlanLine(section)
+    }
+
+    private static func sectionNote(fromSection section: String) -> String {
+        let lines = section
+            .components(separatedBy: .newlines)
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty }
+            .filter { !$0.hasPrefix("第") && !$0.hasPrefix("任务") }
+
+        return lines.prefix(3).joined(separator: "；").isEmpty ? "按计划完成并复盘。" : lines.prefix(3).joined(separator: "；")
+    }
+
+    private static func noteFromPlanLine(_ line: String, title: String) -> String {
+        if line == title {
+            return "按 35 分钟学习、5 分钟回顾的节奏执行。"
+        }
+        return line
+    }
+
+    private static func dateKeys(from text: String) -> [String] {
+        guard let regex = try? NSRegularExpression(pattern: #"([0-9]{1,2}|[一二三四五六七八九十]+)\s*月\s*([0-9]{1,2}|[一二三四五六七八九十]+)"#) else {
+            return [DateKey.today()]
+        }
+
+        let nsText = text as NSString
+        let matches = regex.matches(in: text, range: NSRange(location: 0, length: nsText.length))
+        var keys: [String] = []
+
+        for match in matches {
+            guard match.numberOfRanges >= 3,
+                  let month = numberValue(nsText.substring(with: match.range(at: 1))),
+                  let firstDay = numberValue(nsText.substring(with: match.range(at: 2))) else {
+                continue
+            }
+
+            appendDateKey(month: month, day: firstDay, to: &keys)
+
+            let tailStart = match.range.location + match.range.length
+            let tail = nsText.substring(from: tailStart)
+            for day in extraDays(afterMonthDayIn: tail) {
+                appendDateKey(month: month, day: day, to: &keys)
+            }
+        }
+
+        return keys.isEmpty ? [DateKey.today()] : Array(NSOrderedSet(array: keys)) as? [String] ?? keys
+    }
+
+    private static func appendDateKey(month: Int, day: Int, to keys: inout [String]) {
+        guard (1...12).contains(month),
+              (1...31).contains(day),
+              let key = DateKey.from(month: month, day: day),
+              !keys.contains(key) else {
+            return
+        }
+
+        keys.append(key)
+    }
+
+    private static func extraDays(afterMonthDayIn tail: String) -> [Int] {
+        var days: [Int] = []
+        var index = tail.startIndex
+
+        while index < tail.endIndex {
+            while index < tail.endIndex {
+                let character = tail[index]
+                if character == "日" || character == "号" || character == " " || character == "、" || character == "," || character == "，" || character == "/" || character == "和" || character == "及" {
+                    index = tail.index(after: index)
+                } else {
+                    break
+                }
+            }
+
+            let start = index
+            while index < tail.endIndex, tail[index].isNumber {
+                index = tail.index(after: index)
+            }
+
+            guard start != index else { break }
+            let value = Int(tail[start..<index]) ?? 0
+            guard (1...31).contains(value) else { break }
+            days.append(value)
+        }
+
+        return days
+    }
+
+    private static func numberValue(_ text: String) -> Int? {
+        if let value = Int(text) {
+            return value
+        }
+
+        let digits: [Character: Int] = [
+            "零": 0, "一": 1, "二": 2, "两": 2, "三": 3, "四": 4,
+            "五": 5, "六": 6, "七": 7, "八": 8, "九": 9
+        ]
+
+        if text == "十" { return 10 }
+        if text.hasPrefix("十"), let last = text.last, let value = digits[last] {
+            return 10 + value
+        }
+        if text.hasSuffix("十"), let first = text.first, let value = digits[first] {
+            return value * 10
+        }
+        if text.contains("十") {
+            let parts = text.split(separator: "十")
+            guard let first = parts.first?.first,
+                  let firstValue = digits[first],
+                  let last = parts.last?.first,
+                  let lastValue = digits[last] else {
+                return nil
+            }
+            return firstValue * 10 + lastValue
+        }
+
+        return nil
+    }
+
+    private static func timeLabel(from line: String, index: Int) -> String {
+        if let range = line.range(of: #"[0-2]?[0-9]:[0-5][0-9]([\-—~到][0-2]?[0-9]:[0-5][0-9])?"#, options: .regularExpression) {
+            return String(line[range])
+        }
+        let fallback = ["08:00", "10:00", "14:30", "19:30", "21:00"]
+        return fallback[index % fallback.count]
+    }
+
+    private static func category(from line: String) -> String {
+        if line.contains("词") { return "词汇" }
+        if line.contains("听") { return "听力" }
+        if line.contains("读") || line.contains("阅读") { return "阅读" }
+        if line.contains("写") || line.contains("翻译") { return "输出" }
+        return "复习"
+    }
+}
