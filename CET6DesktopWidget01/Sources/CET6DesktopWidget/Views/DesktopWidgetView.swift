@@ -8,140 +8,147 @@ struct DesktopWidgetView: View {
     @State private var newTaskTitle = ""
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            header
-                .background(WindowDragArea())
-            openWindowButton
+        VStack(alignment: .leading, spacing: 16) {
+            HStack(alignment: .top, spacing: 14) {
+                header
+                    .background(WindowDragArea())
+                Spacer(minLength: 0)
+                Button(action: onOpenStudyWindow) {
+                    Image(systemName: "arrow.up.forward")
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundStyle(StudyTheme.ink)
+                        .frame(width: 32, height: 32)
+                        .background(StudyTheme.paper)
+                        .clipShape(RoundedRectangle(cornerRadius: 7, style: .continuous))
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 7, style: .continuous)
+                                .stroke(StudyTheme.hairline, lineWidth: 1)
+                        }
+                }
+                .buttonStyle(.plain)
+                .help("打开学习窗口")
+            }
+
+            HStack(spacing: 10) {
+                statusChip
+                Spacer(minLength: 0)
+                Text("\(store.todayTasks.filter { !$0.isDone }.count) 待完成")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(StudyTheme.secondaryInk)
+            }
+
             inputRow
             taskList
         }
-        .padding(18)
-        .frame(width: 360, alignment: .topLeading)
+        .padding(20)
+        .frame(width: 372, alignment: .topLeading)
         .frame(minHeight: 260, alignment: .topLeading)
         .background {
             ZStack {
-                RoundedRectangle(cornerRadius: 18, style: .continuous)
-                    .fill(.ultraThinMaterial)
-                RoundedRectangle(cornerRadius: 18, style: .continuous)
-                    .fill(Color(red: 0.08, green: 0.12, blue: 0.15).opacity(0.08))
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    .fill(.regularMaterial)
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    .fill(StudyTheme.widgetPaper)
+                VStack(spacing: 0) {
+                    Rectangle().fill(Color.white.opacity(0.72)).frame(height: 1)
+                    Spacer()
+                    Rectangle().fill(Color.black.opacity(0.04)).frame(height: 1)
+                }
             }
         }
-        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
         .overlay {
-            RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .stroke(.white.opacity(0.22), lineWidth: 1)
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .stroke(StudyTheme.hairline, lineWidth: 1)
         }
-        .shadow(color: .black.opacity(0.22), radius: 24, x: 0, y: 12)
+        .shadow(color: .black.opacity(0.18), radius: 22, x: 0, y: 12)
         .preferredColorScheme(.light)
     }
 
     private var header: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            HStack(alignment: .firstTextBaseline) {
-                Button(action: onOpenStudyWindow) {
-                    Text("CET-6 今日计划")
-                        .font(.system(size: 22, weight: .semibold, design: .rounded))
-                        .foregroundStyle(.primary)
-                }
-                .buttonStyle(.plain)
-                .help("打开学习窗口")
-                Spacer()
-                Button(action: onOpenStudyWindow) {
-                    Image(systemName: "rectangle.inset.filled.and.person.filled")
-                        .font(.system(size: 14, weight: .semibold))
-                        .foregroundStyle(.teal)
-                        .frame(width: 26, height: 24)
-                }
-                .buttonStyle(.plain)
-                .help("打开学习窗口")
-            }
-
-            HStack(spacing: 8) {
-                Text(DateKey.today())
-                Text("学习控制台")
-            }
-            .font(.system(size: 13, weight: .medium))
-            .foregroundStyle(.secondary)
+        VStack(alignment: .leading, spacing: 5) {
+            Text("CET-6")
+                .font(.system(size: 26, weight: .semibold, design: .serif))
+                .foregroundStyle(StudyTheme.ink)
+            Text("今日计划")
+                .font(.system(size: 13, weight: .medium))
+                .foregroundStyle(StudyTheme.secondaryInk)
         }
     }
 
-    private var openWindowButton: some View {
-        Button(action: onOpenStudyWindow) {
-            HStack(spacing: 8) {
-                Image(systemName: "arrow.up.forward.app")
-                    .font(.system(size: 13, weight: .bold))
-                Text("打开学习窗口")
-                    .font(.system(size: 13, weight: .bold))
-                Spacer()
-            }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 9)
-            .background(Color.teal.opacity(0.14))
-            .foregroundStyle(Color.teal)
-            .clipShape(RoundedRectangle(cornerRadius: 9, style: .continuous))
+    private var statusChip: some View {
+        HStack(spacing: 7) {
+            Circle()
+                .fill(StudyCategory.today.tint)
+                .frame(width: 6, height: 6)
+            Text(DateKey.today())
+                .font(.system(size: 12, weight: .semibold))
         }
-        .buttonStyle(.plain)
-        .help("打开计划书、日程和单词页面")
+        .padding(.horizontal, 10)
+        .padding(.vertical, 6)
+        .background(StudyTheme.paper)
+        .clipShape(Capsule())
+        .overlay {
+            Capsule().stroke(StudyTheme.hairline, lineWidth: 1)
+        }
     }
 
     private var inputRow: some View {
         HStack(spacing: 8) {
-            TextField("输入任何任务，回车后显示", text: $newTaskTitle)
+            TextField("写下一件要完成的事", text: $newTaskTitle)
                 .textFieldStyle(.plain)
-                .font(.system(size: 14))
+                .font(.system(size: 14, weight: .medium))
+                .foregroundStyle(StudyTheme.ink)
                 .padding(.horizontal, 12)
-                .padding(.vertical, 9)
-                .background(.black.opacity(0.08))
-                .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                .padding(.vertical, 10)
+                .background(StudyTheme.paper)
+                .clipShape(RoundedRectangle(cornerRadius: 7, style: .continuous))
+                .overlay {
+                    RoundedRectangle(cornerRadius: 7, style: .continuous)
+                        .stroke(StudyTheme.hairline, lineWidth: 1)
+                }
                 .onSubmit(addTask)
 
             Button(action: addTask) {
                 Image(systemName: "plus")
                     .font(.system(size: 14, weight: .bold))
-                    .frame(width: 30, height: 30)
+                    .frame(width: 34, height: 34)
             }
-            .buttonStyle(.borderless)
-            .background(.blue)
+            .buttonStyle(.plain)
+            .background(StudyTheme.command)
             .foregroundStyle(.white)
-            .clipShape(Circle())
+            .clipShape(RoundedRectangle(cornerRadius: 7, style: .continuous))
         }
     }
 
     private var taskList: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            HStack {
-                Text("今日任务")
-                    .font(.system(size: 15, weight: .semibold))
-                Spacer()
-                Text("\(store.todayTasks.filter { !$0.isDone }.count) 待完成")
-                    .font(.system(size: 12, weight: .medium))
-                    .foregroundStyle(.secondary)
-            }
-
+        VStack(alignment: .leading, spacing: 9) {
             if store.todayTasks.isEmpty {
-                Text("今天还没有任务。输入一条内容，它会保存到本地 JSON 并显示在这里。")
-                    .font(.system(size: 14))
-                    .foregroundStyle(.secondary)
+                Text("今天还没有任务。")
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundStyle(StudyTheme.secondaryInk)
+                    .padding(.vertical, 2)
                     .fixedSize(horizontal: false, vertical: true)
             } else {
                 ScrollView {
-                    LazyVStack(alignment: .leading, spacing: 9) {
+                    LazyVStack(alignment: .leading, spacing: 7) {
                         ForEach(store.todayTasks) { task in
                             Button {
                                 store.toggleDone(task)
                             } label: {
-                                HStack(alignment: .top, spacing: 9) {
+                                HStack(alignment: .top, spacing: 10) {
                                     Image(systemName: task.isDone ? "checkmark.circle.fill" : "circle")
-                                        .foregroundStyle(task.isDone ? .green : .secondary)
-                                        .font(.system(size: 16, weight: .medium))
+                                        .foregroundStyle(task.isDone ? StudyCategory.today.tint : StudyTheme.mutedInk)
+                                        .font(.system(size: 15, weight: .medium))
                                         .frame(width: 20)
                                     Text(task.title)
-                                        .font(.system(size: 14))
-                                        .foregroundStyle(task.isDone ? .secondary : .primary)
+                                        .font(.system(size: 14, weight: .medium))
+                                        .foregroundStyle(task.isDone ? StudyTheme.mutedInk : StudyTheme.ink)
                                         .strikethrough(task.isDone)
                                         .multilineTextAlignment(.leading)
                                     Spacer(minLength: 0)
                                 }
+                                .padding(.vertical, 4)
                                 .frame(maxWidth: .infinity, alignment: .leading)
                                 .contentShape(Rectangle())
                             }
@@ -311,14 +318,14 @@ private enum StudyCategory: String, CaseIterable, Identifiable {
 
     var tint: Color {
         switch self {
-        case .plan: Color(red: 0.19, green: 0.47, blue: 0.76)
-        case .today: Color(red: 0.10, green: 0.55, blue: 0.48)
-        case .words: Color(red: 0.72, green: 0.28, blue: 0.26)
-        case .translation: Color(red: 0.24, green: 0.50, blue: 0.62)
-        case .writing: Color(red: 0.65, green: 0.38, blue: 0.18)
-        case .roots: Color(red: 0.55, green: 0.42, blue: 0.18)
-        case .flashcards: Color(red: 0.37, green: 0.34, blue: 0.70)
-        case .mistakes: Color(red: 0.78, green: 0.43, blue: 0.16)
+        case .plan: Color(red: 0.18, green: 0.36, blue: 0.52)
+        case .today: Color(red: 0.13, green: 0.45, blue: 0.39)
+        case .words: Color(red: 0.58, green: 0.24, blue: 0.25)
+        case .translation: Color(red: 0.22, green: 0.43, blue: 0.50)
+        case .writing: Color(red: 0.56, green: 0.34, blue: 0.18)
+        case .roots: Color(red: 0.46, green: 0.39, blue: 0.20)
+        case .flashcards: Color(red: 0.35, green: 0.34, blue: 0.55)
+        case .mistakes: Color(red: 0.66, green: 0.32, blue: 0.18)
         }
     }
 }
@@ -518,16 +525,21 @@ private enum PlanWorkspaceMode: String, CaseIterable, Identifiable {
 }
 
 private enum StudyTheme {
-    static let windowBase = Color(red: 0.89, green: 0.90, blue: 0.90).opacity(0.78)
-    static let sidebarBase = Color(red: 0.82, green: 0.83, blue: 0.84).opacity(0.46)
-    static let panelBase = Color.white.opacity(0.58)
-    static let panelStrong = Color.white.opacity(0.76)
-    static let hairline = Color.black.opacity(0.12)
-    static let ink = Color(red: 0.12, green: 0.13, blue: 0.14)
-    static let sidebarInk = Color(red: 0.20, green: 0.21, blue: 0.22)
-    static let secondaryInk = Color(red: 0.34, green: 0.36, blue: 0.38)
-    static let mutedInk = Color(red: 0.55, green: 0.57, blue: 0.59)
-    static let blue = Color(red: 0.18, green: 0.47, blue: 0.76)
+    static let windowBase = Color(red: 0.936, green: 0.942, blue: 0.938)
+    static let sidebarBase = Color(red: 0.910, green: 0.918, blue: 0.913).opacity(0.82)
+    static let paper = Color(red: 0.985, green: 0.984, blue: 0.972)
+    static let widgetPaper = Color(red: 0.965, green: 0.964, blue: 0.948).opacity(0.92)
+    static let panelBase = Color(red: 0.976, green: 0.976, blue: 0.962).opacity(0.72)
+    static let panelStrong = Color(red: 0.992, green: 0.990, blue: 0.974).opacity(0.90)
+    static let field = Color(red: 0.998, green: 0.997, blue: 0.986).opacity(0.96)
+    static let hairline = Color(red: 0.18, green: 0.18, blue: 0.16).opacity(0.13)
+    static let ink = Color(red: 0.105, green: 0.112, blue: 0.112)
+    static let sidebarInk = Color(red: 0.16, green: 0.17, blue: 0.16)
+    static let secondaryInk = Color(red: 0.36, green: 0.37, blue: 0.35)
+    static let mutedInk = Color(red: 0.56, green: 0.57, blue: 0.54)
+    static let command = Color(red: 0.17, green: 0.25, blue: 0.25)
+    static let quietGreen = Color(red: 0.13, green: 0.45, blue: 0.39)
+    static let blue = Color(red: 0.18, green: 0.36, blue: 0.52)
 }
 
 private struct FloatingWindowSwitchStyle: ToggleStyle {
@@ -539,18 +551,17 @@ private struct FloatingWindowSwitchStyle: ToggleStyle {
         } label: {
             ZStack(alignment: configuration.isOn ? .trailing : .leading) {
                 Capsule()
-                    .fill(configuration.isOn ? StudyTheme.blue : Color.black.opacity(0.12))
+                    .fill(configuration.isOn ? StudyTheme.command : Color.black.opacity(0.10))
                     .overlay {
                         Capsule()
-                            .stroke(Color.white.opacity(configuration.isOn ? 0.46 : 0.62), lineWidth: 1)
+                            .stroke(StudyTheme.hairline, lineWidth: 1)
                     }
-                    .shadow(color: .black.opacity(0.10), radius: 4, x: 0, y: 2)
 
                 Circle()
-                    .fill(Color.white)
+                    .fill(StudyTheme.paper)
                     .frame(width: 24, height: 24)
                     .padding(3)
-                    .shadow(color: .black.opacity(0.20), radius: 3, x: 0, y: 1)
+                    .shadow(color: .black.opacity(0.14), radius: 2, x: 0, y: 1)
             }
             .frame(width: 52, height: 30)
             .contentShape(Capsule())
@@ -622,7 +633,7 @@ struct StudyWindowView: View {
     var body: some View {
         HStack(spacing: 0) {
             sidebar
-                .frame(width: 236)
+                .frame(width: 224)
 
             Rectangle()
                 .fill(StudyTheme.hairline)
@@ -664,31 +675,37 @@ struct StudyWindowView: View {
     }
 
     private var sidebar: some View {
-        VStack(alignment: .leading, spacing: 18) {
-            VStack(alignment: .leading, spacing: 6) {
-                HStack(alignment: .center, spacing: 12) {
-                    Text("CET-6")
-                        .font(.system(size: 30, weight: .bold, design: .serif))
+        VStack(alignment: .leading, spacing: 20) {
+            VStack(alignment: .leading, spacing: 8) {
+                HStack(alignment: .top, spacing: 12) {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("CET-6")
+                            .font(.system(size: 31, weight: .semibold, design: .serif))
+                            .foregroundStyle(StudyTheme.ink)
+                        Text("Study Desk")
+                            .font(.system(size: 11, weight: .semibold))
+                            .foregroundStyle(StudyTheme.mutedInk)
+                    }
                     Spacer(minLength: 0)
                     Toggle(isOn: $widgetVisibility.isVisible) {}
                         .labelsHidden()
                         .toggleStyle(FloatingWindowSwitchStyle())
                         .help(widgetVisibility.isVisible ? "关闭悬浮窗" : "打开悬浮窗")
                 }
-                Text("计划 · 词汇 · 复习")
-                    .font(.system(size: 13, weight: .medium))
+                Text("计划 · 词汇 · 写作 · 复习")
+                    .font(.system(size: 12, weight: .semibold))
                     .foregroundStyle(StudyTheme.secondaryInk)
             }
-            .padding(.top, 26)
-            .padding(.horizontal, 22)
+            .padding(.top, 28)
+            .padding(.horizontal, 20)
 
             ScrollView {
-                VStack(spacing: 7) {
+                VStack(spacing: 4) {
                     ForEach(StudyCategory.allCases) { category in
                         sidebarButton(for: category)
                     }
                 }
-                .padding(.horizontal, 12)
+                .padding(.horizontal, 10)
             }
 
             Spacer()
@@ -699,8 +716,12 @@ struct StudyWindowView: View {
         }
         .background {
             ZStack {
-                Rectangle().fill(.regularMaterial)
+                Rectangle().fill(.thinMaterial)
                 StudyTheme.sidebarBase
+                HStack {
+                    Rectangle().fill(Color.white.opacity(0.42)).frame(width: 1)
+                    Spacer()
+                }
             }
         }
     }
@@ -710,9 +731,9 @@ struct StudyWindowView: View {
             HStack(alignment: .center) {
                 VStack(alignment: .leading, spacing: 5) {
                     Text(selectedCategory.title)
-                        .font(.system(size: 28, weight: .bold, design: .rounded))
+                        .font(.system(size: 29, weight: .semibold, design: .serif))
                     Text(selectedCategory.subtitle)
-                        .font(.system(size: 13, weight: .medium))
+                        .font(.system(size: 13, weight: .semibold))
                         .foregroundStyle(StudyTheme.secondaryInk)
                 }
                 Spacer()
@@ -750,15 +771,19 @@ struct StudyWindowView: View {
     private var shellBackground: some View {
         ZStack {
             StudyTheme.windowBase
-            Color.white.opacity(0.22)
             LinearGradient(
                 colors: [
-                    selectedCategory.tint.opacity(0.08),
-                    Color.white.opacity(0.06)
+                    StudyTheme.paper.opacity(0.96),
+                    StudyTheme.windowBase,
+                    selectedCategory.tint.opacity(0.045)
                 ],
-                startPoint: .topTrailing,
-                endPoint: .center
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
             )
+            VStack(spacing: 0) {
+                Rectangle().fill(Color.white.opacity(0.52)).frame(height: 1)
+                Spacer()
+            }
         }
     }
 
@@ -806,7 +831,7 @@ struct StudyWindowView: View {
         .padding(.horizontal, 12)
         .padding(.vertical, 8)
         .foregroundStyle(StudyTheme.ink)
-        .background(StudyTheme.panelStrong)
+        .background(StudyTheme.paper)
         .clipShape(Capsule())
         .overlay {
             Capsule().stroke(StudyTheme.hairline, lineWidth: 1)
@@ -819,29 +844,29 @@ struct StudyWindowView: View {
         return Button {
             selectedCategory = category
         } label: {
-            HStack(spacing: 12) {
+            HStack(spacing: 11) {
                 ZStack {
-                    RoundedRectangle(cornerRadius: 7, style: .continuous)
-                        .fill(isSelected ? category.tint : Color.white.opacity(0.68))
-                        .frame(width: 40, height: 40)
+                    RoundedRectangle(cornerRadius: 6, style: .continuous)
+                        .fill(isSelected ? category.tint.opacity(0.12) : Color.white.opacity(0.001))
+                        .frame(width: 34, height: 34)
                     Image(systemName: category.icon)
-                        .font(.system(size: 17, weight: .bold))
-                        .foregroundStyle(isSelected ? .white : category.tint.opacity(0.94))
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundStyle(isSelected ? category.tint : StudyTheme.mutedInk)
                 }
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text(category.title)
-                        .font(.system(size: 15, weight: .bold))
+                        .font(.system(size: 14, weight: .semibold))
                         .foregroundStyle(isSelected ? StudyTheme.ink : StudyTheme.sidebarInk)
                     Text(category.subtitle)
-                        .font(.system(size: 12, weight: .semibold))
+                        .font(.system(size: 11, weight: .medium))
                         .foregroundStyle(isSelected ? StudyTheme.secondaryInk : StudyTheme.sidebarInk.opacity(0.74))
                 }
 
                 Spacer(minLength: 0)
             }
-            .frame(maxWidth: .infinity, minHeight: 58, alignment: .leading)
-            .padding(.horizontal, 12)
+            .frame(maxWidth: .infinity, minHeight: 52, alignment: .leading)
+            .padding(.horizontal, 10)
             .background(isSelected ? StudyTheme.panelStrong : Color.white.opacity(0.001))
             .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
             .contentShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
@@ -855,7 +880,7 @@ struct StudyWindowView: View {
                 if isSelected {
                     RoundedRectangle(cornerRadius: 2, style: .continuous)
                         .fill(category.tint)
-                        .frame(width: 4, height: 26)
+                        .frame(width: 3, height: 24)
                         .padding(.trailing, 1)
                 }
             }
