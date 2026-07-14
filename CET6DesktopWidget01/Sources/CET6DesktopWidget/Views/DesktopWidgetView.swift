@@ -34,9 +34,9 @@ struct DesktopWidgetView: View {
                         .foregroundStyle(StudyTheme.ink)
                         .frame(width: 32, height: 32)
                         .background(StudyTheme.paper)
-                        .clipShape(RoundedRectangle(cornerRadius: 4, style: .continuous))
+                        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
                         .overlay {
-                            RoundedRectangle(cornerRadius: 4, style: .continuous)
+                            RoundedRectangle(cornerRadius: 10, style: .continuous)
                                 .stroke(StudyTheme.hairline, lineWidth: 1)
                         }
                 }
@@ -60,9 +60,9 @@ struct DesktopWidgetView: View {
         .frame(minHeight: 260, alignment: .topLeading)
         .background {
             ZStack {
-                RoundedRectangle(cornerRadius: 5, style: .continuous)
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
                     .fill(.regularMaterial)
-                RoundedRectangle(cornerRadius: 5, style: .continuous)
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
                     .fill(StudyTheme.widgetPaper)
                 VStack(spacing: 0) {
                     Rectangle().fill(Color.white.opacity(0.72)).frame(height: 1)
@@ -71,9 +71,9 @@ struct DesktopWidgetView: View {
                 }
             }
         }
-        .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         .overlay {
-            RoundedRectangle(cornerRadius: 5, style: .continuous)
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
                 .stroke(StudyTheme.hairline, lineWidth: 1)
         }
         .shadow(color: .black.opacity(0.12), radius: 16, x: 0, y: 8)
@@ -155,9 +155,9 @@ struct DesktopWidgetView: View {
                 .padding(.horizontal, 12)
                 .padding(.vertical, 10)
                 .background(StudyTheme.paper)
-                .clipShape(RoundedRectangle(cornerRadius: 4, style: .continuous))
+                .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
                 .overlay {
-                    RoundedRectangle(cornerRadius: 4, style: .continuous)
+                    RoundedRectangle(cornerRadius: 10, style: .continuous)
                         .stroke(StudyTheme.hairline, lineWidth: 1)
                 }
                 .onSubmit(addTask)
@@ -170,7 +170,7 @@ struct DesktopWidgetView: View {
             .buttonStyle(.plain)
             .background(StudyTheme.command)
             .foregroundStyle(.white)
-            .clipShape(RoundedRectangle(cornerRadius: 4, style: .continuous))
+            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
         }
     }
 
@@ -1015,26 +1015,16 @@ struct StudyWindowView: View {
                     Text(goal.title).tag(goal.id)
                 }
             }
-            .pickerStyle(.menu)
             .labelsHidden()
             .frame(width: 170)
-            .padding(.horizontal, 8)
-            .padding(.vertical, 2)
-            .background(Capsule().fill(Color.black.opacity(0.03)))
-            .overlay(Capsule().stroke(StudyTheme.hairline, lineWidth: 1))
 
             Picker("当前计划表", selection: $selectedPlanID) {
                 ForEach(currentGoal.plans) { plan in
                     Text(plan.title).tag(plan.id)
                 }
             }
-            .pickerStyle(.menu)
             .labelsHidden()
             .frame(width: 150)
-            .padding(.horizontal, 8)
-            .padding(.vertical, 2)
-            .background(Capsule().fill(Color.black.opacity(0.03)))
-            .overlay(Capsule().stroke(StudyTheme.hairline, lineWidth: 1))
         }
     }
 
@@ -1113,9 +1103,9 @@ struct StudyWindowView: View {
         }
         .padding(13)
         .background(StudyTheme.panelBase)
-        .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         .overlay {
-            RoundedRectangle(cornerRadius: 5, style: .continuous)
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
                 .stroke(StudyTheme.hairline, lineWidth: 1)
         }
     }
@@ -1168,11 +1158,11 @@ struct StudyWindowView: View {
             .frame(maxWidth: .infinity, minHeight: 52, alignment: .leading)
             .padding(.horizontal, 10)
             .background(isSelected ? StudyTheme.panelStrong : Color.white.opacity(0.001))
-            .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
-            .contentShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
+            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+            .contentShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
             .overlay {
                 if isSelected {
-                    RoundedRectangle(cornerRadius: 5, style: .continuous)
+                    RoundedRectangle(cornerRadius: 12, style: .continuous)
                         .stroke(StudyTheme.hairline, lineWidth: 1)
                 }
             }
@@ -1217,21 +1207,21 @@ struct StudyWindowView: View {
                         .padding(.horizontal, 12)
                         .padding(.vertical, 9)
                         .background(StudyTheme.panelStrong)
-                        .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
+                        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                     TextField("模式，例如：考试冲刺 / 习惯养成 / 长期项目", text: $newGoalMode)
                         .textFieldStyle(.plain)
                         .font(.system(size: 14))
                         .padding(.horizontal, 12)
                         .padding(.vertical, 9)
                         .background(StudyTheme.panelStrong)
-                        .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
+                        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                     TextField("这个目标最重要的执行原则", text: $newGoalFocus)
                         .textFieldStyle(.plain)
                         .font(.system(size: 14))
                         .padding(.horizontal, 12)
                         .padding(.vertical, 9)
                         .background(StudyTheme.panelStrong)
-                        .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
+                        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                         .onSubmit(addGoal)
                     Button {
                         addGoal()
@@ -1243,9 +1233,9 @@ struct StudyWindowView: View {
                 }
                 .padding(13)
                 .background(StudyTheme.panelBase)
-                .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
+                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                 .overlay {
-                    RoundedRectangle(cornerRadius: 5, style: .continuous)
+                    RoundedRectangle(cornerRadius: 12, style: .continuous)
                         .stroke(StudyTheme.hairline, lineWidth: 1)
                 }
             }
@@ -1275,7 +1265,7 @@ struct StudyWindowView: View {
                         .padding(.horizontal, 12)
                         .padding(.vertical, 9)
                         .background(StudyTheme.panelStrong)
-                        .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
+                        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                         .onSubmit(addPlanToCurrentGoal)
 
                     Button {
@@ -1331,9 +1321,9 @@ struct StudyWindowView: View {
             .padding(13)
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(isSelected ? StudyTheme.panelStrong : StudyTheme.panelBase)
-            .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
+            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
             .overlay {
-                RoundedRectangle(cornerRadius: 5, style: .continuous)
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
                     .stroke(isSelected ? StudyCategory.goals.tint.opacity(0.45) : StudyTheme.hairline, lineWidth: 1)
             }
         }
@@ -1385,9 +1375,9 @@ struct StudyWindowView: View {
             .padding(13)
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(isSelected ? StudyTheme.panelStrong : StudyTheme.panelBase)
-            .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
+            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
             .overlay {
-                RoundedRectangle(cornerRadius: 5, style: .continuous)
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
                     .stroke(isSelected ? StudyCategory.plan.tint.opacity(0.45) : StudyTheme.hairline, lineWidth: 1)
             }
         }
@@ -1521,9 +1511,9 @@ struct StudyWindowView: View {
                 .scrollContentBackground(.hidden)
                 .padding(12)
                 .background(StudyTheme.panelStrong)
-                .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
+                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                 .overlay {
-                    RoundedRectangle(cornerRadius: 5, style: .continuous)
+                    RoundedRectangle(cornerRadius: 12, style: .continuous)
                         .stroke(StudyTheme.hairline, lineWidth: 1)
                 }
         }
@@ -1563,9 +1553,9 @@ struct StudyWindowView: View {
         .padding(14)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(StudyTheme.panelStrong)
-        .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         .overlay {
-            RoundedRectangle(cornerRadius: 5, style: .continuous)
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
                 .stroke(StudyTheme.hairline, lineWidth: 1)
         }
     }
@@ -1748,9 +1738,9 @@ struct StudyWindowView: View {
         }
         .padding(13)
         .background(StudyTheme.panelStrong)
-        .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         .overlay {
-            RoundedRectangle(cornerRadius: 5, style: .continuous)
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
                 .stroke(StudyTheme.hairline, lineWidth: 1)
         }
     }
@@ -1774,9 +1764,9 @@ struct StudyWindowView: View {
                     .frame(minHeight: 230)
                     .padding(10)
                     .background(StudyTheme.panelStrong)
-                    .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
+                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                     .overlay {
-                        RoundedRectangle(cornerRadius: 5, style: .continuous)
+                        RoundedRectangle(cornerRadius: 12, style: .continuous)
                             .stroke(StudyTheme.hairline, lineWidth: 1)
                     }
 
@@ -1838,7 +1828,7 @@ struct StudyWindowView: View {
                                 .padding(12)
                                 .frame(maxWidth: .infinity, alignment: .leading)
                                 .background(StudyTheme.panelStrong)
-                                .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
+                                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
 
                             ForEach(Self.generateSchedule(from: aiPlanDraft, anchorDateKey: DateKey.from(currentPlan.createdAt))) { block in
                                 scheduleCard(block)
@@ -1858,9 +1848,9 @@ struct StudyWindowView: View {
             .padding(.horizontal, 14)
             .padding(.vertical, 11)
             .background(StudyTheme.panelStrong)
-            .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
+            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
             .overlay {
-                RoundedRectangle(cornerRadius: 5, style: .continuous)
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
                     .stroke(StudyTheme.hairline, lineWidth: 1)
             }
             .textSelection(.enabled)
@@ -1964,9 +1954,9 @@ struct StudyWindowView: View {
                     .padding(.horizontal, 14)
                     .padding(.vertical, 10)
                     .background(StudyTheme.panelStrong)
-                    .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
+                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                     .overlay {
-                        RoundedRectangle(cornerRadius: 5, style: .continuous)
+                        RoundedRectangle(cornerRadius: 12, style: .continuous)
                             .stroke(StudyTheme.hairline, lineWidth: 1)
                     }
                     .onSubmit(addQuickTask)
@@ -1992,9 +1982,9 @@ struct StudyWindowView: View {
                     .padding(16)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .background(StudyTheme.panelStrong)
-                    .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
+                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                     .overlay {
-                        RoundedRectangle(cornerRadius: 5, style: .continuous)
+                        RoundedRectangle(cornerRadius: 12, style: .continuous)
                             .stroke(StudyTheme.hairline, lineWidth: 1)
                     }
                 } else {
@@ -2015,9 +2005,9 @@ struct StudyWindowView: View {
                                 }
                                 .padding(13)
                                 .background(StudyTheme.panelStrong)
-                                .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
+                                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                                 .overlay {
-                                    RoundedRectangle(cornerRadius: 5, style: .continuous)
+                                    RoundedRectangle(cornerRadius: 12, style: .continuous)
                                         .stroke(StudyTheme.hairline, lineWidth: 1)
                                 }
                             }
@@ -2039,9 +2029,9 @@ struct StudyWindowView: View {
                     .padding(.horizontal, 14)
                     .padding(.vertical, 10)
                     .background(StudyTheme.panelStrong)
-                    .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
+                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                     .overlay {
-                        RoundedRectangle(cornerRadius: 5, style: .continuous)
+                        RoundedRectangle(cornerRadius: 12, style: .continuous)
                             .stroke(StudyTheme.hairline, lineWidth: 1)
                     }
                     .onSubmit(addCustomWord)
@@ -2063,9 +2053,9 @@ struct StudyWindowView: View {
                     .padding(.horizontal, 14)
                     .padding(.vertical, 10)
                     .background(StudyTheme.panelStrong)
-                    .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
+                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                     .overlay {
-                        RoundedRectangle(cornerRadius: 5, style: .continuous)
+                        RoundedRectangle(cornerRadius: 12, style: .continuous)
                             .stroke(StudyTheme.hairline, lineWidth: 1)
                     }
                 Text("\(filteredWords.count) 词")
@@ -2148,12 +2138,12 @@ struct StudyWindowView: View {
             .padding(14)
             .frame(maxWidth: .infinity, minHeight: 86, alignment: .leading)
             .background(StudyTheme.panelStrong)
-            .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
+            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
             .overlay {
-                RoundedRectangle(cornerRadius: 5, style: .continuous)
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
                     .stroke(StudyTheme.hairline, lineWidth: 1)
             }
-            .contentShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
+            .contentShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
             .gesture(
                 DragGesture(minimumDistance: 12)
                     .onEnded { value in
@@ -2188,7 +2178,7 @@ struct StudyWindowView: View {
                     .frame(width: 78)
                     .frame(minHeight: 86)
                     .background(StudyTheme.cinnabar)
-                    .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
+                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                 }
                 .buttonStyle(.plain)
                 .transition(.move(edge: .trailing).combined(with: .opacity))
@@ -2196,7 +2186,7 @@ struct StudyWindowView: View {
         }
         .animation(.spring(response: 0.36, dampingFraction: 0.82), value: isRevealed)
         .frame(maxWidth: .infinity, minHeight: 86, alignment: .leading)
-        .contentShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
+        .contentShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         .contextMenu {
             Button(role: .destructive) {
                 deleteWord(word)
@@ -2204,7 +2194,7 @@ struct StudyWindowView: View {
                 Label("删除", systemImage: "trash")
             }
         }
-        .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
     }
 
     private var translationWorkspace: some View {
@@ -2217,9 +2207,9 @@ struct StudyWindowView: View {
                     .frame(minHeight: 44)
                     .padding(12)
                     .background(StudyTheme.panelStrong)
-                    .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
+                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                     .overlay {
-                        RoundedRectangle(cornerRadius: 5, style: .continuous)
+                        RoundedRectangle(cornerRadius: 12, style: .continuous)
                             .stroke(StudyTheme.hairline, lineWidth: 1)
                     }
                     .onSubmit(generateTranslationPractice)
@@ -2301,7 +2291,7 @@ struct StudyWindowView: View {
                     .padding(10)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .background(Color.white.opacity(0.48))
-                    .clipShape(RoundedRectangle(cornerRadius: 4, style: .continuous))
+                    .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
                 }
 
                 if !record.notes.isEmpty {
@@ -2313,9 +2303,9 @@ struct StudyWindowView: View {
             .padding(14)
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(StudyTheme.panelStrong)
-            .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
+            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
             .overlay {
-                RoundedRectangle(cornerRadius: 5, style: .continuous)
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
                     .stroke(StudyTheme.hairline, lineWidth: 1)
             }
         }
@@ -2331,9 +2321,9 @@ struct StudyWindowView: View {
                     .frame(minHeight: 44)
                     .padding(12)
                     .background(StudyTheme.panelStrong)
-                    .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
+                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                     .overlay {
-                        RoundedRectangle(cornerRadius: 5, style: .continuous)
+                        RoundedRectangle(cornerRadius: 12, style: .continuous)
                             .stroke(StudyTheme.hairline, lineWidth: 1)
                     }
                     .onSubmit(generateWritingPractice)
@@ -2455,16 +2445,16 @@ struct StudyWindowView: View {
                         .padding(10)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .background(Color.white.opacity(0.48))
-                        .clipShape(RoundedRectangle(cornerRadius: 4, style: .continuous))
+                        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
                     }
                 }
             }
             .padding(14)
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(StudyTheme.panelStrong)
-            .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
+            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
             .overlay {
-                RoundedRectangle(cornerRadius: 5, style: .continuous)
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
                     .stroke(StudyTheme.hairline, lineWidth: 1)
             }
         }
@@ -2506,9 +2496,9 @@ struct StudyWindowView: View {
         .padding(10)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(StudyCategory.writing.tint.opacity(0.10))
-        .clipShape(RoundedRectangle(cornerRadius: 4, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
         .overlay {
-            RoundedRectangle(cornerRadius: 4, style: .continuous)
+            RoundedRectangle(cornerRadius: 10, style: .continuous)
                 .stroke(StudyCategory.writing.tint.opacity(0.25), lineWidth: 1)
         }
     }
@@ -2522,7 +2512,7 @@ struct StudyWindowView: View {
     ) -> some View {
         HStack(spacing: 8) {
             content()
-                .contentShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
+                .contentShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                 .gesture(
                     DragGesture(minimumDistance: 12)
                         .onEnded { value in
@@ -2557,7 +2547,7 @@ struct StudyWindowView: View {
                     .frame(width: 78)
                     .frame(maxHeight: .infinity)
                     .background(StudyTheme.cinnabar)
-                    .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
+                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                 }
                 .buttonStyle(.plain)
                 .transition(.move(edge: .trailing).combined(with: .opacity))
@@ -2572,7 +2562,7 @@ struct StudyWindowView: View {
                 Label("删除", systemImage: "trash")
             }
         }
-        .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
     }
 
     private var rootsWorkspace: some View {
@@ -2584,9 +2574,9 @@ struct StudyWindowView: View {
                 .padding(.horizontal, 14)
                 .padding(.vertical, 10)
                 .background(StudyTheme.panelStrong)
-                .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
+                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                 .overlay {
-                    RoundedRectangle(cornerRadius: 5, style: .continuous)
+                    RoundedRectangle(cornerRadius: 12, style: .continuous)
                         .stroke(StudyTheme.hairline, lineWidth: 1)
                 }
 
@@ -2631,9 +2621,9 @@ struct StudyWindowView: View {
         .padding(16)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(StudyTheme.panelStrong)
-        .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         .overlay {
-            RoundedRectangle(cornerRadius: 5, style: .continuous)
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
                 .stroke(StudyTheme.hairline, lineWidth: 1)
         }
     }
@@ -2712,9 +2702,9 @@ struct StudyWindowView: View {
                 }
                 .frame(maxWidth: 560, minHeight: 300)
                 .background(StudyTheme.panelStrong)
-                .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
+                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                 .overlay {
-                    RoundedRectangle(cornerRadius: 5, style: .continuous)
+                    RoundedRectangle(cornerRadius: 12, style: .continuous)
                         .stroke(StudyTheme.hairline, lineWidth: 1)
                 }
             }
@@ -2778,9 +2768,9 @@ struct StudyWindowView: View {
                     .padding(.horizontal, 14)
                     .padding(.vertical, 10)
                     .background(StudyTheme.panelStrong)
-                    .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
+                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                     .overlay {
-                        RoundedRectangle(cornerRadius: 5, style: .continuous)
+                        RoundedRectangle(cornerRadius: 12, style: .continuous)
                             .stroke(StudyTheme.hairline, lineWidth: 1)
                     }
             }
@@ -2842,9 +2832,9 @@ struct StudyWindowView: View {
         }
         .padding(14)
         .background(StudyTheme.panelStrong)
-        .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         .overlay {
-            RoundedRectangle(cornerRadius: 5, style: .continuous)
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
                 .stroke(StudyTheme.hairline, lineWidth: 1)
         }
     }
@@ -3366,9 +3356,9 @@ struct StudyWindowView: View {
         .padding(16)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(StudyTheme.panelStrong)
-        .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         .overlay {
-            RoundedRectangle(cornerRadius: 5, style: .continuous)
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
                 .stroke(StudyTheme.hairline, lineWidth: 1)
         }
     }
