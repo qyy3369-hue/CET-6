@@ -1015,17 +1015,56 @@ struct StudyWindowView: View {
                     Text(goal.title).tag(goal.id)
                 }
             }
+            .pickerStyle(.menu)
             .labelsHidden()
             .frame(width: 170)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 2)
+            .background(Capsule().fill(Color.black.opacity(0.03)))
+            .overlay(Capsule().stroke(StudyTheme.hairline, lineWidth: 1))
 
             Picker("当前计划表", selection: $selectedPlanID) {
                 ForEach(currentGoal.plans) { plan in
                     Text(plan.title).tag(plan.id)
                 }
             }
+            .pickerStyle(.menu)
             .labelsHidden()
             .frame(width: 150)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 2)
+            .background(Capsule().fill(Color.black.opacity(0.03)))
+            .overlay(Capsule().stroke(StudyTheme.hairline, lineWidth: 1))
         }
+    }
+
+    @ViewBuilder
+    private func segmentedCapsule<T: Hashable>(
+        selection: Binding<T>,
+        options: [(T, String)]
+    ) -> some View {
+        HStack(spacing: 0) {
+            ForEach(options, id: \.0) { option in
+                Button {
+                    selection.wrappedValue = option.0
+                } label: {
+                    Text(option.1)
+                        .font(StudyTheme.songti(size: 13, weight: selection.wrappedValue == option.0 ? .semibold : .regular))
+                        .foregroundStyle(selection.wrappedValue == option.0 ? StudyTheme.ink : StudyTheme.secondaryInk)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 5)
+                        .background(
+                            Capsule()
+                                .fill(selection.wrappedValue == option.0 ? StudyTheme.paper : Color.clear)
+                                .shadow(color: selection.wrappedValue == option.0 ? Color.black.opacity(0.06) : Color.clear, radius: 2, x: 0, y: 1)
+                        )
+                }
+                .buttonStyle(.plain)
+            }
+        }
+        .padding(3)
+        .background(Capsule().fill(StudyTheme.sidebarBase))
+        .overlay(Capsule().stroke(StudyTheme.hairline, lineWidth: 1))
     }
 
     private var shellBackground: some View {
@@ -1358,13 +1397,10 @@ struct StudyWindowView: View {
     private var combinedPlanWorkspace: some View {
         VStack(alignment: .leading, spacing: 14) {
             HStack {
-                Picker("计划模式", selection: $planWorkspaceMode) {
-                    ForEach(PlanWorkspaceMode.allCases) { mode in
-                        Text(mode.title).tag(mode)
-                    }
-                }
-                .pickerStyle(.segmented)
-                .labelsHidden()
+                segmentedCapsule(
+                    selection: $planWorkspaceMode,
+                    options: PlanWorkspaceMode.allCases.map { ($0, $0.title) }
+                )
                 .frame(width: 260)
 
                 Spacer()
@@ -1404,6 +1440,8 @@ struct StudyWindowView: View {
                         generateScheduleWithAI()
                     } label: {
                         Label(isGeneratingSchedule ? "拆解中" : "AI 拆解", systemImage: isGeneratingSchedule ? "hourglass" : "sparkles")
+                            .lineLimit(1)
+                            .fixedSize(horizontal: true, vertical: false)
                     }
                     .buttonStyle(SealButtonStyle())
                     .tint(StudyCategory.plan.tint)
@@ -1459,6 +1497,8 @@ struct StudyWindowView: View {
                 Text("\(currentGoal.title) · \(currentPlan.title)")
                     .font(.system(size: 16, weight: .bold))
                     .foregroundStyle(StudyTheme.ink)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
                 Spacer()
                 Button {
                     pastePlanFromPasteboard()
@@ -1685,7 +1725,7 @@ struct StudyWindowView: View {
                     .foregroundStyle(.white)
                     .frame(width: 104, height: 28)
                     .background(StudyCategory.plan.tint)
-                    .clipShape(RoundedRectangle(cornerRadius: 4, style: .continuous))
+                    .clipShape(Capsule())
             }
 
             VStack(alignment: .leading, spacing: 5) {
@@ -2602,12 +2642,10 @@ struct StudyWindowView: View {
         let words = reviewWords
 
         return AnyView(VStack(spacing: 18) {
-            Picker("复习范围", selection: $reviewMode) {
-                ForEach(WordReviewMode.allCases) { mode in
-                    Text(mode.title).tag(mode)
-                }
-            }
-            .pickerStyle(.segmented)
+            segmentedCapsule(
+                selection: $reviewMode,
+                options: WordReviewMode.allCases.map { ($0, $0.title) }
+            )
             .frame(maxWidth: 360)
 
             if words.isEmpty {
@@ -2727,12 +2765,10 @@ struct StudyWindowView: View {
     private var mistakeWorkspace: some View {
         VStack(alignment: .leading, spacing: 14) {
             HStack(spacing: 12) {
-                Picker("错词范围", selection: $mistakeMode) {
-                    ForEach(MistakeMode.allCases) { mode in
-                        Text(mode.title).tag(mode)
-                    }
-                }
-                .pickerStyle(.segmented)
+                segmentedCapsule(
+                    selection: $mistakeMode,
+                    options: MistakeMode.allCases.map { ($0, $0.title) }
+                )
                 .frame(width: 230)
 
                 TextField("搜索错词", text: $mistakeSearch)
