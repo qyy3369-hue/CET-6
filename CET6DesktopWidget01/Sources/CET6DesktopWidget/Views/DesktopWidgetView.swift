@@ -644,6 +644,52 @@ private enum StudyTheme {
     }
 }
 
+// ── 古典按钮样式 ──────────────────────────────────────────
+
+/// 印章风格按钮（主要操作）
+struct SealButtonStyle: ButtonStyle {
+    var tint: Color = StudyTheme.indigo
+    var isFilled: Bool = true
+    
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .font(StudyTheme.songti(size: 14, weight: .semibold))
+            .padding(.horizontal, 16)
+            .padding(.vertical, 7)
+            .foregroundStyle(isFilled ? StudyTheme.paper : tint)
+            .background(
+                ZStack {
+                    if isFilled {
+                        tint.opacity(configuration.isPressed ? 0.8 : 1.0)
+                    } else {
+                        StudyTheme.paper.opacity(configuration.isPressed ? 0.6 : 0.001)
+                    }
+                }
+            )
+            .border(tint.opacity(configuration.isPressed ? 0.8 : 1.0), width: 1.5)
+            .scaleEffect(configuration.isPressed ? 0.97 : 1.0)
+            .animation(.spring(response: 0.36, dampingFraction: 0.80), value: configuration.isPressed)
+    }
+}
+
+/// 书签便签风格按钮（次要操作）
+struct BookmarkButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .font(StudyTheme.songti(size: 13, weight: .regular))
+            .padding(.horizontal, 12)
+            .padding(.vertical, 6)
+            .foregroundStyle(StudyTheme.ink)
+            .background(
+                StudyTheme.sidebarBase
+                    .brightness(configuration.isPressed ? -0.03 : 0)
+            )
+            .border(StudyTheme.hairline, width: 1)
+            .scaleEffect(configuration.isPressed ? 0.98 : 1.0)
+            .animation(.spring(response: 0.36, dampingFraction: 0.80), value: configuration.isPressed)
+    }
+}
+
 private struct FloatingWindowSwitchStyle: ToggleStyle {
     func makeBody(configuration: Configuration) -> some View {
         Button {
@@ -1150,7 +1196,7 @@ struct StudyWindowView: View {
                     } label: {
                         Label("新增目标", systemImage: "plus")
                     }
-                    .buttonStyle(.borderedProminent)
+                    .buttonStyle(SealButtonStyle())
                     .tint(StudyCategory.goals.tint)
                 }
                 .padding(13)
@@ -1195,7 +1241,7 @@ struct StudyWindowView: View {
                     } label: {
                         Label("新计划表", systemImage: "doc.badge.plus")
                     }
-                    .buttonStyle(.borderedProminent)
+                    .buttonStyle(SealButtonStyle())
                     .tint(StudyCategory.goals.tint)
                 }
 
@@ -1356,7 +1402,7 @@ struct StudyWindowView: View {
                     } label: {
                         Label(isGeneratingSchedule ? "拆解中" : "AI 拆解", systemImage: isGeneratingSchedule ? "hourglass" : "sparkles")
                     }
-                    .buttonStyle(.borderedProminent)
+                    .buttonStyle(SealButtonStyle())
                     .tint(StudyCategory.plan.tint)
                     .disabled(isGeneratingSchedule)
 
@@ -1365,7 +1411,7 @@ struct StudyWindowView: View {
                     } label: {
                         Label("复制", systemImage: "doc.on.doc")
                     }
-                    .buttonStyle(.bordered)
+                    .buttonStyle(BookmarkButtonStyle())
                     .disabled(scheduleBlocks.isEmpty)
 
                     Button {
@@ -1416,14 +1462,14 @@ struct StudyWindowView: View {
                 } label: {
                     Label("粘贴", systemImage: "doc.on.clipboard")
                 }
-                .buttonStyle(.bordered)
+                .buttonStyle(BookmarkButtonStyle())
 
                 Button {
                     savePlan()
                 } label: {
                     Label("保存计划书", systemImage: "square.and.arrow.down")
                 }
-                .buttonStyle(.borderedProminent)
+                .buttonStyle(SealButtonStyle())
                 .tint(StudyCategory.plan.tint)
             }
             TextEditor(text: $planText)
@@ -1468,7 +1514,7 @@ struct StudyWindowView: View {
                 Label("显示/编辑原文", systemImage: "pencil")
                     .padding(.horizontal, 6)
             }
-            .buttonStyle(.borderedProminent)
+            .buttonStyle(SealButtonStyle())
             .tint(StudyCategory.plan.tint)
         }
         .padding(14)
@@ -1701,7 +1747,7 @@ struct StudyWindowView: View {
                     } label: {
                         Label(isRevisingPlan ? "定制中" : "AI 定计划", systemImage: isRevisingPlan ? "hourglass" : "sparkles")
                     }
-                    .buttonStyle(.borderedProminent)
+                    .buttonStyle(SealButtonStyle())
                     .tint(StudyCategory.plan.tint)
                     .disabled(isRevisingPlan)
                 }
@@ -1724,7 +1770,7 @@ struct StudyWindowView: View {
                     } label: {
                         Label("保存到计划书", systemImage: "square.and.arrow.down")
                     }
-                    .buttonStyle(.bordered)
+                    .buttonStyle(BookmarkButtonStyle())
                     .disabled(aiPlanDraft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
 
                     Button {
@@ -1732,7 +1778,7 @@ struct StudyWindowView: View {
                     } label: {
                         Label("同步任务", systemImage: "arrow.triangle.2.circlepath")
                     }
-                    .buttonStyle(.borderedProminent)
+                    .buttonStyle(SealButtonStyle())
                     .tint(StudyCategory.plan.tint)
                     .disabled(aiPlanDraft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                 }
@@ -1886,7 +1932,7 @@ struct StudyWindowView: View {
                     Label("添加", systemImage: "plus")
                         .padding(.horizontal, 6)
                 }
-                .buttonStyle(.borderedProminent)
+                .buttonStyle(SealButtonStyle())
                 .tint(StudyCategory.today.tint)
             }
 
@@ -1961,7 +2007,7 @@ struct StudyWindowView: View {
                     Label(isCompletingWord ? "补全中" : "加入", systemImage: isCompletingWord ? "hourglass" : "plus")
                         .padding(.horizontal, 6)
                 }
-                .buttonStyle(.borderedProminent)
+                .buttonStyle(SealButtonStyle())
                 .tint(StudyCategory.words.tint)
                 .disabled(isCompletingWord)
             }
@@ -2146,7 +2192,7 @@ struct StudyWindowView: View {
                         Label(isGeneratingTranslation ? "生成中" : "生成表达", systemImage: isGeneratingTranslation ? "hourglass" : "sparkles")
                             .padding(.horizontal, 6)
                     }
-                    .buttonStyle(.borderedProminent)
+                    .buttonStyle(SealButtonStyle())
                     .tint(StudyCategory.translation.tint)
                     .disabled(isGeneratingTranslation)
                     .keyboardShortcut(.return, modifiers: [.command])
@@ -2260,7 +2306,7 @@ struct StudyWindowView: View {
                         Label(isGeneratingWriting ? "生成中" : "生成作文", systemImage: isGeneratingWriting ? "hourglass" : "doc.text")
                             .padding(.horizontal, 6)
                     }
-                    .buttonStyle(.borderedProminent)
+                    .buttonStyle(SealButtonStyle())
                     .tint(StudyCategory.writing.tint)
                     .disabled(isGeneratingWriting)
                     .keyboardShortcut(.return, modifiers: [.command])
@@ -2398,7 +2444,7 @@ struct StudyWindowView: View {
                     } label: {
                         Label("加入单词本", systemImage: "plus.circle")
                     }
-                    .buttonStyle(.bordered)
+                    .buttonStyle(BookmarkButtonStyle())
                     .tint(StudyCategory.writing.tint)
                 }
             }
@@ -2639,14 +2685,14 @@ struct StudyWindowView: View {
                 } label: {
                     Label("上一个", systemImage: "chevron.left")
                 }
-                .buttonStyle(.bordered)
+                .buttonStyle(BookmarkButtonStyle())
 
                 Button {
                     toggleCardFavorite(word)
                 } label: {
                     Label(favoriteWordIDs.contains(word.id) ? "取消收藏" : "不熟收藏", systemImage: "bookmark")
                 }
-                .buttonStyle(.bordered)
+                .buttonStyle(BookmarkButtonStyle())
                 .tint(StudyCategory.flashcards.tint)
 
                 Button {
@@ -2654,14 +2700,14 @@ struct StudyWindowView: View {
                 } label: {
                     Label("认识", systemImage: "checkmark")
                 }
-                .buttonStyle(.bordered)
+                .buttonStyle(BookmarkButtonStyle())
 
                 Button {
                     nextCard()
                 } label: {
                     Label("下一个", systemImage: "chevron.right")
                 }
-                .buttonStyle(.borderedProminent)
+                .buttonStyle(SealButtonStyle())
                 .tint(StudyCategory.flashcards.tint)
             }
 
