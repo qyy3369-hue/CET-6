@@ -122,7 +122,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         )
         window.title = "目标计划中心"
         window.appearance = NSAppearance(named: .aqua)
-        window.backgroundColor = NSColor.windowBackgroundColor.withAlphaComponent(0.86)
+        window.backgroundColor = NSColor.windowBackgroundColor.withAlphaComponent(0.92)
         window.isOpaque = false
         window.titlebarAppearsTransparent = false
         window.contentMinSize = NSSize(width: 900, height: 560)

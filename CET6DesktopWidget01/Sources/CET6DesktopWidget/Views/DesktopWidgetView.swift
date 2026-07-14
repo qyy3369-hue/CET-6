@@ -34,9 +34,9 @@ struct DesktopWidgetView: View {
                         .foregroundStyle(StudyTheme.ink)
                         .frame(width: 32, height: 32)
                         .background(StudyTheme.paper)
-                        .clipShape(RoundedRectangle(cornerRadius: 7, style: .continuous))
+                        .clipShape(RoundedRectangle(cornerRadius: 4, style: .continuous))
                         .overlay {
-                            RoundedRectangle(cornerRadius: 7, style: .continuous)
+                            RoundedRectangle(cornerRadius: 4, style: .continuous)
                                 .stroke(StudyTheme.hairline, lineWidth: 1)
                         }
                 }
@@ -60,9 +60,9 @@ struct DesktopWidgetView: View {
         .frame(minHeight: 260, alignment: .topLeading)
         .background {
             ZStack {
-                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                RoundedRectangle(cornerRadius: 5, style: .continuous)
                     .fill(.regularMaterial)
-                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                RoundedRectangle(cornerRadius: 5, style: .continuous)
                     .fill(StudyTheme.widgetPaper)
                 VStack(spacing: 0) {
                     Rectangle().fill(Color.white.opacity(0.72)).frame(height: 1)
@@ -71,12 +71,12 @@ struct DesktopWidgetView: View {
                 }
             }
         }
-        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
         .overlay {
-            RoundedRectangle(cornerRadius: 14, style: .continuous)
+            RoundedRectangle(cornerRadius: 5, style: .continuous)
                 .stroke(StudyTheme.hairline, lineWidth: 1)
         }
-        .shadow(color: .black.opacity(0.18), radius: 22, x: 0, y: 12)
+        .shadow(color: .black.opacity(0.12), radius: 16, x: 0, y: 8)
         .preferredColorScheme(.light)
         .onReceive(NotificationCenter.default.publisher(for: .goalSelectionDidChange)) { _ in
             refreshSelectedGoal()
@@ -87,7 +87,7 @@ struct DesktopWidgetView: View {
         VStack(alignment: .leading, spacing: 5) {
             HStack(spacing: 6) {
                 Text(selectedGoalTitle)
-                    .font(.system(size: 26, weight: .semibold, design: .serif))
+                    .font(StudyTheme.songti(size: 26, weight: .semibold))
                     .foregroundStyle(StudyTheme.ink)
                     .lineLimit(1)
                     .minimumScaleFactor(0.72)
@@ -155,9 +155,9 @@ struct DesktopWidgetView: View {
                 .padding(.horizontal, 12)
                 .padding(.vertical, 10)
                 .background(StudyTheme.paper)
-                .clipShape(RoundedRectangle(cornerRadius: 7, style: .continuous))
+                .clipShape(RoundedRectangle(cornerRadius: 4, style: .continuous))
                 .overlay {
-                    RoundedRectangle(cornerRadius: 7, style: .continuous)
+                    RoundedRectangle(cornerRadius: 4, style: .continuous)
                         .stroke(StudyTheme.hairline, lineWidth: 1)
                 }
                 .onSubmit(addTask)
@@ -170,7 +170,7 @@ struct DesktopWidgetView: View {
             .buttonStyle(.plain)
             .background(StudyTheme.command)
             .foregroundStyle(.white)
-            .clipShape(RoundedRectangle(cornerRadius: 7, style: .continuous))
+            .clipShape(RoundedRectangle(cornerRadius: 4, style: .continuous))
         }
     }
 
@@ -411,15 +411,15 @@ private enum StudyCategory: String, CaseIterable, Identifiable {
 
     var tint: Color {
         switch self {
-        case .goals: Color(red: 0.42, green: 0.30, blue: 0.56)
-        case .plan: Color(red: 0.18, green: 0.36, blue: 0.52)
-        case .today: Color(red: 0.13, green: 0.45, blue: 0.39)
-        case .words: Color(red: 0.58, green: 0.24, blue: 0.25)
-        case .translation: Color(red: 0.22, green: 0.43, blue: 0.50)
-        case .writing: Color(red: 0.56, green: 0.34, blue: 0.18)
-        case .roots: Color(red: 0.46, green: 0.39, blue: 0.20)
-        case .flashcards: Color(red: 0.35, green: 0.34, blue: 0.55)
-        case .mistakes: Color(red: 0.66, green: 0.32, blue: 0.18)
+        case .goals: Color(red: 0.18, green: 0.22, blue: 0.42)       // 靛蓝
+        case .plan: Color(red: 0.14, green: 0.24, blue: 0.38)        // 藏蓝
+        case .today: Color(red: 0.18, green: 0.42, blue: 0.32)       // 松花绿
+        case .words: Color(red: 0.65, green: 0.22, blue: 0.18)       // 朱砂
+        case .translation: Color(red: 0.16, green: 0.34, blue: 0.42) // 石青
+        case .writing: Color(red: 0.52, green: 0.38, blue: 0.18)     // 赭石
+        case .roots: Color(red: 0.56, green: 0.46, blue: 0.16)       // 藤黄
+        case .flashcards: Color(red: 0.38, green: 0.20, blue: 0.30)  // 紫檀
+        case .mistakes: Color(red: 0.60, green: 0.36, blue: 0.12)    // 琥珀
         }
     }
 }
@@ -606,27 +606,48 @@ private enum PlanWorkspaceMode: String, CaseIterable, Identifiable {
 }
 
 private enum StudyTheme {
-    static let windowBase = Color(red: 0.936, green: 0.942, blue: 0.938)
-    static let sidebarBase = Color(red: 0.910, green: 0.918, blue: 0.913).opacity(0.82)
-    static let paper = Color(red: 0.985, green: 0.984, blue: 0.972)
-    static let widgetPaper = Color(red: 0.965, green: 0.964, blue: 0.948).opacity(0.92)
-    static let panelBase = Color(red: 0.976, green: 0.976, blue: 0.962).opacity(0.72)
-    static let panelStrong = Color(red: 0.992, green: 0.990, blue: 0.974).opacity(0.90)
-    static let field = Color(red: 0.998, green: 0.997, blue: 0.986).opacity(0.96)
-    static let hairline = Color(red: 0.18, green: 0.18, blue: 0.16).opacity(0.13)
-    static let ink = Color(red: 0.105, green: 0.112, blue: 0.112)
-    static let sidebarInk = Color(red: 0.16, green: 0.17, blue: 0.16)
-    static let secondaryInk = Color(red: 0.36, green: 0.37, blue: 0.35)
-    static let mutedInk = Color(red: 0.56, green: 0.57, blue: 0.54)
-    static let command = Color(red: 0.17, green: 0.25, blue: 0.25)
-    static let quietGreen = Color(red: 0.13, green: 0.45, blue: 0.39)
-    static let blue = Color(red: 0.18, green: 0.36, blue: 0.52)
+    // ── 典雅古典色板 ──────────────────────────────────────
+    // 底色：暖宣纸系
+    static let windowBase = Color(red: 0.958, green: 0.945, blue: 0.918)
+    static let sidebarBase = Color(red: 0.930, green: 0.915, blue: 0.882).opacity(0.85)
+    static let paper = Color(red: 0.978, green: 0.968, blue: 0.938)
+    static let widgetPaper = Color(red: 0.965, green: 0.952, blue: 0.918).opacity(0.93)
+    static let panelBase = Color(red: 0.972, green: 0.962, blue: 0.930).opacity(0.75)
+    static let panelStrong = Color(red: 0.988, green: 0.978, blue: 0.948).opacity(0.92)
+    static let field = Color(red: 0.992, green: 0.985, blue: 0.960).opacity(0.96)
+
+    // 描边 / 分割线：淡墨色
+    static let hairline = Color(red: 0.28, green: 0.22, blue: 0.16).opacity(0.16)
+
+    // 文字：水墨层级
+    static let ink = Color(red: 0.10, green: 0.08, blue: 0.06)
+    static let sidebarInk = Color(red: 0.14, green: 0.12, blue: 0.10)
+    static let secondaryInk = Color(red: 0.38, green: 0.34, blue: 0.28)
+    static let mutedInk = Color(red: 0.55, green: 0.50, blue: 0.42)
+
+    // 强调色：传统中国色
+    static let command = Color(red: 0.12, green: 0.16, blue: 0.28)        // 靛蓝 — 按钮 / 主操作
+    static let quietGreen = Color(red: 0.18, green: 0.42, blue: 0.32)     // 松花绿 — 完成状态
+    static let blue = Color(red: 0.14, green: 0.22, blue: 0.36)           // 藏蓝 — 链接 / 交互
+    static let cinnabar = Color(red: 0.72, green: 0.22, blue: 0.18)       // 朱砂 — 错误 / 删除
+    static let ochre = Color(red: 0.62, green: 0.42, blue: 0.20)          // 赭石 — 提示 / 标签
+    static let indigo = Color(red: 0.16, green: 0.22, blue: 0.42)         // 靛蓝深 — 标题装饰
+
+    // ── 字体系统 ──────────────────────────────────────────
+    // 标题 — 宋体衬线
+    static func songti(size: CGFloat, weight: Font.Weight = .regular) -> Font {
+        Font.custom("Songti SC", size: size).weight(weight)
+    }
+    // 正文 — 系统默认（去掉 .rounded）
+    static func body(size: CGFloat, weight: Font.Weight = .regular) -> Font {
+        Font.system(size: size, weight: weight)
+    }
 }
 
 private struct FloatingWindowSwitchStyle: ToggleStyle {
     func makeBody(configuration: Configuration) -> some View {
         Button {
-            withAnimation(.spring(response: 0.24, dampingFraction: 0.82)) {
+            withAnimation(.spring(response: 0.38, dampingFraction: 0.80)) {
                 configuration.isOn.toggle()
             }
         } label: {
@@ -642,7 +663,7 @@ private struct FloatingWindowSwitchStyle: ToggleStyle {
                     .fill(StudyTheme.paper)
                     .frame(width: 24, height: 24)
                     .padding(3)
-                    .shadow(color: .black.opacity(0.14), radius: 2, x: 0, y: 1)
+                    .shadow(color: .black.opacity(0.10), radius: 1, x: 0, y: 1)
             }
             .frame(width: 52, height: 30)
             .contentShape(Capsule())
@@ -751,7 +772,7 @@ struct StudyWindowView: View {
     var body: some View {
         HStack(spacing: 0) {
             sidebar
-                .frame(width: 224)
+                .frame(width: 210)
 
             Rectangle()
                 .fill(StudyTheme.hairline)
@@ -808,7 +829,7 @@ struct StudyWindowView: View {
                 HStack(alignment: .top, spacing: 12) {
                     VStack(alignment: .leading, spacing: 2) {
                         Text("Goals")
-                            .font(.system(size: 31, weight: .semibold, design: .serif))
+                            .font(StudyTheme.songti(size: 31, weight: .semibold))
                             .foregroundStyle(StudyTheme.ink)
                         Text("Life Desk")
                             .font(.system(size: 11, weight: .semibold))
@@ -859,7 +880,7 @@ struct StudyWindowView: View {
             HStack(alignment: .center) {
                 VStack(alignment: .leading, spacing: 5) {
                     Text(selectedCategory.title)
-                        .font(.system(size: 29, weight: .semibold, design: .serif))
+                        .font(StudyTheme.songti(size: 29, weight: .semibold))
                     Text(selectedCategory.subtitle)
                         .font(.system(size: 13, weight: .semibold))
                         .foregroundStyle(StudyTheme.secondaryInk)
@@ -996,7 +1017,7 @@ struct StudyWindowView: View {
                 ZStack(alignment: .leading) {
                     Capsule().fill(Color.black.opacity(0.12))
                     Capsule()
-                        .fill(Color(red: 0.10, green: 0.55, blue: 0.48))
+                        .fill(StudyTheme.quietGreen)
                         .frame(width: proxy.size.width * CGFloat(done) / CGFloat(total))
                 }
             }
@@ -1004,9 +1025,9 @@ struct StudyWindowView: View {
         }
         .padding(13)
         .background(StudyTheme.panelBase)
-        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
         .overlay {
-            RoundedRectangle(cornerRadius: 8, style: .continuous)
+            RoundedRectangle(cornerRadius: 5, style: .continuous)
                 .stroke(StudyTheme.hairline, lineWidth: 1)
         }
     }
@@ -1037,7 +1058,7 @@ struct StudyWindowView: View {
         } label: {
             HStack(spacing: 11) {
                 ZStack {
-                    RoundedRectangle(cornerRadius: 6, style: .continuous)
+                    RoundedRectangle(cornerRadius: 3, style: .continuous)
                         .fill(isSelected ? category.tint.opacity(0.12) : Color.white.opacity(0.001))
                         .frame(width: 34, height: 34)
                     Image(systemName: category.icon)
@@ -1059,11 +1080,11 @@ struct StudyWindowView: View {
             .frame(maxWidth: .infinity, minHeight: 52, alignment: .leading)
             .padding(.horizontal, 10)
             .background(isSelected ? StudyTheme.panelStrong : Color.white.opacity(0.001))
-            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
-            .contentShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+            .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
+            .contentShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
             .overlay {
                 if isSelected {
-                    RoundedRectangle(cornerRadius: 8, style: .continuous)
+                    RoundedRectangle(cornerRadius: 5, style: .continuous)
                         .stroke(StudyTheme.hairline, lineWidth: 1)
                 }
             }
@@ -1108,21 +1129,21 @@ struct StudyWindowView: View {
                         .padding(.horizontal, 12)
                         .padding(.vertical, 9)
                         .background(StudyTheme.panelStrong)
-                        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                        .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
                     TextField("模式，例如：考试冲刺 / 习惯养成 / 长期项目", text: $newGoalMode)
                         .textFieldStyle(.plain)
                         .font(.system(size: 14))
                         .padding(.horizontal, 12)
                         .padding(.vertical, 9)
                         .background(StudyTheme.panelStrong)
-                        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                        .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
                     TextField("这个目标最重要的执行原则", text: $newGoalFocus)
                         .textFieldStyle(.plain)
                         .font(.system(size: 14))
                         .padding(.horizontal, 12)
                         .padding(.vertical, 9)
                         .background(StudyTheme.panelStrong)
-                        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                        .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
                         .onSubmit(addGoal)
                     Button {
                         addGoal()
@@ -1134,9 +1155,9 @@ struct StudyWindowView: View {
                 }
                 .padding(13)
                 .background(StudyTheme.panelBase)
-                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
                 .overlay {
-                    RoundedRectangle(cornerRadius: 8, style: .continuous)
+                    RoundedRectangle(cornerRadius: 5, style: .continuous)
                         .stroke(StudyTheme.hairline, lineWidth: 1)
                 }
             }
@@ -1146,7 +1167,7 @@ struct StudyWindowView: View {
                 HStack(alignment: .top) {
                     VStack(alignment: .leading, spacing: 5) {
                         Text(currentGoal.title)
-                            .font(.system(size: 24, weight: .semibold, design: .serif))
+                            .font(StudyTheme.songti(size: 24, weight: .semibold))
                         Text("\(currentGoal.mode) · \(currentGoal.focus)")
                             .font(.system(size: 13, weight: .semibold))
                             .foregroundStyle(StudyTheme.secondaryInk)
@@ -1166,7 +1187,7 @@ struct StudyWindowView: View {
                         .padding(.horizontal, 12)
                         .padding(.vertical, 9)
                         .background(StudyTheme.panelStrong)
-                        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                        .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
                         .onSubmit(addPlanToCurrentGoal)
 
                     Button {
@@ -1222,9 +1243,9 @@ struct StudyWindowView: View {
             .padding(13)
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(isSelected ? StudyTheme.panelStrong : StudyTheme.panelBase)
-            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+            .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
             .overlay {
-                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                RoundedRectangle(cornerRadius: 5, style: .continuous)
                     .stroke(isSelected ? StudyCategory.goals.tint.opacity(0.45) : StudyTheme.hairline, lineWidth: 1)
             }
         }
@@ -1276,9 +1297,9 @@ struct StudyWindowView: View {
             .padding(13)
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(isSelected ? StudyTheme.panelStrong : StudyTheme.panelBase)
-            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+            .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
             .overlay {
-                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                RoundedRectangle(cornerRadius: 5, style: .continuous)
                     .stroke(isSelected ? StudyCategory.plan.tint.opacity(0.45) : StudyTheme.hairline, lineWidth: 1)
             }
         }
@@ -1406,14 +1427,14 @@ struct StudyWindowView: View {
                 .tint(StudyCategory.plan.tint)
             }
             TextEditor(text: $planText)
-                .font(.system(size: 14, weight: .regular, design: .serif))
+                .font(StudyTheme.songti(size: 14))
                 .foregroundStyle(StudyTheme.ink)
                 .scrollContentBackground(.hidden)
                 .padding(12)
                 .background(StudyTheme.panelStrong)
-                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
                 .overlay {
-                    RoundedRectangle(cornerRadius: 8, style: .continuous)
+                    RoundedRectangle(cornerRadius: 5, style: .continuous)
                         .stroke(StudyTheme.hairline, lineWidth: 1)
                 }
         }
@@ -1453,9 +1474,9 @@ struct StudyWindowView: View {
         .padding(14)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(StudyTheme.panelStrong)
-        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
         .overlay {
-            RoundedRectangle(cornerRadius: 8, style: .continuous)
+            RoundedRectangle(cornerRadius: 5, style: .continuous)
                 .stroke(StudyTheme.hairline, lineWidth: 1)
         }
     }
@@ -1615,7 +1636,7 @@ struct StudyWindowView: View {
                     .foregroundStyle(.white)
                     .frame(width: 104, height: 28)
                     .background(StudyCategory.plan.tint)
-                    .clipShape(RoundedRectangle(cornerRadius: 7, style: .continuous))
+                    .clipShape(RoundedRectangle(cornerRadius: 4, style: .continuous))
             }
 
             VStack(alignment: .leading, spacing: 5) {
@@ -1638,9 +1659,9 @@ struct StudyWindowView: View {
         }
         .padding(13)
         .background(StudyTheme.panelStrong)
-        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
         .overlay {
-            RoundedRectangle(cornerRadius: 8, style: .continuous)
+            RoundedRectangle(cornerRadius: 5, style: .continuous)
                 .stroke(StudyTheme.hairline, lineWidth: 1)
         }
     }
@@ -1664,9 +1685,9 @@ struct StudyWindowView: View {
                     .frame(minHeight: 230)
                     .padding(10)
                     .background(StudyTheme.panelStrong)
-                    .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                    .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
                     .overlay {
-                        RoundedRectangle(cornerRadius: 8, style: .continuous)
+                        RoundedRectangle(cornerRadius: 5, style: .continuous)
                             .stroke(StudyTheme.hairline, lineWidth: 1)
                     }
 
@@ -1722,13 +1743,13 @@ struct StudyWindowView: View {
                     ScrollView {
                         VStack(alignment: .leading, spacing: 12) {
                             Text(aiPlanDraft)
-                                .font(.system(size: 13, weight: .regular, design: .serif))
+                                .font(StudyTheme.songti(size: 13))
                                 .foregroundStyle(StudyTheme.ink)
                                 .textSelection(.enabled)
                                 .padding(12)
                                 .frame(maxWidth: .infinity, alignment: .leading)
                                 .background(StudyTheme.panelStrong)
-                                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                                .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
 
                             ForEach(Self.generateSchedule(from: aiPlanDraft, anchorDateKey: DateKey.from(currentPlan.createdAt))) { block in
                                 scheduleCard(block)
@@ -1748,9 +1769,9 @@ struct StudyWindowView: View {
             .padding(.horizontal, 14)
             .padding(.vertical, 11)
             .background(StudyTheme.panelStrong)
-            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+            .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
             .overlay {
-                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                RoundedRectangle(cornerRadius: 5, style: .continuous)
                     .stroke(StudyTheme.hairline, lineWidth: 1)
             }
             .textSelection(.enabled)
@@ -1854,9 +1875,9 @@ struct StudyWindowView: View {
                     .padding(.horizontal, 14)
                     .padding(.vertical, 10)
                     .background(StudyTheme.panelStrong)
-                    .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                    .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
                     .overlay {
-                        RoundedRectangle(cornerRadius: 8, style: .continuous)
+                        RoundedRectangle(cornerRadius: 5, style: .continuous)
                             .stroke(StudyTheme.hairline, lineWidth: 1)
                     }
                     .onSubmit(addQuickTask)
@@ -1882,9 +1903,9 @@ struct StudyWindowView: View {
                     .padding(16)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .background(StudyTheme.panelStrong)
-                    .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                    .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
                     .overlay {
-                        RoundedRectangle(cornerRadius: 8, style: .continuous)
+                        RoundedRectangle(cornerRadius: 5, style: .continuous)
                             .stroke(StudyTheme.hairline, lineWidth: 1)
                     }
                 } else {
@@ -1905,9 +1926,9 @@ struct StudyWindowView: View {
                                 }
                                 .padding(13)
                                 .background(StudyTheme.panelStrong)
-                                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                                .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
                                 .overlay {
-                                    RoundedRectangle(cornerRadius: 8, style: .continuous)
+                                    RoundedRectangle(cornerRadius: 5, style: .continuous)
                                         .stroke(StudyTheme.hairline, lineWidth: 1)
                                 }
                             }
@@ -1929,9 +1950,9 @@ struct StudyWindowView: View {
                     .padding(.horizontal, 14)
                     .padding(.vertical, 10)
                     .background(StudyTheme.panelStrong)
-                    .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                    .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
                     .overlay {
-                        RoundedRectangle(cornerRadius: 8, style: .continuous)
+                        RoundedRectangle(cornerRadius: 5, style: .continuous)
                             .stroke(StudyTheme.hairline, lineWidth: 1)
                     }
                     .onSubmit(addCustomWord)
@@ -1953,9 +1974,9 @@ struct StudyWindowView: View {
                     .padding(.horizontal, 14)
                     .padding(.vertical, 10)
                     .background(StudyTheme.panelStrong)
-                    .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                    .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
                     .overlay {
-                        RoundedRectangle(cornerRadius: 8, style: .continuous)
+                        RoundedRectangle(cornerRadius: 5, style: .continuous)
                             .stroke(StudyTheme.hairline, lineWidth: 1)
                     }
                 Text("\(filteredWords.count) 词")
@@ -1989,7 +2010,7 @@ struct StudyWindowView: View {
                 VStack(alignment: .leading, spacing: 5) {
                     HStack(spacing: 8) {
                         Text(word.word)
-                            .font(.system(size: 20, weight: .bold, design: .serif))
+                            .font(StudyTheme.songti(size: 20, weight: .bold))
                             .foregroundStyle(StudyTheme.ink)
                         if !word.phonetic.isEmpty {
                             Text(word.phonetic)
@@ -2013,7 +2034,7 @@ struct StudyWindowView: View {
                             .foregroundStyle(StudyCategory.words.tint)
                     }
                     Text(word.example)
-                        .font(.system(size: 13, design: .serif))
+                        .font(StudyTheme.songti(size: 13))
                         .foregroundStyle(StudyTheme.secondaryInk)
                     if !word.mnemonic.isEmpty {
                         Text(word.mnemonic)
@@ -2038,16 +2059,16 @@ struct StudyWindowView: View {
             .padding(14)
             .frame(maxWidth: .infinity, minHeight: 86, alignment: .leading)
             .background(StudyTheme.panelStrong)
-            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+            .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
             .overlay {
-                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                RoundedRectangle(cornerRadius: 5, style: .continuous)
                     .stroke(StudyTheme.hairline, lineWidth: 1)
             }
-            .contentShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+            .contentShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
             .gesture(
                 DragGesture(minimumDistance: 12)
                     .onEnded { value in
-                        withAnimation(.spring(response: 0.24, dampingFraction: 0.86)) {
+                        withAnimation(.spring(response: 0.36, dampingFraction: 0.82)) {
                             if value.translation.width < -28 {
                                 revealedDeleteWordID = word.id
                             } else if value.translation.width > 20 {
@@ -2058,7 +2079,7 @@ struct StudyWindowView: View {
             )
             .onTapGesture {
                 if isRevealed {
-                    withAnimation(.spring(response: 0.22, dampingFraction: 0.9)) {
+                    withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) {
                         revealedDeleteWordID = nil
                     }
                 }
@@ -2077,16 +2098,16 @@ struct StudyWindowView: View {
                     .foregroundStyle(.white)
                     .frame(width: 78)
                     .frame(minHeight: 86)
-                    .background(Color.red.opacity(0.88))
-                    .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                    .background(StudyTheme.cinnabar)
+                    .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
                 }
                 .buttonStyle(.plain)
                 .transition(.move(edge: .trailing).combined(with: .opacity))
             }
         }
-        .animation(.spring(response: 0.24, dampingFraction: 0.86), value: isRevealed)
+        .animation(.spring(response: 0.36, dampingFraction: 0.82), value: isRevealed)
         .frame(maxWidth: .infinity, minHeight: 86, alignment: .leading)
-        .contentShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+        .contentShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
         .contextMenu {
             Button(role: .destructive) {
                 deleteWord(word)
@@ -2094,7 +2115,7 @@ struct StudyWindowView: View {
                 Label("删除", systemImage: "trash")
             }
         }
-        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
     }
 
     private var translationWorkspace: some View {
@@ -2107,9 +2128,9 @@ struct StudyWindowView: View {
                     .frame(minHeight: 44)
                     .padding(12)
                     .background(StudyTheme.panelStrong)
-                    .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                    .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
                     .overlay {
-                        RoundedRectangle(cornerRadius: 8, style: .continuous)
+                        RoundedRectangle(cornerRadius: 5, style: .continuous)
                             .stroke(StudyTheme.hairline, lineWidth: 1)
                     }
                     .onSubmit(generateTranslationPractice)
@@ -2179,7 +2200,7 @@ struct StudyWindowView: View {
                             .font(.system(size: 12, weight: .bold))
                             .foregroundStyle(StudyCategory.translation.tint)
                         Text(version.text)
-                            .font(.system(size: 15, weight: .semibold, design: .serif))
+                            .font(StudyTheme.songti(size: 15, weight: .semibold))
                             .foregroundStyle(StudyTheme.ink)
                             .textSelection(.enabled)
                         if !version.reason.isEmpty {
@@ -2191,7 +2212,7 @@ struct StudyWindowView: View {
                     .padding(10)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .background(Color.white.opacity(0.48))
-                    .clipShape(RoundedRectangle(cornerRadius: 7, style: .continuous))
+                    .clipShape(RoundedRectangle(cornerRadius: 4, style: .continuous))
                 }
 
                 if !record.notes.isEmpty {
@@ -2203,9 +2224,9 @@ struct StudyWindowView: View {
             .padding(14)
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(StudyTheme.panelStrong)
-            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+            .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
             .overlay {
-                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                RoundedRectangle(cornerRadius: 5, style: .continuous)
                     .stroke(StudyTheme.hairline, lineWidth: 1)
             }
         }
@@ -2221,9 +2242,9 @@ struct StudyWindowView: View {
                     .frame(minHeight: 44)
                     .padding(12)
                     .background(StudyTheme.panelStrong)
-                    .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                    .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
                     .overlay {
-                        RoundedRectangle(cornerRadius: 8, style: .continuous)
+                        RoundedRectangle(cornerRadius: 5, style: .continuous)
                             .stroke(StudyTheme.hairline, lineWidth: 1)
                     }
                     .onSubmit(generateWritingPractice)
@@ -2273,7 +2294,7 @@ struct StudyWindowView: View {
             VStack(alignment: .leading, spacing: 10) {
                 HStack(alignment: .firstTextBaseline) {
                     Text(record.title)
-                        .font(.system(size: 18, weight: .bold, design: .serif))
+                        .font(StudyTheme.songti(size: 18, weight: .bold))
                         .foregroundStyle(StudyTheme.ink)
                     Text("\(record.wordCount) words")
                         .font(.system(size: 11, weight: .bold))
@@ -2298,7 +2319,7 @@ struct StudyWindowView: View {
 
                 if isCollapsed {
                     Text(Self.essayPreview(record.essay))
-                        .font(.system(size: 13, weight: .medium, design: .serif))
+                        .font(StudyTheme.songti(size: 13, weight: .medium))
                         .foregroundStyle(StudyTheme.secondaryInk)
                         .lineLimit(2)
                 } else {
@@ -2345,16 +2366,16 @@ struct StudyWindowView: View {
                         .padding(10)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .background(Color.white.opacity(0.48))
-                        .clipShape(RoundedRectangle(cornerRadius: 7, style: .continuous))
+                        .clipShape(RoundedRectangle(cornerRadius: 4, style: .continuous))
                     }
                 }
             }
             .padding(14)
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(StudyTheme.panelStrong)
-            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+            .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
             .overlay {
-                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                RoundedRectangle(cornerRadius: 5, style: .continuous)
                     .stroke(StudyTheme.hairline, lineWidth: 1)
             }
         }
@@ -2367,7 +2388,7 @@ struct StudyWindowView: View {
                     .font(.system(size: 12, weight: .bold))
                     .foregroundStyle(StudyTheme.secondaryInk)
                 Text(selectedEssayText)
-                    .font(.system(size: 13, weight: .semibold, design: .serif))
+                    .font(StudyTheme.songti(size: 13, weight: .semibold))
                     .lineLimit(2)
                     .foregroundStyle(StudyTheme.ink)
                 Spacer()
@@ -2396,9 +2417,9 @@ struct StudyWindowView: View {
         .padding(10)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(StudyCategory.writing.tint.opacity(0.10))
-        .clipShape(RoundedRectangle(cornerRadius: 7, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 4, style: .continuous))
         .overlay {
-            RoundedRectangle(cornerRadius: 7, style: .continuous)
+            RoundedRectangle(cornerRadius: 4, style: .continuous)
                 .stroke(StudyCategory.writing.tint.opacity(0.25), lineWidth: 1)
         }
     }
@@ -2412,11 +2433,11 @@ struct StudyWindowView: View {
     ) -> some View {
         HStack(spacing: 8) {
             content()
-                .contentShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                .contentShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
                 .gesture(
                     DragGesture(minimumDistance: 12)
                         .onEnded { value in
-                            withAnimation(.spring(response: 0.24, dampingFraction: 0.86)) {
+                            withAnimation(.spring(response: 0.36, dampingFraction: 0.82)) {
                                 if value.translation.width < -28 {
                                     reveal()
                                 } else if value.translation.width > 20 {
@@ -2427,7 +2448,7 @@ struct StudyWindowView: View {
                 )
                 .onTapGesture {
                     if isRevealed {
-                        withAnimation(.spring(response: 0.22, dampingFraction: 0.9)) {
+                        withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) {
                             hide()
                         }
                     }
@@ -2446,14 +2467,14 @@ struct StudyWindowView: View {
                     .foregroundStyle(.white)
                     .frame(width: 78)
                     .frame(maxHeight: .infinity)
-                    .background(Color.red.opacity(0.88))
-                    .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                    .background(StudyTheme.cinnabar)
+                    .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
                 }
                 .buttonStyle(.plain)
                 .transition(.move(edge: .trailing).combined(with: .opacity))
             }
         }
-        .animation(.spring(response: 0.24, dampingFraction: 0.86), value: isRevealed)
+        .animation(.spring(response: 0.36, dampingFraction: 0.82), value: isRevealed)
         .frame(maxWidth: .infinity, alignment: .leading)
         .contextMenu {
             Button(role: .destructive) {
@@ -2462,7 +2483,7 @@ struct StudyWindowView: View {
                 Label("删除", systemImage: "trash")
             }
         }
-        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
     }
 
     private var rootsWorkspace: some View {
@@ -2474,9 +2495,9 @@ struct StudyWindowView: View {
                 .padding(.horizontal, 14)
                 .padding(.vertical, 10)
                 .background(StudyTheme.panelStrong)
-                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
                 .overlay {
-                    RoundedRectangle(cornerRadius: 8, style: .continuous)
+                    RoundedRectangle(cornerRadius: 5, style: .continuous)
                         .stroke(StudyTheme.hairline, lineWidth: 1)
                 }
 
@@ -2498,7 +2519,7 @@ struct StudyWindowView: View {
         VStack(alignment: .leading, spacing: 10) {
             HStack(alignment: .firstTextBaseline) {
                 Text(root.root)
-                    .font(.system(size: 22, weight: .bold, design: .serif))
+                    .font(StudyTheme.songti(size: 22, weight: .bold))
                     .foregroundStyle(StudyCategory.roots.tint)
                 Spacer()
                 Text(root.pattern)
@@ -2521,9 +2542,9 @@ struct StudyWindowView: View {
         .padding(16)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(StudyTheme.panelStrong)
-        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
         .overlay {
-            RoundedRectangle(cornerRadius: 8, style: .continuous)
+            RoundedRectangle(cornerRadius: 5, style: .continuous)
                 .stroke(StudyTheme.hairline, lineWidth: 1)
         }
     }
@@ -2554,17 +2575,17 @@ struct StudyWindowView: View {
             Spacer(minLength: 10)
 
             Button {
-                withAnimation(.spring(response: 0.32, dampingFraction: 0.86)) {
+                withAnimation(.spring(response: 0.42, dampingFraction: 0.82)) {
                     showsCardBack.toggle()
                 }
             } label: {
                 VStack(spacing: 14) {
                     Text(showsCardBack ? word.meaning : word.word)
-                        .font(.system(size: showsCardBack ? 28 : 50, weight: .bold, design: .serif))
+                        .font(StudyTheme.songti(size: showsCardBack ? 28 : 50, weight: .bold))
                         .foregroundStyle(StudyTheme.ink)
                         .multilineTextAlignment(.center)
                     Text(showsCardBack ? word.example : (frontCardMeta(for: word).isEmpty ? "点击翻面" : frontCardMeta(for: word)))
-                        .font(.system(size: 16, weight: .medium, design: .serif))
+                        .font(StudyTheme.songti(size: 16, weight: .medium))
                         .foregroundStyle(StudyTheme.secondaryInk)
                         .multilineTextAlignment(.center)
                         .padding(.horizontal, 26)
@@ -2604,9 +2625,9 @@ struct StudyWindowView: View {
                 }
                 .frame(maxWidth: 560, minHeight: 300)
                 .background(StudyTheme.panelStrong)
-                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
                 .overlay {
-                    RoundedRectangle(cornerRadius: 8, style: .continuous)
+                    RoundedRectangle(cornerRadius: 5, style: .continuous)
                         .stroke(StudyTheme.hairline, lineWidth: 1)
                 }
             }
@@ -2672,9 +2693,9 @@ struct StudyWindowView: View {
                     .padding(.horizontal, 14)
                     .padding(.vertical, 10)
                     .background(StudyTheme.panelStrong)
-                    .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                    .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
                     .overlay {
-                        RoundedRectangle(cornerRadius: 8, style: .continuous)
+                        RoundedRectangle(cornerRadius: 5, style: .continuous)
                             .stroke(StudyTheme.hairline, lineWidth: 1)
                     }
             }
@@ -2703,7 +2724,7 @@ struct StudyWindowView: View {
             VStack(alignment: .leading, spacing: 5) {
                 HStack(spacing: 8) {
                     Text(word.word)
-                        .font(.system(size: 18, weight: .bold, design: .serif))
+                        .font(StudyTheme.songti(size: 18, weight: .bold))
                         .foregroundStyle(StudyTheme.ink)
                     Text(word.tag)
                         .font(.system(size: 11, weight: .bold))
@@ -2713,7 +2734,7 @@ struct StudyWindowView: View {
                     .font(.system(size: 14, weight: .semibold))
                     .foregroundStyle(StudyTheme.ink)
                 Text(word.example)
-                    .font(.system(size: 13, design: .serif))
+                    .font(StudyTheme.songti(size: 13))
                     .foregroundStyle(StudyTheme.secondaryInk)
             }
 
@@ -2736,9 +2757,9 @@ struct StudyWindowView: View {
         }
         .padding(14)
         .background(StudyTheme.panelStrong)
-        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
         .overlay {
-            RoundedRectangle(cornerRadius: 8, style: .continuous)
+            RoundedRectangle(cornerRadius: 5, style: .continuous)
                 .stroke(StudyTheme.hairline, lineWidth: 1)
         }
     }
@@ -3260,9 +3281,9 @@ struct StudyWindowView: View {
         .padding(16)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(StudyTheme.panelStrong)
-        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
         .overlay {
-            RoundedRectangle(cornerRadius: 8, style: .continuous)
+            RoundedRectangle(cornerRadius: 5, style: .continuous)
                 .stroke(StudyTheme.hairline, lineWidth: 1)
         }
     }
