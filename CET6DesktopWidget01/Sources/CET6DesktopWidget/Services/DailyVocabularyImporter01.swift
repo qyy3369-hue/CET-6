@@ -230,12 +230,27 @@ final class DailyVocabularyImporter01 {
 
         if let latest = existing
             .filter({ $0.lastPathComponent.range(of: #"^custom_words\d+\.json$"#, options: .regularExpression) != nil })
-            .sorted(by: { $0.lastPathComponent > $1.lastPathComponent })
+            .sorted(by: numberedFileSort)
             .first {
             return latest
         }
 
         return dataFolderURL.appendingPathComponent("custom_words01.json")
+    }
+
+    private static func numberedFileSort(_ lhs: URL, _ rhs: URL) -> Bool {
+        let lhsIndex = numberedFileIndex(lhs)
+        let rhsIndex = numberedFileIndex(rhs)
+        if lhsIndex == rhsIndex {
+            return lhs.lastPathComponent > rhs.lastPathComponent
+        }
+        return lhsIndex > rhsIndex
+    }
+
+    private static func numberedFileIndex(_ url: URL) -> Int {
+        let stem = url.deletingPathExtension().lastPathComponent
+        let suffix = String(stem.reversed().prefix(while: \Character.isNumber).reversed())
+        return Int(suffix) ?? 0
     }
 
     private static let stateFileURL = dataFolderURL

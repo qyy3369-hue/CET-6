@@ -17,6 +17,11 @@ let package = Package(
         .executableTarget(
             name: "CET6DesktopWidget",
             path: "Sources/CET6DesktopWidget"
+        ),
+        .testTarget(
+            name: "CET6DesktopWidgetTests",
+            dependencies: ["CET6DesktopWidget"],
+            path: "Tests/CET6DesktopWidgetTests"
         )
     ]
 )

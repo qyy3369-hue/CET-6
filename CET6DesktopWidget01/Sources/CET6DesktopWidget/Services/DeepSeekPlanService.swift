@@ -41,21 +41,21 @@ struct DeepSeekPlanService {
                 ChatMessage(
                     role: "system",
                     content: """
-                    你是 CET-6 学习计划助理。请把用户的计划书拆成清晰日程。
+                    你是目标计划助理。请把用户的计划书拆成清晰日程。
                     当前年份是 \(currentYear)，今天是 \(today)。
                     用户写“5月24日”时，dateKeys 必须输出 "\(currentYear)-05-24" 这样的 yyyy-MM-dd。
                     用户写“5月23 24”“5月23日、24日”“5月23和24日”这类同一任务跨多个日期时，dateKeys 必须包含每一个日期，同一个任务会由客户端展开到多天日程。
                     只输出 JSON，不要 Markdown，不要解释。
                     JSON 格式必须是：
-                    {"schedule":[{"dateKeys":["\(currentYear)-05-24"],"timeLabel":"全天","title":"高频词 60 个","note":"重点看同义替换","category":"词汇"}]}
-                    category 只能从 词汇、听力、阅读、输出、复习 中选择。
+                    {"schedule":[{"dateKeys":["\(currentYear)-05-24"],"timeLabel":"全天","title":"晨跑 30 分钟","note":"记录心率和体感","category":"健康"}]}
+                    category 可以是学习、健康、工作、生活、输出、复习、其他。
                     """
                 ),
                 ChatMessage(role: "user", content: planText)
             ],
             temperature: 0.2,
             thinking: ThinkingMode(type: "disabled"),
-            maxTokens: 1200,
+            maxTokens: 6000,
             responseFormat: ResponseFormat(type: "json_object")
         )
 
@@ -118,7 +118,7 @@ struct DeepSeekPlanService {
                 ChatMessage(
                     role: "system",
                     content: """
-                    你是 CET-6 学习计划修改助理。根据用户的要求，改写当前计划书。
+                    你是目标计划修改助理。根据用户的要求，改写当前计划书。
                     当前年份是 \(currentYear)，今天是 \(today)。
                     保留中文表达风格，日期必须写成“5月24日”这类真实日期，不要写“第几天”替代日期。
                     如果用户要求某件事在多个日期出现，请在每个日期都写清楚。
@@ -189,15 +189,15 @@ struct DeepSeekPlanService {
                 ChatMessage(
                     role: "system",
                     content: """
-                    你是 CET-6 备考规划师。根据用户的备考情况，从零生成一份可执行的 CET-6 学习计划。
+                    你是目标规划师。根据用户的目标、期限、可用时间和执行偏好，从零生成一份可执行计划。
                     当前年份是 \(currentYear)，今天是 \(today)。
                     计划必须直接可被客户端拆成日程，所以每一行都要包含明确日期、时间段、任务标题和备注。
                     日期写成“6月2日”这类真实日期，不要写“第1天”替代日期。
-                    任务要覆盖词汇、听力、阅读、翻译、写作、复习，按用户薄弱项倾斜。
+                    任务要围绕用户的目标拆成具体行动，必要时包含学习、训练、输出、整理、复盘或休息。
                     每天任务量要现实，不要堆砌；如果用户没有给天数，默认生成未来 7 天。
                     只输出 JSON，不要 Markdown，不要解释。
                     JSON 格式必须是：
-                    {"reply":"简短说明计划重点","planText":"完整计划书，每行一个任务，例如：6月2日 08:00-08:40 高频词 40 个，重点看同义替换"}
+                    {"reply":"简短说明计划重点","planText":"完整计划书，每行一个任务，例如：6月2日 08:00-08:40 晨跑 30 分钟，记录心率和体感"}
                     """
                 ),
                 ChatMessage(role: "user", content: userProfile)
@@ -809,6 +809,28 @@ private struct DeepSeekErrorResponse: Decodable {
 
 private struct GeneratedSchedule: Decodable {
     let schedule: [GeneratedScheduleItem]
+
+    init(from decoder: Decoder) throws {
+        if var unkeyedContainer = try? decoder.unkeyedContainer() {
+            var items: [GeneratedScheduleItem] = []
+            while !unkeyedContainer.isAtEnd {
+                items.append(try unkeyedContainer.decode(GeneratedScheduleItem.self))
+            }
+            self.schedule = items
+            return
+        }
+
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.schedule = try container.decodeFirstPresent([GeneratedScheduleItem].self, forKeys: [.schedule, .items, .tasks, .日程, .计划])
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case schedule
+        case items
+        case tasks
+        case 日程
+        case 计划
+    }
 }
 
 private struct GeneratedScheduleItem: Decodable {
@@ -819,11 +841,93 @@ private struct GeneratedScheduleItem: Decodable {
     let note: String?
     let category: String?
 
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.dateKeys = container.decodeFlexibleStringArray(forKeys: [.dateKeys, .dates, .dateList, .日期列表])
+        self.dateKey = container.decodeFirstPresentIfPossible(String.self, forKeys: [.dateKey, .date, .day, .日期, .dateLabel])
+        self.timeLabel = container.decodeFirstPresentIfPossible(String.self, forKeys: [.timeLabel, .time, .period, .时间, .时间段])
+
+        let decodedTitle = container.decodeFirstPresentIfPossible(String.self, forKeys: [.title, .task, .taskTitle, .content, .name, .任务, .标题])
+        let decodedNote = container.decodeFirstPresentIfPossible(String.self, forKeys: [.note, .detail, .description, .备注, .说明])
+        self.title = decodedTitle?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false ? decodedTitle! : (decodedNote ?? "计划任务")
+        self.note = decodedNote
+        self.category = container.decodeFirstPresentIfPossible(String.self, forKeys: [.category, .type, .mode, .分类, .类型])
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case dateKeys
+        case dates
+        case dateList
+        case 日期列表
+        case dateKey
+        case date
+        case day
+        case 日期
+        case dateLabel
+        case timeLabel
+        case time
+        case period
+        case 时间
+        case 时间段
+        case title
+        case task
+        case taskTitle
+        case content
+        case name
+        case 任务
+        case 标题
+        case note
+        case detail
+        case description
+        case 备注
+        case 说明
+        case category
+        case type
+        case mode
+        case 分类
+        case 类型
+    }
+
     func normalizedDateKeys() -> [String] {
         let keys = dateKeys ?? dateKey.map { [$0] } ?? [DateKey.today()]
         return keys
             .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
             .map { DateKey.normalized($0) ?? $0 }
             .filter { !$0.isEmpty }
+    }
+}
+
+private extension KeyedDecodingContainer {
+    func decodeFirstPresent<T: Decodable>(_ type: T.Type, forKeys keys: [Key]) throws -> T {
+        for key in keys {
+            if let value = try? decode(type, forKey: key) {
+                return value
+            }
+        }
+        throw DecodingError.keyNotFound(
+            keys[0],
+            DecodingError.Context(codingPath: codingPath, debugDescription: "None of the expected keys were present.")
+        )
+    }
+
+    func decodeFirstPresentIfPossible<T: Decodable>(_ type: T.Type, forKeys keys: [Key]) -> T? {
+        for key in keys {
+            if let value = try? decode(type, forKey: key) {
+                return value
+            }
+        }
+        return nil
+    }
+
+    func decodeFlexibleStringArray(forKeys keys: [Key]) -> [String]? {
+        for key in keys {
+            if let values = try? decode([String].self, forKey: key) {
+                return values
+            }
+            if let value = try? decode(String.self, forKey: key) {
+                return [value]
+            }
+        }
+        return nil
     }
 }

@@ -9,8 +9,17 @@ enum DateKey {
         return formatter.string(from: Date())
     }
 
+    static func from(_ date: Date, calendar: Calendar = .current) -> String {
+        key(from: date, calendar: calendar)
+    }
+
     static func from(month: Int, day: Int, calendar: Calendar = .current) -> String? {
-        let year = calendar.component(.year, from: Date())
+        from(month: month, day: day, relativeTo: today(calendar: calendar), calendar: calendar)
+    }
+
+    static func from(month: Int, day: Int, relativeTo anchorKey: String, calendar: Calendar = .current) -> String? {
+        guard let anchorDate = date(from: normalized(anchorKey) ?? anchorKey, calendar: calendar) else { return nil }
+        let year = calendar.component(.year, from: anchorDate)
         var components = DateComponents()
         components.calendar = calendar
         components.year = year
@@ -56,6 +65,15 @@ enum DateKey {
         }
 
         return self.key(from: nextDate, calendar: calendar)
+    }
+
+    static func addingDays(_ days: Int, to key: String, calendar: Calendar = .current) -> String? {
+        guard let date = date(from: normalized(key) ?? key, calendar: calendar),
+              let targetDate = calendar.date(byAdding: .day, value: days, to: date) else {
+            return nil
+        }
+
+        return self.key(from: targetDate, calendar: calendar)
     }
 
     private static func key(from date: Date, calendar: Calendar) -> String {

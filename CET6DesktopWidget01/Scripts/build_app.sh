@@ -12,9 +12,10 @@ swift build
 
 mkdir -p "$MACOS_DIR"
 mkdir -p "$RESOURCES_DIR"
+rm -f "$RESOURCES_DIR"/AppIcon*.icns
 cp "$PROJECT_DIR/.build/debug/CET6DesktopWidget" "$MACOS_DIR/CET6DesktopWidget"
 cp "$PROJECT_DIR/Support/Info.plist" "$CONTENTS_DIR/Info.plist"
-cp "$PROJECT_DIR/Support/AppIcon02.icns" "$RESOURCES_DIR/AppIcon02.icns"
+cp "$PROJECT_DIR/Support/AppIcon04.icns" "$RESOURCES_DIR/AppIcon04.icns"
 chmod +x "$MACOS_DIR/CET6DesktopWidget"
 xattr -cr "$APP_DIR"
 codesign --force --deep --sign - "$APP_DIR"

@@ -26,12 +26,20 @@ final class WidgetVisibilityController: ObservableObject {
 final class AppDelegate: NSObject, NSApplicationDelegate {
     private var widgetWindow: DraggableWidgetWindow?
     private var studyWindow: NSWindow?
+    private var dateRolloverTimer: Timer?
+    private var lastKnownDateKey = DateKey.today()
     private let store = TaskStore()
     private let widgetVisibility = WidgetVisibilityController()
     private lazy var dailyVocabularyImporter = DailyVocabularyImporter01(store: store)
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        let goals = GoalPlanStore01.load(defaultPlanText: StudyWindowView.defaultPlanText)
+        store.refreshPlanTasks(from: goals) { plan in
+            plan.generatedSchedule ?? StudyWindowView.generateSchedule(from: plan.planText, anchorDateKey: DateKey.from(plan.createdAt))
+        }
+        store.advancePlanDatesIfNeeded(from: goals)
         dailyVocabularyImporter.start()
+        startDateRolloverMonitor()
         widgetVisibility.onVisibilityChange = { [weak self] isVisible in
             self?.setWidgetWindowVisible(isVisible)
         }
@@ -72,6 +80,28 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationWillTerminate(_ notification: Notification) {
         dailyVocabularyImporter.stop()
+        dateRolloverTimer?.invalidate()
+    }
+
+    private func startDateRolloverMonitor() {
+        dateRolloverTimer?.invalidate()
+        dateRolloverTimer = Timer.scheduledTimer(withTimeInterval: 60, repeats: true) { [weak self] _ in
+            Task { @MainActor [weak self] in
+                self?.advancePlanDatesAfterDateChange()
+            }
+        }
+    }
+
+    private func advancePlanDatesAfterDateChange() {
+        let today = DateKey.today()
+        guard today != lastKnownDateKey else { return }
+
+        lastKnownDateKey = today
+        let goals = GoalPlanStore01.load(defaultPlanText: StudyWindowView.defaultPlanText)
+        store.refreshPlanTasks(from: goals) { plan in
+            plan.generatedSchedule ?? StudyWindowView.generateSchedule(from: plan.planText, anchorDateKey: DateKey.from(plan.createdAt))
+        }
+        store.advancePlanDatesIfNeeded(from: goals)
     }
 
     private func openStudyWindow() {
@@ -90,7 +120,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             backing: .buffered,
             defer: false
         )
-        window.title = "CET-6 学习计划"
+        window.title = "目标计划中心"
         window.appearance = NSAppearance(named: .aqua)
         window.backgroundColor = NSColor.windowBackgroundColor.withAlphaComponent(0.86)
         window.isOpaque = false

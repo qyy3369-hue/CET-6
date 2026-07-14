@@ -1,6 +1,3048 @@
 [
   {
     "difficulty" : 4,
+    "example" : "The proceedings of the conference will be published next month.",
+    "exampleTranslation" : "会议的记录将于下个月出版。",
+    "id" : "custom-proceeding",
+    "meaning" : "进程；诉讼；会议记录",
+    "mnemonic" : "pro-向前+ceed走+ing：向前走的过程就是进程",
+    "partOfSpeech" : "n.",
+    "phonetic" : "\/prəˈsiːdɪŋ\/",
+    "phraseTranslations" : [
+      "法律诉讼",
+      "会议记录",
+      "启动程序"
+    ],
+    "phrases" : [
+      "legal proceedings",
+      "proceedings of the meeting",
+      "start proceedings"
+    ],
+    "tag" : "阅读高频",
+    "word" : "proceeding"
+  },
+  {
+    "difficulty" : 3,
+    "example" : "The primitive tools were made of stone and wood.",
+    "exampleTranslation" : "这些原始工具是由石头和木头制成的。",
+    "id" : "custom-primitive",
+    "meaning" : "原始的；早期的；简单的",
+    "mnemonic" : "prime（最初的）+itive（形容词后缀）→ 最初的，原始的",
+    "partOfSpeech" : "adj.",
+    "phonetic" : "\/ˈprɪmɪtɪv\/",
+    "phraseTranslations" : [
+      "原始社会",
+      "原始技术",
+      "原始本能"
+    ],
+    "phrases" : [
+      "primitive society",
+      "primitive technology",
+      "primitive instinct"
+    ],
+    "tag" : "阅读高频、词根、基础词",
+    "word" : "primitive"
+  },
+  {
+    "difficulty" : 3,
+    "example" : "Environmental protection should be given top priority in modern society.",
+    "exampleTranslation" : "环境保护在现代社会应被给予最高优先权。",
+    "id" : "custom-priority",
+    "meaning" : "优先；优先权；重点",
+    "mnemonic" : "prior（先前的）+ ity：先做的事就是优先事项",
+    "partOfSpeech" : "n.",
+    "phonetic" : "\/praɪˈɒrəti\/",
+    "phraseTranslations" : [
+      "最高优先权",
+      "优先考虑",
+      "优先于"
+    ],
+    "phrases" : [
+      "top priority",
+      "give priority to",
+      "priority over"
+    ],
+    "tag" : "写作高频",
+    "word" : "priority"
+  },
+  {
+    "difficulty" : 2,
+    "example" : "In an ideal world, there would be no poverty.",
+    "exampleTranslation" : "在理想的世界里，将不会有贫困。",
+    "id" : "custom-ideal",
+    "meaning" : "理想的；完美的；理想；完美的人或事物",
+    "mnemonic" : "idea（想法）+ l → 想法中的完美状态就是理想",
+    "partOfSpeech" : "adj.\/n.",
+    "phonetic" : "\/aɪˈdiːəl\/",
+    "phraseTranslations" : [
+      "理想候选人",
+      "理想解决方案",
+      "理想情况"
+    ],
+    "phrases" : [
+      "ideal candidate",
+      "ideal solution",
+      "ideal situation"
+    ],
+    "tag" : "写作替换、阅读高频、基础词",
+    "word" : "ideal"
+  },
+  {
+    "difficulty" : 4,
+    "example" : "The rugged terrain made the hike extremely challenging.",
+    "exampleTranslation" : "崎岖的地形使这次徒步旅行极具挑战性。",
+    "id" : "custom-terrain",
+    "meaning" : "地形；地势；地带",
+    "mnemonic" : "terr- 土地 + ain 名词后缀：土地的样子就是地形",
+    "partOfSpeech" : "n.",
+    "phonetic" : "\/təˈreɪn\/",
+    "phraseTranslations" : [
+      "崎岖的地形",
+      "多山的地形",
+      "困难的地形"
+    ],
+    "phrases" : [
+      "rough terrain",
+      "mountainous terrain",
+      "difficult terrain"
+    ],
+    "tag" : "阅读高频",
+    "word" : "terrain"
+  },
+  {
+    "difficulty" : 4,
+    "example" : "The novel portrays the life of a young artist in Paris.",
+    "exampleTranslation" : "这部小说描绘了一位年轻艺术家在巴黎的生活。",
+    "id" : "custom-portray",
+    "meaning" : "描绘；描述；扮演",
+    "mnemonic" : "por-（向前）+ tray（托盘）：把托盘上的东西展示出来，即描绘。",
+    "partOfSpeech" : "v.",
+    "phonetic" : "\/pɔːrˈtreɪ\/",
+    "phraseTranslations" : [
+      "把…描绘成",
+      "以正面的角度描绘",
+      "准确地描绘"
+    ],
+    "phrases" : [
+      "portray as",
+      "portray in a positive light",
+      "portray accurately"
+    ],
+    "tag" : "阅读高频、写作替换、词根",
+    "word" : "portray"
+  },
+  {
+    "difficulty" : 4,
+    "example" : "The intrusion of noise from the construction site disrupted our class.",
+    "exampleTranslation" : "建筑工地的噪音干扰打断了我们的课堂。",
+    "id" : "custom-intrusion",
+    "meaning" : "侵入；闯入；干扰",
+    "mnemonic" : "in- 进入 + trus- 推 + -ion 名词：强行推入就是侵入",
+    "partOfSpeech" : "n.",
+    "phonetic" : "\/ɪnˈtruːʒn\/",
+    "phraseTranslations" : [
+      "对隐私的侵犯",
+      "闯入个人空间",
+      "不受欢迎的侵入"
+    ],
+    "phrases" : [
+      "an intrusion on privacy",
+      "intrusion into personal space",
+      "unwanted intrusion"
+    ],
+    "tag" : "阅读高频、写作替换、词根",
+    "word" : "intrusion"
+  },
+  {
+    "difficulty" : 3,
+    "example" : "Her contribution to the project was invaluable.",
+    "exampleTranslation" : "她对这个项目的贡献是无价的。",
+    "id" : "custom-contribution",
+    "meaning" : "贡献；捐款；投稿",
+    "mnemonic" : "con- 一起 + tribute 给予：大家一起给予就是贡献",
+    "partOfSpeech" : "n.",
+    "phonetic" : "\/ˌkɒntrɪˈbjuːʃn\/",
+    "phraseTranslations" : [
+      "做出贡献",
+      "对社会的贡献",
+      "财务捐款"
+    ],
+    "phrases" : [
+      "make a contribution",
+      "contribution to society",
+      "financial contribution"
+    ],
+    "tag" : "阅读高频",
+    "word" : "contribution"
+  },
+  {
+    "difficulty" : 3,
+    "example" : "From a historical perspective, the event was significant.",
+    "exampleTranslation" : "从历史的角度来看，这一事件意义重大。",
+    "id" : "custom-perspective",
+    "meaning" : "视角；观点；透视法",
+    "mnemonic" : "per- 贯穿 + spect 看 + ive：看穿事物本质的视角",
+    "partOfSpeech" : "n.",
+    "phonetic" : "\/pərˈspektɪv\/",
+    "phraseTranslations" : [
+      "从不同的视角",
+      "全球视角",
+      "人生观"
+    ],
+    "phrases" : [
+      "from a different perspective",
+      "global perspective",
+      "perspective on life"
+    ],
+    "tag" : "阅读高频、写作替换、词根",
+    "word" : "perspective"
+  },
+  {
+    "difficulty" : 4,
+    "example" : "His deceit was eventually discovered by his colleagues.",
+    "exampleTranslation" : "他的欺骗行为最终被同事们发现了。",
+    "id" : "custom-deceit",
+    "meaning" : "欺骗；欺诈",
+    "mnemonic" : "de- 向下 + ceit 拿：偷偷拿走东西就是欺骗",
+    "partOfSpeech" : "n.",
+    "phonetic" : "\/dɪˈsiːt\/",
+    "phraseTranslations" : [
+      "欺骗与欺诈",
+      "揭露欺骗",
+      "通过欺骗手段"
+    ],
+    "phrases" : [
+      "deceit and fraud",
+      "expose deceit",
+      "by deceit"
+    ],
+    "tag" : "阅读高频",
+    "word" : "deceit"
+  },
+  {
+    "difficulty" : 4,
+    "example" : "The rebellious teenager often clashed with his parents over rules.",
+    "exampleTranslation" : "这个叛逆的青少年经常因为规则与父母发生冲突。",
+    "id" : "custom-rebellious",
+    "meaning" : "叛逆的；反抗的；难控制的",
+    "mnemonic" : "re-（反）+ bell（战争）+ ious（形容词后缀）：反着打仗，就是反抗的、叛逆的。",
+    "partOfSpeech" : "adj.",
+    "phonetic" : "\/rɪˈbeljəs\/",
+    "phraseTranslations" : [
+      "叛逆行为",
+      "反抗精神",
+      "叛逆青少年"
+    ],
+    "phrases" : [
+      "rebellious behavior",
+      "rebellious spirit",
+      "rebellious teenager"
+    ],
+    "tag" : "阅读高频、写作替换、词根",
+    "word" : "rebellious"
+  },
+  {
+    "difficulty" : 3,
+    "example" : "Students should be respectful to their teachers and classmates.",
+    "exampleTranslation" : "学生应该对老师和同学保持尊敬。",
+    "id" : "custom-respectful",
+    "meaning" : "尊敬的；恭敬的；有礼貌的",
+    "mnemonic" : "respect（尊重）+ ful（充满…的）：充满尊重的，即恭敬的。",
+    "partOfSpeech" : "adj.",
+    "phonetic" : "\/rɪˈspektfl\/",
+    "phraseTranslations" : [
+      "尊重……",
+      "恭敬的行为",
+      "以恭敬的方式"
+    ],
+    "phrases" : [
+      "be respectful of",
+      "respectful behavior",
+      "in a respectful manner"
+    ],
+    "tag" : "写作替换、阅读高频、词根",
+    "word" : "respectful"
+  },
+  {
+    "difficulty" : 4,
+    "example" : "The company launched a campaign to publicize its new product.",
+    "exampleTranslation" : "公司发起了一场宣传活动来推广其新产品。",
+    "id" : "custom-publicize",
+    "meaning" : "宣传；公布；推广",
+    "mnemonic" : "public（公开的）+ -ize（使…）→ 使公开 → 宣传",
+    "partOfSpeech" : "v.",
+    "phonetic" : "\/ˈpʌblɪsaɪz\/",
+    "phraseTranslations" : [
+      "宣传一项活动",
+      "广泛宣传",
+      "公布结果"
+    ],
+    "phrases" : [
+      "publicize an event",
+      "publicize widely",
+      "publicize the results"
+    ],
+    "tag" : "写作替换、阅读高频、词根",
+    "word" : "publicize"
+  },
+  {
+    "difficulty" : 4,
+    "example" : "The university received a large endowment from an anonymous donor.",
+    "exampleTranslation" : "这所大学从一位匿名捐赠者那里获得了一大笔捐赠基金。",
+    "id" : "custom-endowment",
+    "meaning" : "捐赠；天赋；基金",
+    "mnemonic" : "en- 使 + dow 给予 + ment 名词：给予的东西，即捐赠；引申为天赋",
+    "partOfSpeech" : "n.",
+    "phonetic" : "\/ɪnˈdaʊmənt\/",
+    "phraseTranslations" : [
+      "捐赠基金",
+      "天赋；天资",
+      "禀赋效应"
+    ],
+    "phrases" : [
+      "endowment fund",
+      "natural endowment",
+      "endowment effect"
+    ],
+    "tag" : "阅读高频、写作替换、词根",
+    "word" : "endowment"
+  },
+  {
+    "difficulty" : 4,
+    "example" : "Students should allocate time for vocabulary review.",
+    "exampleTranslation" : "学生应该分配时间进行词汇复习。",
+    "id" : "custom-allocate",
+    "meaning" : "分配；拨出",
+    "mnemonic" : "al- 去 + locate 放置：把资源放到合适位置就是分配",
+    "partOfSpeech" : "v.",
+    "phonetic" : "\/ˈæləkeɪt\/",
+    "phraseTranslations" : [
+      "分配资源",
+      "分配时间学习"
+    ],
+    "phrases" : [
+      "allocate resources",
+      "allocate time to study"
+    ],
+    "tag" : "计划表达",
+    "word" : "allocate"
+  },
+  {
+    "difficulty" : 4,
+    "example" : "The loud noise caused a sudden arousal from sleep.",
+    "exampleTranslation" : "巨大的噪音使他从睡梦中突然惊醒。",
+    "id" : "custom-arousal",
+    "meaning" : "唤醒；兴奋；激发",
+    "mnemonic" : "a- 加强 + rouse 唤醒 + -al 名词后缀：彻底唤醒就是 arousal",
+    "partOfSpeech" : "n.",
+    "phonetic" : "\/əˈraʊzl\/",
+    "phraseTranslations" : [
+      "性唤起",
+      "情绪唤醒",
+      "认知唤醒"
+    ],
+    "phrases" : [
+      "sexual arousal",
+      "emotional arousal",
+      "cognitive arousal"
+    ],
+    "tag" : "阅读高频",
+    "word" : "arousal"
+  },
+  {
+    "difficulty" : 4,
+    "example" : "Many people still hold the superstition that breaking a mirror brings seven years of bad luck.",
+    "exampleTranslation" : "许多人仍然抱有打破镜子会带来七年厄运的迷信。",
+    "id" : "custom-superstition",
+    "meaning" : "迷信；迷信行为",
+    "mnemonic" : "super- 超过 + stit 站立 + ion：站得过高（超出理性）就是迷信",
+    "partOfSpeech" : "n.",
+    "phonetic" : "\/ˌsuːpərˈstɪʃən\/",
+    "phraseTranslations" : [
+      "关于……的迷信",
+      "古老的迷信",
+      "……的迷信说法"
+    ],
+    "phrases" : [
+      "superstition about",
+      "old superstition",
+      "superstition that"
+    ],
+    "tag" : "阅读高频",
+    "word" : "superstition"
+  },
+  {
+    "difficulty" : 4,
+    "example" : "The company's business model continues to evolve with changing market demands.",
+    "exampleTranslation" : "公司的商业模式随着市场需求的变化而不断发展。",
+    "id" : "custom-evolve",
+    "meaning" : "进化；发展；逐步形成",
+    "mnemonic" : "e- 向外 + volve 转：向外旋转展开，即进化发展",
+    "partOfSpeech" : "v.",
+    "phonetic" : "\/ɪˈvɒlv\/",
+    "phraseTranslations" : [
+      "从…进化而来",
+      "进化成；发展成",
+      "随时间演变"
+    ],
+    "phrases" : [
+      "evolve from",
+      "evolve into",
+      "evolve over time"
+    ],
+    "tag" : "阅读高频;写作替换;词根",
+    "word" : "evolve"
+  },
+  {
+    "difficulty" : 3,
+    "example" : "The museum has a remarkable collection of modern sculpture.",
+    "exampleTranslation" : "这家博物馆收藏了令人瞩目的现代雕塑作品。",
+    "id" : "custom-sculpture",
+    "meaning" : "雕塑；雕刻品",
+    "mnemonic" : "sculpt（雕刻）+ure（名词后缀）：雕刻出来的作品就是雕塑。",
+    "partOfSpeech" : "n.",
+    "phonetic" : "\/ˈskʌlptʃər\/",
+    "phraseTranslations" : [
+      "雕塑花园",
+      "雕塑展览",
+      "青铜雕塑"
+    ],
+    "phrases" : [
+      "sculpture garden",
+      "sculpture exhibition",
+      "bronze sculpture"
+    ],
+    "tag" : "阅读高频",
+    "word" : "sculpture"
+  },
+  {
+    "difficulty" : 3,
+    "example" : "The software updates automatically every night.",
+    "exampleTranslation" : "该软件每晚自动更新。",
+    "id" : "custom-automatically",
+    "meaning" : "自动地；无意识地",
+    "mnemonic" : "auto-自己 + matic-动 + ally副词后缀：自己动→自动地",
+    "partOfSpeech" : "adv.",
+    "phonetic" : "\/ˌɔːtəˈmætɪkli\/",
+    "phraseTranslations" : [
+      "自动更新",
+      "自动调整",
+      "自动生成"
+    ],
+    "phrases" : [
+      "automatically update",
+      "automatically adjust",
+      "automatically generate"
+    ],
+    "tag" : "阅读高频、写作替换、词根",
+    "word" : "automatically"
+  },
+  {
+    "difficulty" : 4,
+    "example" : "The new law may infringe on citizens' privacy rights.",
+    "exampleTranslation" : "新法律可能侵犯公民的隐私权。",
+    "id" : "custom-infringe",
+    "meaning" : "侵犯；违反；侵害",
+    "mnemonic" : "in-进入 + fringe边缘：进入别人的边缘地带就是侵犯",
+    "partOfSpeech" : "v.",
+    "phonetic" : "\/ɪnˈfrɪndʒ\/",
+    "phraseTranslations" : [
+      "侵犯；侵害",
+      "侵犯专利权",
+      "违反规则"
+    ],
+    "phrases" : [
+      "infringe upon",
+      "infringe a patent",
+      "infringe the rules"
+    ],
+    "tag" : "阅读高频、法律词汇、写作替换",
+    "word" : "infringe"
+  },
+  {
+    "difficulty" : 4,
+    "example" : "The product comes with a two-year warranty against defects.",
+    "exampleTranslation" : "该产品附带两年保修期，针对缺陷问题。",
+    "id" : "custom-warranty",
+    "meaning" : "保修单；担保；保证",
+    "mnemonic" : "war（战争）+rant（咆哮）+y：战争时咆哮保证胜利→担保",
+    "partOfSpeech" : "n.",
+    "phonetic" : "\/ˈwɒrənti\/",
+    "phraseTranslations" : [
+      "在保修期内",
+      "延长保修",
+      "保修期"
+    ],
+    "phrases" : [
+      "under warranty",
+      "extended warranty",
+      "warranty period"
+    ],
+    "tag" : "阅读高频",
+    "word" : "warranty"
+  },
+  {
+    "difficulty" : 3,
+    "example" : "The hostess entertained her guests with a variety of delicious dishes.",
+    "exampleTranslation" : "女主人用各种美味佳肴招待客人。",
+    "id" : "custom-entertain",
+    "meaning" : "招待；使娱乐；怀有",
+    "mnemonic" : "enter（进入）+ tain（拿住）→ 进入并拿住注意力 → 使娱乐",
+    "partOfSpeech" : "v.",
+    "phonetic" : "\/ˌentərˈteɪn\/",
+    "phraseTranslations" : [
+      "招待客人",
+      "怀有想法",
+      "自娱自乐"
+    ],
+    "phrases" : [
+      "entertain guests",
+      "entertain an idea",
+      "entertain oneself"
+    ],
+    "tag" : "阅读高频；写作替换",
+    "word" : "entertain"
+  },
+  {
+    "difficulty" : 3,
+    "example" : "Everyone should contribute to protecting the environment.",
+    "exampleTranslation" : "每个人都应该为保护环境做出贡献。",
+    "id" : "custom-contribute",
+    "meaning" : "贡献；捐献；促成",
+    "mnemonic" : "con- 共同 + tribute 给予：共同给予就是贡献",
+    "partOfSpeech" : "v.",
+    "phonetic" : "\/kənˈtrɪbjuːt\/",
+    "phraseTranslations" : [
+      "有助于；捐献",
+      "捐钱",
+      "出主意"
+    ],
+    "phrases" : [
+      "contribute to",
+      "contribute money",
+      "contribute ideas"
+    ],
+    "tag" : "写作替换、阅读高频、词根",
+    "word" : "contribute"
+  },
+  {
+    "difficulty" : 3,
+    "example" : "The data previously collected was insufficient for the analysis.",
+    "exampleTranslation" : "之前收集的数据不足以进行分析。",
+    "id" : "custom-previously",
+    "meaning" : "以前；先前",
+    "mnemonic" : "pre- 前 + vious 路 + -ly：走在前面就是以前",
+    "partOfSpeech" : "adv.",
+    "phonetic" : "\/ˈpriːviəsli\/",
+    "phraseTranslations" : [
+      "如前所述",
+      "先前未知的"
+    ],
+    "phrases" : [
+      "as previously mentioned",
+      "previously unknown"
+    ],
+    "tag" : "阅读高频、写作替换、词根",
+    "word" : "previously"
+  },
+  {
+    "difficulty" : 1,
+    "example" : "The court ruled in favor of the defendant.",
+    "exampleTranslation" : "法院做出了有利于被告的裁决。",
+    "id" : "custom-court",
+    "meaning" : "法院；法庭；球场；庭院",
+    "mnemonic" : "court 音似\"靠他\"，打官司要靠法院，打球要靠球场。",
+    "partOfSpeech" : "n.",
+    "phonetic" : "\/kɔːrt\/",
+    "phraseTranslations" : [
+      "法院",
+      "篮球场",
+      "出庭"
+    ],
+    "phrases" : [
+      "court of law",
+      "basketball court",
+      "court appearance"
+    ],
+    "tag" : "阅读高频、基础词、听力高频",
+    "word" : "court"
+  },
+  {
+    "difficulty" : 2,
+    "example" : "The frightened child hid behind his mother.",
+    "exampleTranslation" : "那个受惊的孩子躲在母亲身后。",
+    "id" : "custom-frightened",
+    "meaning" : "害怕的；受惊的",
+    "mnemonic" : "fright（惊吓）+ en（使）+ ed（被动的）：被惊吓到的就是害怕的。",
+    "partOfSpeech" : "adj.",
+    "phonetic" : "\/ˈfraɪtnd\/",
+    "phraseTranslations" : [
+      "害怕",
+      "吓死了",
+      "害怕的表情"
+    ],
+    "phrases" : [
+      "be frightened of",
+      "frightened to death",
+      "frightened look"
+    ],
+    "tag" : "基础词、写作替换、听力高频",
+    "word" : "frightened"
+  },
+  {
+    "difficulty" : 4,
+    "example" : "Her argument was so convincing that everyone agreed with her.",
+    "exampleTranslation" : "她的论点如此有说服力，以至于每个人都同意她的观点。",
+    "id" : "custom-convincing",
+    "meaning" : "令人信服的；有说服力的",
+    "mnemonic" : "con- 完全 + vince 征服 + -ing：完全征服对方，就是令人信服的",
+    "partOfSpeech" : "adj.",
+    "phonetic" : "\/kənˈvɪnsɪŋ\/",
+    "phraseTranslations" : [
+      "令人信服的证据",
+      "有说服力的论点",
+      "令人信服的胜利"
+    ],
+    "phrases" : [
+      "convincing evidence",
+      "convincing argument",
+      "convincing victory"
+    ],
+    "tag" : "写作替换",
+    "word" : "convincing"
+  },
+  {
+    "difficulty" : 2,
+    "example" : "He admitted making a mistake in the report.",
+    "exampleTranslation" : "他承认在报告中犯了一个错误。",
+    "id" : "custom-admit",
+    "meaning" : "承认；准许进入；容纳",
+    "mnemonic" : "ad- 去 + mit 送：送进去就是准许进入；送出口就是承认",
+    "partOfSpeech" : "v.",
+    "phonetic" : "\/ədˈmɪt\/",
+    "phraseTranslations" : [
+      "承认失败",
+      "承认做了某事",
+      "被收入医院"
+    ],
+    "phrases" : [
+      "admit defeat",
+      "admit to doing something",
+      "be admitted to hospital"
+    ],
+    "tag" : "写作替换、阅读高频、词根",
+    "word" : "admit"
+  },
+  {
+    "difficulty" : 3,
+    "example" : "There is a serious flaw in your argument.",
+    "exampleTranslation" : "你的论点有一个严重的缺陷。",
+    "id" : "custom-flaw",
+    "meaning" : "缺点；瑕疵；裂缝",
+    "mnemonic" : "flaw 音似“福老”，福气老了就变成缺点（瑕疵）。",
+    "partOfSpeech" : "n.",
+    "phonetic" : "\/flɔː\/",
+    "phraseTranslations" : [
+      "设计缺陷",
+      "计划中的漏洞",
+      "性格缺陷"
+    ],
+    "phrases" : [
+      "design flaw",
+      "flaw in the plan",
+      "character flaw"
+    ],
+    "tag" : "阅读高频、写作替换、词根",
+    "word" : "flaw"
+  },
+  {
+    "difficulty" : 4,
+    "example" : "The spectators cheered as the runner crossed the finish line.",
+    "exampleTranslation" : "当运动员冲过终点线时，观众们欢呼起来。",
+    "id" : "custom-spectator",
+    "meaning" : "观众；旁观者",
+    "mnemonic" : "spect- 看 + -ator 人：看的人就是观众",
+    "partOfSpeech" : "n.",
+    "phonetic" : "\/ˈspekteɪtər\/",
+    "phraseTranslations" : [
+      "观赏性运动",
+      "比赛的观众",
+      "仅仅旁观者"
+    ],
+    "phrases" : [
+      "spectator sport",
+      "spectator at a match",
+      "mere spectator"
+    ],
+    "tag" : "阅读高频",
+    "word" : "spectator"
+  },
+  {
+    "difficulty" : 3,
+    "example" : "The Federal Bureau of Investigation is responsible for national security.",
+    "exampleTranslation" : "联邦调查局负责国家安全。",
+    "id" : "custom-bureau",
+    "meaning" : "局；办事处；办公桌",
+    "mnemonic" : "bureau 音似'不如'，不如去局里办事。",
+    "partOfSpeech" : "n.",
+    "phonetic" : "\/ˈbjʊəroʊ\/",
+    "phraseTranslations" : [
+      "统计局",
+      "旅行社",
+      "信息局"
+    ],
+    "phrases" : [
+      "bureau of statistics",
+      "travel bureau",
+      "information bureau"
+    ],
+    "tag" : "阅读高频、写作替换、基础词",
+    "word" : "bureau"
+  },
+  {
+    "difficulty" : 3,
+    "example" : "The Ministry of Education announced new policies for higher education.",
+    "exampleTranslation" : "教育部宣布了高等教育的新政策。",
+    "id" : "custom-ministry",
+    "meaning" : "（政府的）部；神职；服务",
+    "mnemonic" : "minister（大臣）+ y → 大臣办公的地方就是部",
+    "partOfSpeech" : "n.",
+    "phonetic" : "\/ˈmɪnɪstri\/",
+    "phraseTranslations" : [
+      "财政部",
+      "进入神职界",
+      "卫生部"
+    ],
+    "phrases" : [
+      "ministry of finance",
+      "enter the ministry",
+      "ministry of health"
+    ],
+    "tag" : "阅读高频、政治词汇、词根",
+    "word" : "ministry"
+  },
+  {
+    "difficulty" : 4,
+    "example" : "The artist carved a beautiful sculpture out of wood.",
+    "exampleTranslation" : "艺术家用木头雕刻出一尊美丽的雕像。",
+    "id" : "custom-carve",
+    "meaning" : "雕刻；切；开创",
+    "mnemonic" : "carve 音似'卡屋'，想象用刀卡在木屋里雕刻。",
+    "partOfSpeech" : "v.",
+    "phonetic" : "\/kɑːrv\/",
+    "phraseTranslations" : [
+      "开辟；创出",
+      "分割；瓜分",
+      "开创自己的领域"
+    ],
+    "phrases" : [
+      "carve out",
+      "carve up",
+      "carve a niche"
+    ],
+    "tag" : "写作替换、阅读高频、词根",
+    "word" : "carve"
+  },
+  {
+    "difficulty" : 4,
+    "example" : "You should acquaint yourself with the new software before using it.",
+    "exampleTranslation" : "在使用新软件之前，你应该先熟悉它。",
+    "id" : "custom-acquaint",
+    "meaning" : "使熟悉；使了解",
+    "mnemonic" : "ac-加强 + quaint（=know知道）：使知道→使熟悉",
+    "partOfSpeech" : "v.",
+    "phonetic" : "\/əˈkweɪnt\/",
+    "phraseTranslations" : [
+      "使熟悉",
+      "使自己熟悉",
+      "熟悉；了解"
+    ],
+    "phrases" : [
+      "acquaint with",
+      "acquaint oneself with",
+      "be acquainted with"
+    ],
+    "tag" : "阅读高频、写作替换、词根",
+    "word" : "acquaint"
+  },
+  {
+    "difficulty" : 4,
+    "example" : "The teacher used examples to reinforce the key points.",
+    "exampleTranslation" : "老师用例子来强化重点。",
+    "id" : "custom-reinforce",
+    "meaning" : "加强；增援；强化",
+    "mnemonic" : "re-再次 + in-进入 + force力量：再次注入力量，就是加强",
+    "partOfSpeech" : "v.",
+    "phonetic" : "\/ˌriːɪnˈfɔːrs\/",
+    "phraseTranslations" : [
+      "强化观点",
+      "加固结构",
+      "巩固学习"
+    ],
+    "phrases" : [
+      "reinforce the idea",
+      "reinforce the structure",
+      "reinforce learning"
+    ],
+    "tag" : "写作替换、阅读高频、词根",
+    "word" : "reinforce"
+  },
+  {
+    "difficulty" : 3,
+    "example" : "You must submit your application before the deadline.",
+    "exampleTranslation" : "你必须在截止日期前提交申请。",
+    "id" : "custom-submit",
+    "meaning" : "提交；服从；屈从",
+    "mnemonic" : "sub- 下 + mit 送：从下面送上去就是提交",
+    "partOfSpeech" : "v.",
+    "phonetic" : "\/səbˈmɪt\/",
+    "phraseTranslations" : [
+      "服从；屈服于",
+      "提交提案",
+      "提交申请"
+    ],
+    "phrases" : [
+      "submit to",
+      "submit a proposal",
+      "submit an application"
+    ],
+    "tag" : "写作高频；阅读高频",
+    "word" : "submit"
+  },
+  {
+    "difficulty" : 2,
+    "example" : "We expect the experiment to yield significant results.",
+    "exampleTranslation" : "我们预期这个实验会产生重要结果。",
+    "id" : "custom-expect",
+    "meaning" : "期待；预期；预料",
+    "mnemonic" : "ex-向外 + pect看：向外看，即期待未来",
+    "partOfSpeech" : "v.",
+    "phonetic" : "\/ɪkˈspekt\/",
+    "phraseTranslations" : [
+      "期待做某事",
+      "期望从某人那里得到某物",
+      "正如所料",
+      "期待意外之事"
+    ],
+    "phrases" : [
+      "expect to do",
+      "expect something from someone",
+      "as expected",
+      "expect the unexpected"
+    ],
+    "tag" : "阅读高频、写作替换、词根、听力高频",
+    "word" : "expect"
+  },
+  {
+    "difficulty" : 2,
+    "example" : "The criminal was sentenced to ten years in prison.",
+    "exampleTranslation" : "这名罪犯被判处十年监禁。",
+    "id" : "custom-criminal",
+    "meaning" : "罪犯；犯罪的",
+    "mnemonic" : "crim（罪行）+ inal（形容词后缀）→ 犯罪的",
+    "partOfSpeech" : "n.\/adj.",
+    "phonetic" : "\/ˈkrɪmɪnl\/",
+    "phraseTranslations" : [
+      "刑法",
+      "犯罪记录",
+      "刑事调查"
+    ],
+    "phrases" : [
+      "criminal law",
+      "criminal record",
+      "criminal investigation"
+    ],
+    "tag" : "阅读高频、写作替换、法律词汇",
+    "word" : "criminal"
+  },
+  {
+    "difficulty" : 4,
+    "example" : "The adverse weather conditions forced the cancellation of the outdoor event.",
+    "exampleTranslation" : "不利的天气条件迫使户外活动取消。",
+    "id" : "custom-adverse",
+    "meaning" : "不利的；有害的；相反的",
+    "mnemonic" : "ad-（向）+ verse（转）：转向反面，即不利的",
+    "partOfSpeech" : "adj.",
+    "phonetic" : "\/ˈædvɜːrs\/",
+    "phraseTranslations" : [
+      "不利影响",
+      "不利条件",
+      "不良反应"
+    ],
+    "phrases" : [
+      "adverse effects",
+      "adverse conditions",
+      "adverse reaction"
+    ],
+    "tag" : "阅读高频、写作替换、词根",
+    "word" : "adverse"
+  },
+  {
+    "difficulty" : 3,
+    "example" : "Technological innovation is the key to economic growth.",
+    "exampleTranslation" : "技术创新是经济增长的关键。",
+    "id" : "custom-innovation",
+    "meaning" : "创新；革新；新事物",
+    "mnemonic" : "in- 进入 + nov 新 + -ation 名词后缀：引入新东西就是创新",
+    "partOfSpeech" : "n.",
+    "phonetic" : "\/ˌɪnəˈveɪʃən\/",
+    "phraseTranslations" : [
+      "技术创新",
+      "教育创新",
+      "培养创新"
+    ],
+    "phrases" : [
+      "technological innovation",
+      "innovation in education",
+      "foster innovation"
+    ],
+    "tag" : "阅读高频、写作替换、词根",
+    "word" : "innovation"
+  },
+  {
+    "difficulty" : 4,
+    "example" : "The academician delivered a keynote speech at the conference.",
+    "exampleTranslation" : "这位院士在会议上发表了主题演讲。",
+    "id" : "custom-academician",
+    "meaning" : "院士；学会会员；学者",
+    "mnemonic" : "academic（学术的）+ ian（人）→ 学术的人 → 院士",
+    "partOfSpeech" : "n.",
+    "phonetic" : "\/əˌkædəˈmɪʃn\/",
+    "phraseTranslations" : [
+      "科学院院士",
+      "杰出院士",
+      "当选为院士"
+    ],
+    "phrases" : [
+      "academician of the academy",
+      "distinguished academician",
+      "elected as an academician"
+    ],
+    "tag" : "阅读高频、词根、学术词汇",
+    "word" : "academician"
+  },
+  {
+    "difficulty" : 3,
+    "example" : "He is a respected professor in the field of economics.",
+    "exampleTranslation" : "他是一位在经济学领域受尊敬的教授。",
+    "id" : "custom-respected",
+    "meaning" : "受尊敬的；敬重的",
+    "mnemonic" : "re- 反复 + spect 看 + -ed 被：反复被看重的，即受尊敬的",
+    "partOfSpeech" : "adj.",
+    "phonetic" : "\/rɪˈspektɪd\/",
+    "phraseTranslations" : [
+      "备受尊敬的",
+      "受尊敬的权威",
+      "受尊敬的人物"
+    ],
+    "phrases" : [
+      "highly respected",
+      "respected authority",
+      "respected figure"
+    ],
+    "tag" : "阅读高频、写作替换、词根",
+    "word" : "respected"
+  },
+  {
+    "difficulty" : 4,
+    "example" : "The company appointed a new distributor for its products in Asia.",
+    "exampleTranslation" : "该公司为亚洲地区指定了新的产品经销商。",
+    "id" : "custom-distributor",
+    "meaning" : "经销商；分销商；分配器",
+    "mnemonic" : "dis- 分散 + tribute 给予 + -or 人：把货物分散给各地的人就是经销商",
+    "partOfSpeech" : "n.",
+    "phonetic" : "\/dɪˈstrɪbjətər\/",
+    "phraseTranslations" : [
+      "独家经销商",
+      "授权经销商",
+      "分销网络"
+    ],
+    "phrases" : [
+      "exclusive distributor",
+      "authorized distributor",
+      "distributor network"
+    ],
+    "tag" : "商务词汇",
+    "word" : "distributor"
+  },
+  {
+    "difficulty" : 3,
+    "example" : "Prevention is better than cure.",
+    "exampleTranslation" : "预防胜于治疗。",
+    "id" : "custom-prevention",
+    "meaning" : "预防；防止",
+    "mnemonic" : "pre-前 + vent来 + -tion名词后缀：提前采取措施阻止事情发生",
+    "partOfSpeech" : "n.",
+    "phonetic" : "\/prɪˈvenʃn\/",
+    "phraseTranslations" : [
+      "疾病预防",
+      "犯罪预防",
+      "防火"
+    ],
+    "phrases" : [
+      "disease prevention",
+      "crime prevention",
+      "fire prevention"
+    ],
+    "tag" : "阅读高频、写作替换、词根",
+    "word" : "prevention"
+  },
+  {
+    "difficulty" : 4,
+    "example" : "The university will confer an honorary degree on the famous scientist.",
+    "exampleTranslation" : "这所大学将授予这位著名科学家荣誉学位。",
+    "id" : "custom-confer",
+    "meaning" : "授予；商议",
+    "mnemonic" : "con-共同 + fer带来：大家带来意见一起讨论就是商议；把荣誉带来给某人就是授予",
+    "partOfSpeech" : "v.",
+    "phonetic" : "\/kənˈfɜːr\/",
+    "phraseTranslations" : [
+      "与...商议",
+      "授予头衔",
+      "带来好处"
+    ],
+    "phrases" : [
+      "confer with",
+      "confer a title",
+      "confer benefits"
+    ],
+    "tag" : "阅读高频、写作替换、词根",
+    "word" : "confer"
+  },
+  {
+    "difficulty" : 3,
+    "example" : "The new system greatly improved the efficiency of the production process.",
+    "exampleTranslation" : "新系统大大提高了生产过程的效率。",
+    "id" : "custom-efficiency",
+    "meaning" : "效率；效能",
+    "mnemonic" : "ef-（出）+ fic（做）+ iency（名词后缀）→ 做得出来 → 效率",
+    "partOfSpeech" : "n.",
+    "phonetic" : "\/ɪˈfɪʃənsi\/",
+    "phraseTranslations" : [
+      "能源效率",
+      "提高效率",
+      "成本效率"
+    ],
+    "phrases" : [
+      "energy efficiency",
+      "improve efficiency",
+      "cost efficiency"
+    ],
+    "tag" : "阅读高频、写作替换、词根",
+    "word" : "efficiency"
+  },
+  {
+    "difficulty" : 3,
+    "example" : "One major drawback of the plan is its high cost.",
+    "exampleTranslation" : "该计划的一个主要缺点是成本高昂。",
+    "id" : "custom-drawback",
+    "meaning" : "缺点；不利条件",
+    "mnemonic" : "draw（拉）+ back（回）：拉后腿的东西就是缺点",
+    "partOfSpeech" : "n.",
+    "phonetic" : "\/ˈdrɔːbæk\/",
+    "phraseTranslations" : [
+      "主要缺点",
+      "克服缺点",
+      "系统的缺点"
+    ],
+    "phrases" : [
+      "major drawback",
+      "overcome a drawback",
+      "drawback of the system"
+    ],
+    "tag" : "阅读高频；写作替换",
+    "word" : "drawback"
+  },
+  {
+    "difficulty" : 2,
+    "example" : "The demand for electricity reaches its peak during summer afternoons.",
+    "exampleTranslation" : "夏季下午用电需求达到高峰。",
+    "id" : "custom-peak",
+    "meaning" : "山峰；顶点；达到顶峰；高峰的",
+    "mnemonic" : "p+each：每个（each）山顶（peak）都有独特的风景。",
+    "partOfSpeech" : "n.\/v.\/adj.",
+    "phonetic" : "\/piːk\/",
+    "phraseTranslations" : [
+      "旺季",
+      "最佳表现",
+      "高峰时段"
+    ],
+    "phrases" : [
+      "peak season",
+      "peak performance",
+      "peak hours"
+    ],
+    "tag" : "阅读高频、听力高频、基础词",
+    "word" : "peak"
+  },
+  {
+    "difficulty" : 4,
+    "example" : "The court sentenced the offender to three years in prison.",
+    "exampleTranslation" : "法院判处该罪犯三年监禁。",
+    "id" : "custom-offender",
+    "meaning" : "罪犯；违法者；冒犯者",
+    "mnemonic" : "offend（冒犯）+er（人）→ 冒犯别人的人 → 罪犯",
+    "partOfSpeech" : "n.",
+    "phonetic" : "\/əˈfendər\/",
+    "phraseTranslations" : [
+      "初犯",
+      "惯犯",
+      "少年犯"
+    ],
+    "phrases" : [
+      "first-time offender",
+      "repeat offender",
+      "juvenile offender"
+    ],
+    "tag" : "阅读高频、法律词汇、写作替换",
+    "word" : "offender"
+  },
+  {
+    "difficulty" : 4,
+    "example" : "The pandemic caused unprecedented disruption to global supply chains.",
+    "exampleTranslation" : "疫情对全球供应链造成了前所未有的破坏。",
+    "id" : "custom-unprecedented",
+    "meaning" : "史无前例的；空前的",
+    "mnemonic" : "un- 没有 + precedent 先例 + -ed 的：没有先例的就是空前的",
+    "partOfSpeech" : "adj.",
+    "phonetic" : "\/ʌnˈpresɪdentɪd\/",
+    "phraseTranslations" : [
+      "前所未有的挑战",
+      "前所未有的水平",
+      "前所未有的机会"
+    ],
+    "phrases" : [
+      "unprecedented challenge",
+      "unprecedented level",
+      "unprecedented opportunity"
+    ],
+    "tag" : "阅读高频;写作替换;词根",
+    "word" : "unprecedented"
+  },
+  {
+    "difficulty" : 3,
+    "example" : "Virtual reality technology is becoming increasingly popular in education.",
+    "exampleTranslation" : "虚拟现实技术在教育中越来越受欢迎。",
+    "id" : "custom-virtual",
+    "meaning" : "虚拟的；实质上的",
+    "mnemonic" : "virtue（美德）+ al：美德是内在的，虚拟也是看不见但存在的",
+    "partOfSpeech" : "adj.",
+    "phonetic" : "\/ˈvɜːrtʃuəl\/",
+    "phraseTranslations" : [
+      "虚拟现实",
+      "虚拟会议",
+      "虚拟环境"
+    ],
+    "phrases" : [
+      "virtual reality",
+      "virtual meeting",
+      "virtual environment"
+    ],
+    "tag" : "阅读高频、科技词汇、写作替换",
+    "word" : "virtual"
+  },
+  {
+    "difficulty" : 2,
+    "example" : "Many people donate money to charity during the holiday season.",
+    "exampleTranslation" : "许多人在假期期间向慈善机构捐款。",
+    "id" : "custom-donate",
+    "meaning" : "捐赠；捐献",
+    "mnemonic" : "don-（给予）+ -ate（动词后缀）→ 给予出去 → 捐赠",
+    "partOfSpeech" : "v.",
+    "phonetic" : "\/ˈdoʊneɪt\/",
+    "phraseTranslations" : [
+      "献血",
+      "向慈善机构捐款",
+      "捐钱"
+    ],
+    "phrases" : [
+      "donate blood",
+      "donate to charity",
+      "donate money"
+    ],
+    "tag" : "写作替换、听力高频、基础词",
+    "word" : "donate"
+  },
+  {
+    "difficulty" : 4,
+    "example" : "The rebellion was quickly suppressed by the government forces.",
+    "exampleTranslation" : "叛乱很快被政府军镇压了。",
+    "id" : "custom-rebellion",
+    "meaning" : "叛乱；反抗；造反",
+    "mnemonic" : "re-（反）+ bell（战争）+ -ion：反过来打一仗就是叛乱",
+    "partOfSpeech" : "n.",
+    "phonetic" : "\/rɪˈbeljən\/",
+    "phraseTranslations" : [
+      "武装叛乱",
+      "反抗权威",
+      "镇压叛乱"
+    ],
+    "phrases" : [
+      "armed rebellion",
+      "rebellion against authority",
+      "suppress a rebellion"
+    ],
+    "tag" : "阅读高频",
+    "word" : "rebellion"
+  },
+  {
+    "difficulty" : 3,
+    "example" : "The advanced technology has revolutionized the way we communicate.",
+    "exampleTranslation" : "先进技术彻底改变了我们的沟通方式。",
+    "id" : "custom-advanced",
+    "meaning" : "先进的；高级的；年迈的",
+    "mnemonic" : "advance（前进）+ -ed（形容词后缀）→ 向前发展的 → 先进的",
+    "partOfSpeech" : "adj.",
+    "phonetic" : "\/ədˈvænst\/",
+    "phraseTranslations" : [
+      "先进技术",
+      "高级水平",
+      "高级课程"
+    ],
+    "phrases" : [
+      "advanced technology",
+      "advanced level",
+      "advanced course"
+    ],
+    "tag" : "阅读高频,写作替换,词根",
+    "word" : "advanced"
+  },
+  {
+    "difficulty" : 4,
+    "example" : "The people revolted against the oppressive regime.",
+    "exampleTranslation" : "人民反抗压迫的政权。",
+    "id" : "custom-revolt",
+    "meaning" : "反抗；起义；反叛",
+    "mnemonic" : "re-（回）+ volt（转）：转回去，即反抗、反叛。",
+    "partOfSpeech" : "v.\/n.",
+    "phonetic" : "\/rɪˈvoʊlt\/",
+    "phraseTranslations" : [
+      "反抗；反叛",
+      "反抗中；起义",
+      "对…感到反感"
+    ],
+    "phrases" : [
+      "revolt against",
+      "in revolt",
+      "revolt at"
+    ],
+    "tag" : "阅读高频、写作替换、词根",
+    "word" : "revolt"
+  },
+  {
+    "difficulty" : 3,
+    "example" : "He confessed to stealing the money.",
+    "exampleTranslation" : "他承认偷了钱。",
+    "id" : "custom-confess",
+    "meaning" : "承认；坦白；忏悔",
+    "mnemonic" : "con-（共同）+ fess（说）→ 一起说出来 → 坦白",
+    "partOfSpeech" : "v.",
+    "phonetic" : "\/kənˈfes\/",
+    "phraseTranslations" : [
+      "认罪",
+      "承认罪行",
+      "表白感情"
+    ],
+    "phrases" : [
+      "confess to a crime",
+      "confess one's guilt",
+      "confess one's feelings"
+    ],
+    "tag" : "阅读高频、写作替换、词根",
+    "word" : "confess"
+  },
+  {
+    "difficulty" : 3,
+    "example" : "The factory workers were idle due to the power outage.",
+    "exampleTranslation" : "由于停电，工厂工人无所事事。",
+    "id" : "custom-idle",
+    "meaning" : "空闲的；懒散的；无用的",
+    "mnemonic" : "i（我）+ dle（dle 谐音“都乐”）：我太闲了，大家都乐了",
+    "partOfSpeech" : "adj.",
+    "phonetic" : "\/ˈaɪdl\/",
+    "phraseTranslations" : [
+      "虚度光阴",
+      "闲聊",
+      "空闲时间"
+    ],
+    "phrases" : [
+      "idle away",
+      "idle talk",
+      "idle time"
+    ],
+    "tag" : "阅读高频；基础词",
+    "word" : "idle"
+  },
+  {
+    "difficulty" : 4,
+    "example" : "Pollution can endanger the survival of many species.",
+    "exampleTranslation" : "污染会危及许多物种的生存。",
+    "id" : "custom-endanger",
+    "meaning" : "危及；使遭受危险",
+    "mnemonic" : "en- 使 + danger 危险：使处于危险中",
+    "partOfSpeech" : "v.",
+    "phonetic" : "\/ɪnˈdeɪndʒər\/",
+    "phraseTranslations" : [
+      "危及生命",
+      "危害环境"
+    ],
+    "phrases" : [
+      "endanger one's life",
+      "endanger the environment"
+    ],
+    "tag" : "阅读高频、写作替换、词根",
+    "word" : "endanger"
+  },
+  {
+    "difficulty" : 4,
+    "example" : "A perceptive reader can understand the author's underlying message.",
+    "exampleTranslation" : "有洞察力的读者能理解作者的隐含信息。",
+    "id" : "custom-perceptive",
+    "meaning" : "有洞察力的；感知敏锐的",
+    "mnemonic" : "per-全部 + cept拿取 + ive：能全部拿取信息，即感知敏锐",
+    "partOfSpeech" : "adj.",
+    "phonetic" : "\/pərˈseptɪv\/",
+    "phraseTranslations" : [
+      "敏锐的观察",
+      "透彻的分析",
+      "有见地的评论"
+    ],
+    "phrases" : [
+      "perceptive observation",
+      "perceptive analysis",
+      "perceptive comment"
+    ],
+    "tag" : "阅读高频；写作替换；词根",
+    "word" : "perceptive"
+  },
+  {
+    "difficulty" : 3,
+    "example" : "The survival of the fittest is a key concept in evolution.",
+    "exampleTranslation" : "适者生存是进化论中的一个关键概念。",
+    "id" : "custom-survival",
+    "meaning" : "生存；幸存",
+    "mnemonic" : "sur- 超过 + viv 活 + -al 名词后缀：活得比别人久就是幸存",
+    "partOfSpeech" : "n.",
+    "phonetic" : "\/sərˈvaɪvəl\/",
+    "phraseTranslations" : [
+      "存活率",
+      "生存技能",
+      "生存本能"
+    ],
+    "phrases" : [
+      "survival rate",
+      "survival skills",
+      "survival instinct"
+    ],
+    "tag" : "阅读高频",
+    "word" : "survival"
+  },
+  {
+    "difficulty" : 4,
+    "example" : "The population of the town is ethnically homogeneous.",
+    "exampleTranslation" : "这个镇的人口在种族上是同质的。",
+    "id" : "custom-homogeneous",
+    "meaning" : "同质的；均匀的",
+    "mnemonic" : "homo- 相同 + gene 基因 + ous 形容词：基因相同的就是同质的",
+    "partOfSpeech" : "adj.",
+    "phonetic" : "\/ˌhəʊməˈdʒiːniəs\/",
+    "phraseTranslations" : [
+      "均匀混合物",
+      "同质群体",
+      "同质社会"
+    ],
+    "phrases" : [
+      "homogeneous mixture",
+      "homogeneous group",
+      "homogeneous society"
+    ],
+    "tag" : "阅读高频",
+    "word" : "homogeneous"
+  },
+  {
+    "difficulty" : 4,
+    "example" : "The court decided to reverse the previous ruling.",
+    "exampleTranslation" : "法院决定撤销之前的裁决。",
+    "id" : "custom-reverse",
+    "meaning" : "逆转；撤销；倒车",
+    "mnemonic" : "re- 回 + verse 转：转回去就是逆转",
+    "partOfSpeech" : "v.",
+    "phonetic" : "\/rɪˈvɜːrs\/",
+    "phraseTranslations" : [
+      "逆转趋势",
+      "撤销决定",
+      "按相反顺序"
+    ],
+    "phrases" : [
+      "reverse the trend",
+      "reverse a decision",
+      "in reverse order"
+    ],
+    "tag" : "阅读高频",
+    "word" : "reverse"
+  },
+  {
+    "difficulty" : 2,
+    "example" : "It is important to understand the legal implications of the contract.",
+    "exampleTranslation" : "理解合同的法律影响很重要。",
+    "id" : "custom-legal",
+    "meaning" : "法律的；合法的",
+    "mnemonic" : "leg-（法律）+ -al（形容词后缀）：与法律有关的",
+    "partOfSpeech" : "adj.",
+    "phonetic" : "\/ˈliːɡl\/",
+    "phraseTranslations" : [
+      "法律体系",
+      "法律咨询",
+      "法律诉讼"
+    ],
+    "phrases" : [
+      "legal system",
+      "legal advice",
+      "legal action"
+    ],
+    "tag" : "阅读高频、写作替换、词根",
+    "word" : "legal"
+  },
+  {
+    "difficulty" : 3,
+    "example" : "The company has secured a major contract with a foreign partner.",
+    "exampleTranslation" : "该公司已与一家外国合作伙伴获得了一份重要合同。",
+    "id" : "custom-secure",
+    "meaning" : "安全的；牢固的；获得；保护",
+    "mnemonic" : "se- 分开 + cure 关心：不用再担心，就是安全的；获得后也安心",
+    "partOfSpeech" : "adj.\/v.",
+    "phonetic" : "\/sɪˈkjʊr\/",
+    "phraseTranslations" : [
+      "获得工作",
+      "封锁区域",
+      "获得资金"
+    ],
+    "phrases" : [
+      "secure a job",
+      "secure the area",
+      "secure funding"
+    ],
+    "tag" : "阅读高频、写作替换、词根",
+    "word" : "secure"
+  },
+  {
+    "difficulty" : 4,
+    "example" : "This sofa is convertible into a bed.",
+    "exampleTranslation" : "这张沙发可以转换成一张床。",
+    "id" : "custom-convertible",
+    "meaning" : "可转换的；可改变的；敞篷的",
+    "mnemonic" : "con-（一起）+vert（转）+ible（能…的）→ 能一起转的 → 可转换的",
+    "partOfSpeech" : "adj.",
+    "phonetic" : "\/kənˈvɜːrtəbl\/",
+    "phraseTranslations" : [
+      "可兑换货币",
+      "可转换债券",
+      "敞篷车"
+    ],
+    "phrases" : [
+      "convertible currency",
+      "convertible bond",
+      "convertible car"
+    ],
+    "tag" : "阅读高频、词根、写作替换",
+    "word" : "convertible"
+  },
+  {
+    "difficulty" : 4,
+    "example" : "The company took precautionary measures to prevent data breaches.",
+    "exampleTranslation" : "公司采取了预防措施以防止数据泄露。",
+    "id" : "custom-precautionary",
+    "meaning" : "预防的；防备的",
+    "mnemonic" : "pre- 前 + caution 小心 + -ary 形容词：提前小心就是预防的",
+    "partOfSpeech" : "adj.",
+    "phonetic" : "\/prɪˈkɔːʃəneri\/",
+    "phraseTranslations" : [
+      "预防原则",
+      "预防措施",
+      "预防步骤"
+    ],
+    "phrases" : [
+      "precautionary principle",
+      "precautionary measures",
+      "precautionary steps"
+    ],
+    "tag" : "阅读高频",
+    "word" : "precautionary"
+  },
+  {
+    "difficulty" : 4,
+    "example" : "The atmosphere was filled with expectancy as the results were announced.",
+    "exampleTranslation" : "结果宣布时，气氛充满了期待。",
+    "id" : "custom-expectancy",
+    "meaning" : "期待；预期；期望",
+    "mnemonic" : "expect（期待）+ ancy（名词后缀）→ 期待的状态",
+    "partOfSpeech" : "n.",
+    "phonetic" : "\/ɪkˈspektənsi\/",
+    "phraseTranslations" : [
+      "预期寿命",
+      "期望理论",
+      "期待……"
+    ],
+    "phrases" : [
+      "life expectancy",
+      "expectancy theory",
+      "in expectancy of"
+    ],
+    "tag" : "阅读高频、写作替换、词根",
+    "word" : "expectancy"
+  },
+  {
+    "difficulty" : 3,
+    "example" : "Taking offense at minor criticism can hinder personal growth.",
+    "exampleTranslation" : "对微小的批评感到生气会阻碍个人成长。",
+    "id" : "custom-offense",
+    "meaning" : "冒犯；违法行为；进攻",
+    "mnemonic" : "of（离开）+ fense（篱笆）：越过篱笆就是冒犯或进攻。",
+    "partOfSpeech" : "n.",
+    "phonetic" : "\/əˈfens\/",
+    "phraseTranslations" : [
+      "生气；见怪",
+      "刑事犯罪",
+      "进攻与防守"
+    ],
+    "phrases" : [
+      "take offense",
+      "criminal offense",
+      "offense and defense"
+    ],
+    "tag" : "阅读高频、写作替换、词根",
+    "word" : "offense"
+  },
+  {
+    "difficulty" : 3,
+    "example" : "The university has a diverse student body from over 50 countries.",
+    "exampleTranslation" : "这所大学拥有来自50多个国家的多元化的学生群体。",
+    "id" : "custom-diverse",
+    "meaning" : "不同的；多种多样的",
+    "mnemonic" : "di- 分开 + verse 转：转开变成不同方向，即多样的",
+    "partOfSpeech" : "adj.",
+    "phonetic" : "\/daɪˈvɜːrs\/",
+    "phraseTranslations" : [
+      "多元文化",
+      "不同意见",
+      "多样化的产品系列"
+    ],
+    "phrases" : [
+      "diverse cultures",
+      "diverse opinions",
+      "diverse range of products"
+    ],
+    "tag" : "阅读高频、写作替换、词根",
+    "word" : "diverse"
+  },
+  {
+    "difficulty" : 4,
+    "example" : "The preceding chapter introduced the basic concepts.",
+    "exampleTranslation" : "前一章介绍了基本概念。",
+    "id" : "custom-preceding",
+    "meaning" : "在前的；前述的",
+    "mnemonic" : "pre- 前 + cede 走 + -ing：走在前面的是前面的",
+    "partOfSpeech" : "adj.",
+    "phonetic" : "\/prɪˈsiːdɪŋ\/",
+    "phraseTranslations" : [
+      "前一年",
+      "前一段",
+      "前面的讨论"
+    ],
+    "phrases" : [
+      "preceding year",
+      "preceding paragraph",
+      "preceding discussion"
+    ],
+    "tag" : "阅读高频、写作替换、词根",
+    "word" : "preceding"
+  },
+  {
+    "difficulty" : 4,
+    "example" : "The alleged thief was taken into custody.",
+    "exampleTranslation" : "那个被指控的小偷被拘留了。",
+    "id" : "custom-alleged",
+    "meaning" : "被指控的；所谓的",
+    "mnemonic" : "al- 加强 + leg 说 + ed：被说出来的，即被指控的",
+    "partOfSpeech" : "adj.",
+    "phonetic" : "\/əˈledʒd\/",
+    "phraseTranslations" : [
+      "被指控的罪行",
+      "所谓的受害者",
+      "被指控的肇事者"
+    ],
+    "phrases" : [
+      "alleged crime",
+      "alleged victim",
+      "alleged perpetrator"
+    ],
+    "tag" : "阅读高频, 法律词汇",
+    "word" : "alleged"
+  },
+  {
+    "difficulty" : 3,
+    "example" : "The intricate carving on the ancient door amazed the visitors.",
+    "exampleTranslation" : "古老门上的精美雕刻令游客惊叹。",
+    "id" : "custom-carving",
+    "meaning" : "雕刻品；雕刻术",
+    "mnemonic" : "carve（雕刻）+ing，想象用刀在木头上刻出图案。",
+    "partOfSpeech" : "n.",
+    "phonetic" : "\/ˈkɑːrvɪŋ\/",
+    "phraseTranslations" : [
+      "木雕",
+      "石雕",
+      "雕刻刀"
+    ],
+    "phrases" : [
+      "wood carving",
+      "stone carving",
+      "carving knife"
+    ],
+    "tag" : "阅读高频、艺术类、名词",
+    "word" : "carving"
+  },
+  {
+    "difficulty" : 2,
+    "example" : "The room was in a mess after the party.",
+    "exampleTranslation" : "派对结束后房间一片狼藉。",
+    "id" : "custom-mess",
+    "meaning" : "混乱；脏乱；困境",
+    "mnemonic" : "mess 音似‘妹死’，妹妹把房间弄得一团糟，真是要命。",
+    "partOfSpeech" : "n.",
+    "phonetic" : "\/mes\/",
+    "phraseTranslations" : [
+      "处于混乱中",
+      "制造混乱",
+      "搞砸"
+    ],
+    "phrases" : [
+      "in a mess",
+      "make a mess",
+      "mess up"
+    ],
+    "tag" : "基础词、听力高频、口语表达",
+    "word" : "mess"
+  },
+  {
+    "difficulty" : 3,
+    "example" : "The automatic doors opened as she approached.",
+    "exampleTranslation" : "当她走近时，自动门打开了。",
+    "id" : "custom-automatic",
+    "meaning" : "自动的；无意识的",
+    "mnemonic" : "auto- 自己 + mat 动 + -ic 形容词：自己动的就是自动的",
+    "partOfSpeech" : "adj.",
+    "phonetic" : "\/ˌɔːtəˈmætɪk\/",
+    "phraseTranslations" : [
+      "自动反应",
+      "自动变速器",
+      "自动驾驶仪"
+    ],
+    "phrases" : [
+      "automatic response",
+      "automatic transmission",
+      "automatic pilot"
+    ],
+    "tag" : "阅读高频",
+    "word" : "automatic"
+  },
+  {
+    "difficulty" : 3,
+    "example" : "Doing the laundry is a chore I try to avoid.",
+    "exampleTranslation" : "洗衣服是我尽量回避的琐事。",
+    "id" : "custom-chore",
+    "meaning" : "日常琐事；令人厌烦的任务",
+    "mnemonic" : "chore 音似“吵”，做琐事常被家人唠叨争吵。",
+    "partOfSpeech" : "n.",
+    "phonetic" : "\/tʃɔːr\/",
+    "phraseTranslations" : [
+      "家务琐事",
+      "日常杂务",
+      "一项乏味的任务"
+    ],
+    "phrases" : [
+      "household chores",
+      "daily chores",
+      "a tedious chore"
+    ],
+    "tag" : "生活词汇",
+    "word" : "chore"
+  },
+  {
+    "difficulty" : 4,
+    "example" : "The smoke detector went off when it sensed a small fire.",
+    "exampleTranslation" : "烟雾探测器在感应到小火时响了起来。",
+    "id" : "custom-detector",
+    "meaning" : "探测器；检测器",
+    "mnemonic" : "de- 去掉 + tect 掩盖 + or 物：去掉掩盖的东西就是探测器",
+    "partOfSpeech" : "n.",
+    "phonetic" : "\/dɪˈtektər\/",
+    "phraseTranslations" : [
+      "烟雾探测器",
+      "金属探测器",
+      "测谎仪"
+    ],
+    "phrases" : [
+      "smoke detector",
+      "metal detector",
+      "lie detector"
+    ],
+    "tag" : "阅读高频",
+    "word" : "detector"
+  },
+  {
+    "difficulty" : 4,
+    "example" : "The prevailing attitude among students is to focus on practical skills.",
+    "exampleTranslation" : "学生中普遍的态度是关注实用技能。",
+    "id" : "custom-prevailing",
+    "meaning" : "流行的；普遍的；占优势的",
+    "mnemonic" : "pre- 前 + vail 强大 + -ing：在前面很强大，就是占优势的、流行的。",
+    "partOfSpeech" : "adj.",
+    "phonetic" : "\/prɪˈveɪlɪŋ\/",
+    "phraseTranslations" : [
+      "盛行风",
+      "主流趋势",
+      "普遍观点"
+    ],
+    "phrases" : [
+      "prevailing wind",
+      "prevailing trend",
+      "prevailing view"
+    ],
+    "tag" : "阅读高频、写作替换、词根",
+    "word" : "prevailing"
+  },
+  {
+    "difficulty" : 4,
+    "example" : "Early detection of the disease can save lives.",
+    "exampleTranslation" : "疾病的早期发现可以挽救生命。",
+    "id" : "custom-detection",
+    "meaning" : "察觉；发现；侦查",
+    "mnemonic" : "de- 去掉 + tect 掩盖 + ion 名词：去掉掩盖就是发现",
+    "partOfSpeech" : "n.",
+    "phonetic" : "\/dɪˈtekʃn\/",
+    "phraseTranslations" : [
+      "检测系统",
+      "错误检测",
+      "早期发现"
+    ],
+    "phrases" : [
+      "detection system",
+      "error detection",
+      "early detection"
+    ],
+    "tag" : "阅读高频; 科技词汇; 医学词汇",
+    "word" : "detection"
+  },
+  {
+    "difficulty" : 4,
+    "example" : "The government pledged to reduce carbon emissions by 50% by 2030.",
+    "exampleTranslation" : "政府承诺到2030年将碳排放减少50%。",
+    "id" : "custom-pledge",
+    "meaning" : "保证；誓言；抵押",
+    "mnemonic" : "p+ledge（壁架）：站在壁架上发誓，不成功便成仁。",
+    "partOfSpeech" : "v.\/n.",
+    "phonetic" : "\/pledʒ\/",
+    "phraseTranslations" : [
+      "做出承诺",
+      "宣誓效忠",
+      "承诺支持",
+      "取出抵押品"
+    ],
+    "phrases" : [
+      "make a pledge",
+      "pledge allegiance",
+      "pledge support",
+      "take out a pledge"
+    ],
+    "tag" : "写作替换;阅读高频;词根",
+    "word" : "pledge"
+  },
+  {
+    "difficulty" : 3,
+    "example" : "The wires were all tangled up, making it hard to find the right one.",
+    "exampleTranslation" : "电线都缠在一起，很难找到正确的那根。",
+    "id" : "custom-tangled",
+    "meaning" : "纠缠的；混乱的",
+    "mnemonic" : "tangle（纠缠）+ ed：被纠缠住的，引申为混乱的",
+    "partOfSpeech" : "adj.",
+    "phonetic" : "\/ˈtæŋɡld\/",
+    "phraseTranslations" : [
+      "卷入；被缠住",
+      "错综复杂的关系",
+      "一团糟"
+    ],
+    "phrases" : [
+      "tangled in",
+      "tangled web",
+      "tangled mess"
+    ],
+    "tag" : "阅读高频",
+    "word" : "tangled"
+  },
+  {
+    "difficulty" : 4,
+    "example" : "Her strong conviction in justice drove her to become a lawyer.",
+    "exampleTranslation" : "她对正义的坚定信念促使她成为了一名律师。",
+    "id" : "custom-conviction",
+    "meaning" : "定罪；信念；坚信",
+    "mnemonic" : "con-（共同）+vict（征服）+ion：共同征服罪犯→定罪；内心被征服→信念",
+    "partOfSpeech" : "n.",
+    "phonetic" : "\/kənˈvɪkʃən\/",
+    "phraseTranslations" : [
+      "坚信……",
+      "有说服力",
+      "前科"
+    ],
+    "phrases" : [
+      "have the conviction that",
+      "carry conviction",
+      "previous conviction"
+    ],
+    "tag" : "阅读高频、写作替换、词根",
+    "word" : "conviction"
+  },
+  {
+    "difficulty" : 4,
+    "example" : "The plane began its descent toward the airport.",
+    "exampleTranslation" : "飞机开始向机场降落。",
+    "id" : "custom-descent",
+    "meaning" : "下降；下坡；血统；出身",
+    "mnemonic" : "de-向下 + scent(爬升的反义)：向下爬就是下降",
+    "partOfSpeech" : "n.",
+    "phonetic" : "\/dɪˈsent\/",
+    "phraseTranslations" : [
+      "陷入混乱",
+      "贵族出身",
+      "陡峭的下坡"
+    ],
+    "phrases" : [
+      "descent into chaos",
+      "of noble descent",
+      "steep descent"
+    ],
+    "tag" : "阅读高频、写作替换、词根",
+    "word" : "descent"
+  },
+  {
+    "difficulty" : 4,
+    "example" : "Her proficiency in English helped her get the job.",
+    "exampleTranslation" : "她熟练的英语帮助她得到了这份工作。",
+    "id" : "custom-proficiency",
+    "meaning" : "熟练；精通",
+    "mnemonic" : "pro-（向前）+ fic（做）+ iency（名词后缀）→ 做得向前→熟练",
+    "partOfSpeech" : "n.",
+    "phonetic" : "\/prəˈfɪʃənsi\/",
+    "phraseTranslations" : [
+      "水平测试",
+      "语言熟练度",
+      "技术熟练度"
+    ],
+    "phrases" : [
+      "proficiency test",
+      "proficiency in a language",
+      "technical proficiency"
+    ],
+    "tag" : "阅读高频、写作替换、词根",
+    "word" : "proficiency"
+  },
+  {
+    "difficulty" : 3,
+    "example" : "The guardian is responsible for the child's education and welfare.",
+    "exampleTranslation" : "监护人负责孩子的教育和福利。",
+    "id" : "custom-guardian",
+    "meaning" : "监护人；保护者",
+    "mnemonic" : "guard（保卫）+ian（人）→ 保卫的人 → 监护人",
+    "partOfSpeech" : "n.",
+    "phonetic" : "\/ˈɡɑːrdiən\/",
+    "phraseTranslations" : [
+      "法定监护人",
+      "守护天使"
+    ],
+    "phrases" : [
+      "legal guardian",
+      "guardian angel"
+    ],
+    "tag" : "阅读高频、法律词汇、基础词",
+    "word" : "guardian"
+  },
+  {
+    "difficulty" : 4,
+    "example" : "The ecosystem can sustain a limited number of species.",
+    "exampleTranslation" : "这个生态系统能维持有限数量的物种。",
+    "id" : "custom-sustain",
+    "meaning" : "维持；支撑；遭受",
+    "mnemonic" : "sus- 在下面 + tain 拿住：在下面拿住，即支撑、维持。",
+    "partOfSpeech" : "v.",
+    "phonetic" : "\/səˈsteɪn\/",
+    "phraseTranslations" : [
+      "维持生命",
+      "遭受损害",
+      "维持增长"
+    ],
+    "phrases" : [
+      "sustain life",
+      "sustain damage",
+      "sustain growth"
+    ],
+    "tag" : "阅读高频、写作替换、词根",
+    "word" : "sustain"
+  },
+  {
+    "difficulty" : 4,
+    "example" : "The doctor was sued for malpractice after the surgery failed.",
+    "exampleTranslation" : "手术后失败，医生被起诉医疗事故。",
+    "id" : "custom-malpractice",
+    "meaning" : "渎职；医疗事故；玩忽职守",
+    "mnemonic" : "mal-坏 + practice实践：坏的做法就是渎职",
+    "partOfSpeech" : "n.",
+    "phonetic" : "\/ˌmælˈpræktɪs\/",
+    "phraseTranslations" : [
+      "医疗事故",
+      "渎职诉讼",
+      "职业渎职"
+    ],
+    "phrases" : [
+      "medical malpractice",
+      "malpractice lawsuit",
+      "professional malpractice"
+    ],
+    "tag" : "阅读高频、法律词汇、词根",
+    "word" : "malpractice"
+  },
+  {
+    "difficulty" : 4,
+    "example" : "They decided to venture into the unknown market despite the risks.",
+    "exampleTranslation" : "尽管有风险，他们还是决定冒险进入未知市场。",
+    "id" : "custom-venture",
+    "meaning" : "风险项目；冒险；敢于去",
+    "mnemonic" : "ven- 来 + ture 名词后缀：来到危险的地方就是冒险",
+    "partOfSpeech" : "n. & v.",
+    "phonetic" : "\/ˈventʃər\/",
+    "phraseTranslations" : [
+      "商业冒险",
+      "风险投资",
+      "合资企业"
+    ],
+    "phrases" : [
+      "business venture",
+      "venture capital",
+      "joint venture"
+    ],
+    "tag" : "阅读高频",
+    "word" : "venture"
+  },
+  {
+    "difficulty" : 4,
+    "example" : "The prosecutor alleged that the defendant had committed perjury.",
+    "exampleTranslation" : "检察官指控被告作了伪证。",
+    "id" : "custom-allege",
+    "meaning" : "断言；宣称；指控",
+    "mnemonic" : "al-（加强）+ leg（法律）+ e：在法律上强调，即断言、指控。",
+    "partOfSpeech" : "v.",
+    "phonetic" : "\/əˈledʒ\/",
+    "phraseTranslations" : [
+      "声称……",
+      "据称……",
+      "指控不当行为"
+    ],
+    "phrases" : [
+      "allege that",
+      "be alleged to",
+      "allege wrongdoing"
+    ],
+    "tag" : "阅读高频、写作替换、法律词汇",
+    "word" : "allege"
+  },
+  {
+    "difficulty" : 3,
+    "example" : "We are fortunate to have such a supportive community.",
+    "exampleTranslation" : "我们很幸运有这样一个支持我们的社区。",
+    "id" : "custom-fortunate",
+    "meaning" : "幸运的；侥幸的",
+    "mnemonic" : "fortune（财富）+ate（形容词后缀）：拥有财富就是幸运的",
+    "partOfSpeech" : "adj.",
+    "phonetic" : "\/ˈfɔːrtʃənət\/",
+    "phraseTranslations" : [
+      "足够幸运",
+      "幸运的巧合",
+      "幸运的结果"
+    ],
+    "phrases" : [
+      "fortunate enough",
+      "fortunate coincidence",
+      "fortunate outcome"
+    ],
+    "tag" : "写作替换",
+    "word" : "fortunate"
+  },
+  {
+    "difficulty" : 3,
+    "example" : "The problem falls within the domain of computer science.",
+    "exampleTranslation" : "这个问题属于计算机科学领域。",
+    "id" : "custom-domain",
+    "meaning" : "领域；范围；领土",
+    "mnemonic" : "do主+main主要：主要统治的区域就是领域",
+    "partOfSpeech" : "n.",
+    "phonetic" : "\/dəˈmeɪn\/",
+    "phraseTranslations" : [
+      "公共领域",
+      "域名",
+      "领域知识"
+    ],
+    "phrases" : [
+      "public domain",
+      "domain name",
+      "domain knowledge"
+    ],
+    "tag" : "阅读高频、写作替换、词根",
+    "word" : "domain"
+  },
+  {
+    "difficulty" : 4,
+    "example" : "The prototype of the new device was tested in the lab.",
+    "exampleTranslation" : "新设备的原型在实验室进行了测试。",
+    "id" : "custom-prototype",
+    "meaning" : "原型；雏形；样本",
+    "mnemonic" : "proto- 原始 + type 类型：原始的类型就是原型",
+    "partOfSpeech" : "n.",
+    "phonetic" : "\/ˈproʊtətaɪp\/",
+    "phraseTranslations" : [
+      "原型模型",
+      "原型系统",
+      "工作原型"
+    ],
+    "phrases" : [
+      "prototype model",
+      "prototype system",
+      "working prototype"
+    ],
+    "tag" : "阅读高频",
+    "word" : "prototype"
+  },
+  {
+    "difficulty" : 3,
+    "example" : "The sun dipped below the horizon, painting the sky in shades of orange and pink.",
+    "exampleTranslation" : "太阳沉入地平线以下，将天空染成橙红色和粉红色。",
+    "id" : "custom-horizon",
+    "meaning" : "地平线；视野；眼界",
+    "mnemonic" : "horizon = hori（水平）+ zon（区域）→ 水平方向的区域就是地平线",
+    "partOfSpeech" : "n.",
+    "phonetic" : "\/həˈraɪzn\/",
+    "phraseTranslations" : [
+      "开阔眼界",
+      "即将来临",
+      "在地平线上方"
+    ],
+    "phrases" : [
+      "broaden one's horizons",
+      "on the horizon",
+      "above the horizon"
+    ],
+    "tag" : "阅读高频、写作替换、词根",
+    "word" : "horizon"
+  },
+  {
+    "difficulty" : 4,
+    "example" : "The government has taken a firm stance against tax evasion.",
+    "exampleTranslation" : "政府已对逃税采取了坚定的立场。",
+    "id" : "custom-stance",
+    "meaning" : "立场；姿态；站立姿势",
+    "mnemonic" : "st(站立)+ance(名词后缀)：站立的姿态或立场",
+    "partOfSpeech" : "n.",
+    "phonetic" : "\/stæns\/",
+    "phraseTranslations" : [
+      "采取立场",
+      "政治立场",
+      "防御姿态"
+    ],
+    "phrases" : [
+      "take a stance",
+      "political stance",
+      "defensive stance"
+    ],
+    "tag" : "阅读高频",
+    "word" : "stance"
+  },
+  {
+    "difficulty" : 3,
+    "example" : "The evidence is not sufficient to prove his guilt.",
+    "exampleTranslation" : "证据不足以证明他有罪。",
+    "id" : "custom-sufficient",
+    "meaning" : "足够的；充分的",
+    "mnemonic" : "suf-（在下面）+fic（做）+ient（形容词后缀）：在下面做足了，就是足够的。",
+    "partOfSpeech" : "adj.",
+    "phonetic" : "\/səˈfɪʃnt\/",
+    "phraseTranslations" : [
+      "充分条件",
+      "对……足够",
+      "自给自足的"
+    ],
+    "phrases" : [
+      "sufficient condition",
+      "sufficient for",
+      "self-sufficient"
+    ],
+    "tag" : "写作替换",
+    "word" : "sufficient"
+  },
+  {
+    "difficulty" : 4,
+    "example" : "The vaccine helps the body build an immune response.",
+    "exampleTranslation" : "疫苗帮助身体建立免疫反应。",
+    "id" : "custom-immune",
+    "meaning" : "免疫的；不受影响的",
+    "mnemonic" : "im- 不 + mune 服务：不需要服务，即免疫",
+    "partOfSpeech" : "adj.",
+    "phonetic" : "\/ɪˈmjuːn\/",
+    "phraseTranslations" : [
+      "免疫系统",
+      "对批评无动于衷"
+    ],
+    "phrases" : [
+      "immune system",
+      "immune to criticism"
+    ],
+    "tag" : "阅读高频；医学词汇",
+    "word" : "immune"
+  },
+  {
+    "difficulty" : 4,
+    "example" : "The memorial service was a tribute to the victims of the disaster.",
+    "exampleTranslation" : "纪念仪式是对灾难受害者的一种致敬。",
+    "id" : "custom-tribute",
+    "meaning" : "致敬；贡品；体现",
+    "mnemonic" : "tri- 三 + bute 给：三次进贡，即贡品；引申为致敬",
+    "partOfSpeech" : "n.",
+    "phonetic" : "\/ˈtrɪbjuːt\/",
+    "phraseTranslations" : [
+      "向...致敬",
+      "是...的体现",
+      "致敬乐队"
+    ],
+    "phrases" : [
+      "pay tribute to",
+      "a tribute to",
+      "tribute band"
+    ],
+    "tag" : "阅读高频、写作替换、词根",
+    "word" : "tribute"
+  },
+  {
+    "difficulty" : 3,
+    "example" : "The charity event raised funds for the homeless.",
+    "exampleTranslation" : "这次慈善活动为无家可归者筹集了资金。",
+    "id" : "custom-charity",
+    "meaning" : "慈善；慈善机构；宽容",
+    "mnemonic" : "char-（关心）+ -ity（名词后缀）：关心他人就是慈善。",
+    "partOfSpeech" : "n.",
+    "phonetic" : "\/ˈtʃærəti\/",
+    "phraseTranslations" : [
+      "慈善组织",
+      "慈善工作",
+      "慈善活动"
+    ],
+    "phrases" : [
+      "charity organization",
+      "charity work",
+      "charity event"
+    ],
+    "tag" : "阅读高频、写作替换、社会话题",
+    "word" : "charity"
+  },
+  {
+    "difficulty" : 4,
+    "example" : "The transmission of the disease can be prevented by proper hygiene.",
+    "exampleTranslation" : "通过适当的卫生措施可以预防疾病的传播。",
+    "id" : "custom-transmission",
+    "meaning" : "传送；传播；播送；变速器",
+    "mnemonic" : "trans- 跨越 + miss 发送 + -ion 名词：信息跨越空间发送就是传输",
+    "partOfSpeech" : "n.",
+    "phonetic" : "\/trænzˈmɪʃn\/",
+    "phraseTranslations" : [
+      "数据传输",
+      "传输系统",
+      "自动变速器"
+    ],
+    "phrases" : [
+      "data transmission",
+      "transmission system",
+      "automatic transmission"
+    ],
+    "tag" : "阅读高频、科技词汇、词根、听力高频",
+    "word" : "transmission"
+  },
+  {
+    "difficulty" : 3,
+    "example" : "It is important to converse with people from different cultures to broaden your horizons.",
+    "exampleTranslation" : "与来自不同文化的人交谈以拓宽视野是很重要的。",
+    "id" : "custom-converse",
+    "meaning" : "交谈；谈话",
+    "mnemonic" : "con- 共同 + verse 转：共同转动话题就是交谈",
+    "partOfSpeech" : "v.",
+    "phonetic" : "\/kənˈvɜːrs\/",
+    "phraseTranslations" : [
+      "与...交谈",
+      "谈论"
+    ],
+    "phrases" : [
+      "converse with",
+      "converse about"
+    ],
+    "tag" : "写作替换、阅读高频、词根",
+    "word" : "converse"
+  },
+  {
+    "difficulty" : 4,
+    "example" : "Her performance was flawless, earning a standing ovation.",
+    "exampleTranslation" : "她的表演完美无瑕，赢得了起立鼓掌。",
+    "id" : "custom-flawless",
+    "meaning" : "完美的；无瑕疵的",
+    "mnemonic" : "flaw（瑕疵）+ less（无）= 无瑕疵的，即完美的",
+    "partOfSpeech" : "adj.",
+    "phonetic" : "\/ˈflɔːləs\/",
+    "phraseTranslations" : [
+      "完美执行",
+      "无瑕肌肤",
+      "完胜"
+    ],
+    "phrases" : [
+      "flawless execution",
+      "flawless skin",
+      "flawless victory"
+    ],
+    "tag" : "写作替换、阅读高频、形容词",
+    "word" : "flawless"
+  },
+  {
+    "difficulty" : 3,
+    "example" : "She is a champion of environmental protection.",
+    "exampleTranslation" : "她是环境保护的拥护者。",
+    "id" : "custom-champion",
+    "meaning" : "冠军；拥护者；捍卫者",
+    "mnemonic" : "champ（咬）＋ion（人）→ 咬紧牙关拼搏的人 → 冠军",
+    "partOfSpeech" : "n.",
+    "phonetic" : "\/ˈtʃæmpiən\/",
+    "phraseTranslations" : [
+      "支持一项事业",
+      "卫冕冠军",
+      "穷人的捍卫者"
+    ],
+    "phrases" : [
+      "champion a cause",
+      "defending champion",
+      "champion of the poor"
+    ],
+    "tag" : "阅读高频、写作替换、词根",
+    "word" : "champion"
+  },
+  {
+    "difficulty" : 4,
+    "example" : "Regular exercise is a preventive measure against many diseases.",
+    "exampleTranslation" : "定期锻炼是预防许多疾病的措施。",
+    "id" : "custom-preventive",
+    "meaning" : "预防的；防止的",
+    "mnemonic" : "pre- 前 + vent 来 + ive：提前来阻止，就是预防",
+    "partOfSpeech" : "adj.",
+    "phonetic" : "\/prɪˈventɪv\/",
+    "phraseTranslations" : [
+      "预防措施",
+      "预防医学",
+      "预防性维护"
+    ],
+    "phrases" : [
+      "preventive measures",
+      "preventive medicine",
+      "preventive maintenance"
+    ],
+    "tag" : "阅读高频",
+    "word" : "preventive"
+  },
+  {
+    "difficulty" : 2,
+    "example" : "Surfing is a popular water sport that requires balance and skill.",
+    "exampleTranslation" : "冲浪是一项需要平衡和技巧的流行水上运动。",
+    "id" : "custom-surfing",
+    "meaning" : "冲浪运动",
+    "mnemonic" : "surf- 冲浪 + -ing 动名词：冲浪运动",
+    "partOfSpeech" : "n.",
+    "phonetic" : "\/ˈsɜːrfɪŋ\/",
+    "phraseTranslations" : [
+      "去冲浪",
+      "上网冲浪"
+    ],
+    "phrases" : [
+      "go surfing",
+      "surfing the Internet"
+    ],
+    "tag" : "运动词汇",
+    "word" : "surfing"
+  },
+  {
+    "difficulty" : 4,
+    "example" : "The future of the company is in jeopardy due to financial losses.",
+    "exampleTranslation" : "由于财务损失，公司的未来处于危险之中。",
+    "id" : "custom-jeopardy",
+    "meaning" : "危险；风险",
+    "mnemonic" : "jeopardy音似'杰帕迪'，联想《危险边缘》节目，即处于危险中",
+    "partOfSpeech" : "n.",
+    "phonetic" : "\/ˈdʒepərdi\/",
+    "phraseTranslations" : [
+      "处于危险中",
+      "使处于危险中",
+      "危险条款"
+    ],
+    "phrases" : [
+      "in jeopardy",
+      "put in jeopardy",
+      "jeopardy clause"
+    ],
+    "tag" : "阅读高频、写作替换、听力高频",
+    "word" : "jeopardy"
+  },
+  {
+    "difficulty" : 4,
+    "example" : "No admittance without a valid ID card.",
+    "exampleTranslation" : "没有有效身份证件不得入内。",
+    "id" : "custom-admittance",
+    "meaning" : "进入权；准入",
+    "mnemonic" : "admit（承认）+ tance：承认你有资格进入",
+    "partOfSpeech" : "n.",
+    "phonetic" : "\/ədˈmɪtəns\/",
+    "phraseTranslations" : [
+      "获准进入",
+      "拒绝进入",
+      "入场费"
+    ],
+    "phrases" : [
+      "gain admittance to",
+      "deny admittance",
+      "admittance fee"
+    ],
+    "tag" : "阅读高频",
+    "word" : "admittance"
+  },
+  {
+    "difficulty" : 4,
+    "example" : "She traced her ancestry back to the 18th century.",
+    "exampleTranslation" : "她将自己的血统追溯到18世纪。",
+    "id" : "custom-ancestry",
+    "meaning" : "祖先；世系；血统",
+    "mnemonic" : "ancest-（祖先）+ -ry（名词后缀）：祖先的集合就是祖先世系。",
+    "partOfSpeech" : "n.",
+    "phonetic" : "\/ˈænsestri\/",
+    "phraseTranslations" : [
+      "追溯某人的祖先",
+      "共同祖先",
+      "血统测试"
+    ],
+    "phrases" : [
+      "trace one's ancestry",
+      "common ancestry",
+      "ancestry test"
+    ],
+    "tag" : "阅读高频",
+    "word" : "ancestry"
+  },
+  {
+    "difficulty" : 4,
+    "example" : "It is not permissible to use mobile phones during the exam.",
+    "exampleTranslation" : "考试期间不允许使用手机。",
+    "id" : "custom-permissible",
+    "meaning" : "可允许的；许可的",
+    "mnemonic" : "per-（贯穿）+ miss（发送）+ ible（能…的）：能发送通过的，即许可的。",
+    "partOfSpeech" : "adj.",
+    "phonetic" : "\/pərˈmɪsəbl\/",
+    "phraseTranslations" : [
+      "允许的限度",
+      "可允许的行为",
+      "允许的水平"
+    ],
+    "phrases" : [
+      "permissible limit",
+      "permissible behavior",
+      "permissible level"
+    ],
+    "tag" : "阅读高频、写作替换、词根",
+    "word" : "permissible"
+  },
+  {
+    "difficulty" : 2,
+    "example" : "The research team has made significant advances in cancer treatment.",
+    "exampleTranslation" : "研究团队在癌症治疗方面取得了重大进展。",
+    "id" : "custom-advance",
+    "meaning" : "前进；促进；提出；预付；进步；预付款",
+    "mnemonic" : "ad-（向）+ vance（走）→ 向前走 → 前进；促进",
+    "partOfSpeech" : "v.\/n.",
+    "phonetic" : "\/ədˈvæns\/",
+    "phraseTranslations" : [
+      "提前",
+      "预先通知",
+      "预付款"
+    ],
+    "phrases" : [
+      "in advance",
+      "advance notice",
+      "advance payment"
+    ],
+    "tag" : "阅读高频、写作替换、词根",
+    "word" : "advance"
+  },
+  {
+    "difficulty" : 4,
+    "example" : "The Commonwealth of Nations promotes cooperation among its member states.",
+    "exampleTranslation" : "英联邦促进其成员国之间的合作。",
+    "id" : "custom-commonwealth",
+    "meaning" : "联邦；共和国；国民整体",
+    "mnemonic" : "common（共同的）+ wealth（财富）→ 共同财富的联合体",
+    "partOfSpeech" : "n.",
+    "phonetic" : "\/ˈkɒmənwelθ\/",
+    "phraseTranslations" : [
+      "英联邦",
+      "独立国家联合体",
+      "共同利益"
+    ],
+    "phrases" : [
+      "the Commonwealth of Nations",
+      "commonwealth of independent states",
+      "commonwealth of interests"
+    ],
+    "tag" : "阅读高频",
+    "word" : "commonwealth"
+  },
+  {
+    "difficulty" : 4,
+    "example" : "One example will suffice to illustrate the point.",
+    "exampleTranslation" : "一个例子就足以说明这一点。",
+    "id" : "custom-suffice",
+    "meaning" : "足够；满足...的需要",
+    "mnemonic" : "suf-（在下面）+ fice（做）：在下面做足功夫，就能满足需要",
+    "partOfSpeech" : "v.",
+    "phonetic" : "\/səˈfaɪs\/",
+    "phraseTranslations" : [
+      "只需说...就够了",
+      "足够用于"
+    ],
+    "phrases" : [
+      "suffice it to say",
+      "suffice for"
+    ],
+    "tag" : "阅读高频",
+    "word" : "suffice"
+  },
+  {
+    "difficulty" : 4,
+    "example" : "The journey through the jungle was perilous but rewarding.",
+    "exampleTranslation" : "穿越丛林之旅充满危险但收获颇丰。",
+    "id" : "custom-perilous",
+    "meaning" : "危险的；充满危险的",
+    "mnemonic" : "peril（危险）+ous（形容词后缀）：充满危险的",
+    "partOfSpeech" : "adj.",
+    "phonetic" : "\/ˈperələs\/",
+    "phraseTranslations" : [
+      "危险的旅程",
+      "危险的处境",
+      "危险的冒险"
+    ],
+    "phrases" : [
+      "perilous journey",
+      "perilous situation",
+      "perilous adventure"
+    ],
+    "tag" : "阅读高频",
+    "word" : "perilous"
+  },
+  {
+    "difficulty" : 4,
+    "example" : "People with weak immune systems are more susceptible to infections.",
+    "exampleTranslation" : "免疫系统较弱的人更容易受到感染。",
+    "id" : "custom-susceptible",
+    "meaning" : "易受影响的；易感染的；敏感的",
+    "mnemonic" : "sus-下 + cept拿 + ible能：能被拿下的→易受影响的",
+    "partOfSpeech" : "adj.",
+    "phonetic" : "\/səˈseptəbl\/",
+    "phraseTranslations" : [
+      "易受...影响",
+      "易感人群",
+      "易受变化影响"
+    ],
+    "phrases" : [
+      "be susceptible to",
+      "susceptible population",
+      "susceptible to change"
+    ],
+    "tag" : "阅读高频、写作替换、词根",
+    "word" : "susceptible"
+  },
+  {
+    "difficulty" : 3,
+    "example" : "The living room was warm and cosy, with a fire burning in the fireplace.",
+    "exampleTranslation" : "客厅温暖舒适，壁炉里燃烧着火。",
+    "id" : "custom-cosy",
+    "meaning" : "舒适的；温暖的；亲切友好的",
+    "mnemonic" : "co-共同 + sy(see)看到：大家一起看到温馨场景，感觉舒适",
+    "partOfSpeech" : "adj.",
+    "phonetic" : "\/ˈkəʊzi\/",
+    "phraseTranslations" : [
+      "舒适的氛围",
+      "讨好某人；亲近某人",
+      "一座舒适的小房子"
+    ],
+    "phrases" : [
+      "cosy atmosphere",
+      "cosy up to someone",
+      "a cosy little house"
+    ],
+    "tag" : "阅读高频、写作替换、生活场景",
+    "word" : "cosy"
+  },
+  {
+    "difficulty" : 2,
+    "example" : "The report is divided into three main sections.",
+    "exampleTranslation" : "这份报告分为三个主要部分。",
+    "id" : "custom-section",
+    "meaning" : "部分；章节；区域；部门",
+    "mnemonic" : "sec-（切割）+ -tion（名词后缀）→ 切下来的部分",
+    "partOfSpeech" : "n.",
+    "phonetic" : "\/ˈsekʃn\/",
+    "phraseTranslations" : [
+      "横截面；典型群体",
+      "分隔开",
+      "黄金分割"
+    ],
+    "phrases" : [
+      "cross section",
+      "section off",
+      "golden section"
+    ],
+    "tag" : "阅读高频、写作基础、词根",
+    "word" : "section"
+  },
+  {
+    "difficulty" : 3,
+    "example" : "The final exam requires thorough revision of all chapters.",
+    "exampleTranslation" : "期末考试需要对所有章节进行彻底复习。",
+    "id" : "custom-revision",
+    "meaning" : "修订；复习",
+    "mnemonic" : "re- 再 + vision 看：再看一遍就是修订或复习",
+    "partOfSpeech" : "n.",
+    "phonetic" : "\/rɪˈvɪʒn\/",
+    "phraseTranslations" : [
+      "修订过程",
+      "复习笔记",
+      "计划的修订"
+    ],
+    "phrases" : [
+      "revision process",
+      "revision notes",
+      "revision of the plan"
+    ],
+    "tag" : "学习高频",
+    "word" : "revision"
+  },
+  {
+    "difficulty" : 3,
+    "example" : "The factory decided to automate its production line to increase efficiency.",
+    "exampleTranslation" : "工厂决定自动化其生产线以提高效率。",
+    "id" : "custom-automate",
+    "meaning" : "使自动化",
+    "mnemonic" : "auto- 自己 + mate 伙伴：让机器成为自己的伙伴，自动完成工作",
+    "partOfSpeech" : "v.",
+    "phonetic" : "\/ˈɔːtəmeɪt\/",
+    "phraseTranslations" : [
+      "自动化流程",
+      "自动化任务",
+      "全自动的"
+    ],
+    "phrases" : [
+      "automate a process",
+      "automate tasks",
+      "fully automated"
+    ],
+    "tag" : "科技词汇；写作替换",
+    "word" : "automate"
+  },
+  {
+    "difficulty" : 3,
+    "example" : "The flexibility of the schedule allows students to balance study and work.",
+    "exampleTranslation" : "日程安排的灵活性使学生能够平衡学习和工作。",
+    "id" : "custom-flexibility",
+    "meaning" : "灵活性；柔韧性；弹性",
+    "mnemonic" : "flex（弯曲）+ ibility（能力）→ 能弯曲的能力 → 灵活性",
+    "partOfSpeech" : "n.",
+    "phonetic" : "\/ˌfleksəˈbɪləti\/",
+    "phraseTranslations" : [
+      "日程安排的灵活性",
+      "思维灵活性",
+      "材料的柔韧性"
+    ],
+    "phrases" : [
+      "flexibility in scheduling",
+      "mental flexibility",
+      "flexibility of materials"
+    ],
+    "tag" : "写作替换、阅读高频、词根",
+    "word" : "flexibility"
+  },
+  {
+    "difficulty" : 4,
+    "example" : "The task was exceedingly difficult, but she managed to complete it on time.",
+    "exampleTranslation" : "这项任务极其困难，但她设法按时完成了。",
+    "id" : "custom-exceedingly",
+    "meaning" : "非常；极其",
+    "mnemonic" : "ex- 超出 + ceed 走 + ing + ly：走得超出常规，就是非常",
+    "partOfSpeech" : "adv.",
+    "phonetic" : "\/ɪkˈsiːdɪŋli\/",
+    "phraseTranslations" : [
+      "极其罕见",
+      "极其重要",
+      "非常好"
+    ],
+    "phrases" : [
+      "exceedingly rare",
+      "exceedingly important",
+      "exceedingly well"
+    ],
+    "tag" : "写作替换",
+    "word" : "exceedingly"
+  },
+  {
+    "difficulty" : 4,
+    "example" : "The scholar quoted scripture to support his argument.",
+    "exampleTranslation" : "这位学者引用经文来支持他的论点。",
+    "id" : "custom-scripture",
+    "meaning" : "经文；经典；圣经",
+    "mnemonic" : "script（写）+ ure（名词后缀）：写下来的神圣文字就是经文。",
+    "partOfSpeech" : "n.",
+    "phonetic" : "\/ˈskrɪptʃər\/",
+    "phraseTranslations" : [
+      "圣经；圣典",
+      "读经",
+      "根据经文"
+    ],
+    "phrases" : [
+      "holy scripture",
+      "scripture reading",
+      "according to scripture"
+    ],
+    "tag" : "阅读高频、词根、宗教",
+    "word" : "scripture"
+  },
+  {
+    "difficulty" : 4,
+    "example" : "The students returned to their respective classrooms after the assembly.",
+    "exampleTranslation" : "集会结束后，学生们回到了各自的教室。",
+    "id" : "custom-respective",
+    "meaning" : "各自的；分别的",
+    "mnemonic" : "re- 回 + spect 看 + ive：回头看各自的位置，强调分别",
+    "partOfSpeech" : "adj.",
+    "phonetic" : "\/rɪˈspektɪv\/",
+    "phraseTranslations" : [
+      "各自的角色",
+      "各自的领域",
+      "各自的职责"
+    ],
+    "phrases" : [
+      "respective roles",
+      "respective fields",
+      "respective responsibilities"
+    ],
+    "tag" : "阅读高频、写作替换、词根",
+    "word" : "respective"
+  },
+  {
+    "difficulty" : 4,
+    "example" : "The old building underwent a complete renovation to meet modern standards.",
+    "exampleTranslation" : "这座旧建筑进行了全面翻新，以满足现代标准。",
+    "id" : "custom-renovation",
+    "meaning" : "翻新；整修",
+    "mnemonic" : "re- 再次 + nov 新 + -ation 名词后缀：使再次变新",
+    "partOfSpeech" : "n.",
+    "phonetic" : "\/ˌrenəˈveɪʃn\/",
+    "phraseTranslations" : [
+      "进行翻新",
+      "翻新项目",
+      "房屋翻新"
+    ],
+    "phrases" : [
+      "undergo renovation",
+      "renovation project",
+      "home renovation"
+    ],
+    "tag" : "阅读高频",
+    "word" : "renovation"
+  },
+  {
+    "difficulty" : 3,
+    "example" : "The atmosphere in the meeting was tense.",
+    "exampleTranslation" : "会议上的气氛很紧张。",
+    "id" : "custom-atmosphere",
+    "meaning" : "大气；氛围；环境",
+    "mnemonic" : "atmo- 蒸汽 + sphere 球体：包裹地球的蒸汽球就是大气层",
+    "partOfSpeech" : "n.",
+    "phonetic" : "\/ˈætməsfɪər\/",
+    "phraseTranslations" : [
+      "大气压",
+      "营造友好的氛围",
+      "地球大气层"
+    ],
+    "phrases" : [
+      "atmospheric pressure",
+      "create a friendly atmosphere",
+      "the Earth's atmosphere"
+    ],
+    "tag" : "阅读高频",
+    "word" : "atmosphere"
+  },
+  {
+    "difficulty" : 4,
+    "example" : "The museum held a retrospective exhibition of the artist's work.",
+    "exampleTranslation" : "博物馆举办了一场这位艺术家作品的回顾展。",
+    "id" : "custom-retrospective",
+    "meaning" : "回顾的；怀旧的",
+    "mnemonic" : "retro-向后 + spect看 + ive形容词后缀：向后看的就是回顾的",
+    "partOfSpeech" : "adj.",
+    "phonetic" : "\/ˌretrəˈspektɪv\/",
+    "phraseTranslations" : [
+      "回顾性分析",
+      "回顾性研究",
+      "回顾的观点"
+    ],
+    "phrases" : [
+      "retrospective analysis",
+      "retrospective study",
+      "retrospective view"
+    ],
+    "tag" : "阅读高频；学术词汇；词根",
+    "word" : "retrospective"
+  },
+  {
+    "difficulty" : 4,
+    "example" : "The government tried to stifle the protest by limiting media coverage.",
+    "exampleTranslation" : "政府试图通过限制媒体报道来压制抗议。",
+    "id" : "custom-stifle",
+    "meaning" : "抑制；扼杀；使窒息",
+    "mnemonic" : "stifle 音似“死太否”，死得太否定了，就是抑制、扼杀",
+    "partOfSpeech" : "v.",
+    "phonetic" : "\/ˈstaɪfl\/",
+    "phraseTranslations" : [
+      "扼杀创造力",
+      "忍住哈欠",
+      "压制异议"
+    ],
+    "phrases" : [
+      "stifle creativity",
+      "stifle a yawn",
+      "stifle dissent"
+    ],
+    "tag" : "阅读高频；写作替换",
+    "word" : "stifle"
+  },
+  {
+    "difficulty" : 4,
+    "example" : "The company's growth is constrained by limited resources.",
+    "exampleTranslation" : "公司的增长受到有限资源的制约。",
+    "id" : "custom-constrained",
+    "meaning" : "受约束的；被迫的；不自然的",
+    "mnemonic" : "con- 一起 + strain 拉紧 + -ed 被…的：被拉紧在一起就是受约束的",
+    "partOfSpeech" : "adj.",
+    "phonetic" : "\/kənˈstreɪnd\/",
+    "phraseTranslations" : [
+      "受…约束",
+      "感到被迫",
+      "受限制的环境"
+    ],
+    "phrases" : [
+      "constrained by",
+      "feel constrained",
+      "constrained environment"
+    ],
+    "tag" : "阅读高频",
+    "word" : "constrained"
+  },
+  {
+    "difficulty" : 4,
+    "example" : "The report provides a descriptive analysis of the data.",
+    "exampleTranslation" : "该报告对数据进行了描述性分析。",
+    "id" : "custom-descriptive",
+    "meaning" : "描述的；说明的；叙述的",
+    "mnemonic" : "de- 加强 + script 写 + ive 形容词后缀：写得详细的就是描述的",
+    "partOfSpeech" : "adj.",
+    "phonetic" : "\/dɪˈskrɪptɪv\/",
+    "phraseTranslations" : [
+      "描述性统计",
+      "描述性写作",
+      "描述性语言"
+    ],
+    "phrases" : [
+      "descriptive statistics",
+      "descriptive writing",
+      "descriptive language"
+    ],
+    "tag" : "阅读高频；写作替换；学术词汇",
+    "word" : "descriptive"
+  },
+  {
+    "difficulty" : 4,
+    "example" : "The terrorists attempted to hijack the plane.",
+    "exampleTranslation" : "恐怖分子试图劫持飞机。",
+    "id" : "custom-hijack",
+    "meaning" : "劫持；操纵",
+    "mnemonic" : "hi（嗨）+ jack（杰克）：嗨，杰克，把飞机交出来！",
+    "partOfSpeech" : "v.",
+    "phonetic" : "\/ˈhaɪdʒæk\/",
+    "phraseTranslations" : [
+      "劫持飞机",
+      "操纵会议"
+    ],
+    "phrases" : [
+      "hijack a plane",
+      "hijack a meeting"
+    ],
+    "tag" : "阅读高频",
+    "word" : "hijack"
+  },
+  {
+    "difficulty" : 4,
+    "example" : "The federation of states agreed on a common trade policy.",
+    "exampleTranslation" : "各州组成的联邦就共同贸易政策达成一致。",
+    "id" : "custom-federation",
+    "meaning" : "联邦；联盟；联合会",
+    "mnemonic" : "feder- 联盟 + -ation 名词后缀：联合起来的组织就是联邦",
+    "partOfSpeech" : "n.",
+    "phonetic" : "\/ˌfedəˈreɪʃn\/",
+    "phraseTranslations" : [
+      "劳工联合会",
+      "世界联合会",
+      "联邦政府"
+    ],
+    "phrases" : [
+      "federation of labor",
+      "World Federation",
+      "federation government"
+    ],
+    "tag" : "阅读高频；政治词汇；词根",
+    "word" : "federation"
+  },
+  {
+    "difficulty" : 4,
+    "example" : "The bureaucrat insisted on following every rule, even when it slowed down the process.",
+    "exampleTranslation" : "这位官僚坚持遵守每一条规则，即使这拖慢了进程。",
+    "id" : "custom-bureaucrat",
+    "meaning" : "官僚；官僚主义者",
+    "mnemonic" : "bureau（办公桌）+crat（统治者）：坐在办公桌后统治的人就是官僚",
+    "partOfSpeech" : "n.",
+    "phonetic" : "\/ˈbjʊərəkræt\/",
+    "phraseTranslations" : [
+      "政府官僚",
+      "主管官僚",
+      "小官僚"
+    ],
+    "phrases" : [
+      "government bureaucrat",
+      "bureaucrat in charge",
+      "petty bureaucrat"
+    ],
+    "tag" : "阅读高频",
+    "word" : "bureaucrat"
+  },
+  {
+    "difficulty" : 3,
+    "example" : "The report summarizes the main findings of the research.",
+    "exampleTranslation" : "这份报告总结了研究的主要发现。",
+    "id" : "custom-summarize",
+    "meaning" : "总结；概述",
+    "mnemonic" : "sum- 总和 + -ize 动词后缀：把总和说出来就是总结",
+    "partOfSpeech" : "v.",
+    "phonetic" : "\/ˈsʌməraɪz\/",
+    "phraseTranslations" : [
+      "总结要点",
+      "总结数据",
+      "总结文本"
+    ],
+    "phrases" : [
+      "summarize the main points",
+      "summarize the data",
+      "summarize a text"
+    ],
+    "tag" : "写作替换",
+    "word" : "summarize"
+  },
+  {
+    "difficulty" : 4,
+    "example" : "He had the misfortune to lose his passport on the first day of the trip.",
+    "exampleTranslation" : "他很不幸，在旅行的第一天就丢了护照。",
+    "id" : "custom-misfortune",
+    "meaning" : "不幸；厄运",
+    "mnemonic" : "mis- 坏 + fortune 运气：坏运气就是不幸",
+    "partOfSpeech" : "n.",
+    "phonetic" : "\/ˌmɪsˈfɔːrtʃən\/",
+    "phraseTranslations" : [
+      "遭受不幸",
+      "不幸地",
+      "一次不幸的打击"
+    ],
+    "phrases" : [
+      "suffer misfortune",
+      "by misfortune",
+      "a stroke of misfortune"
+    ],
+    "tag" : "阅读高频",
+    "word" : "misfortune"
+  },
+  {
+    "difficulty" : 4,
+    "example" : "The team won three successive championships.",
+    "exampleTranslation" : "该队连续赢得了三次冠军。",
+    "id" : "custom-successive",
+    "meaning" : "连续的；接连的",
+    "mnemonic" : "suc-（下面）+cess（走）+ive：一个接一个地走下去，就是连续的。",
+    "partOfSpeech" : "adj.",
+    "phonetic" : "\/səkˈsɛsɪv\/",
+    "phraseTranslations" : [
+      "连续几天",
+      "历届政府",
+      "接连的尝试"
+    ],
+    "phrases" : [
+      "successive days",
+      "successive governments",
+      "successive attempts"
+    ],
+    "tag" : "阅读高频、写作替换、词根",
+    "word" : "successive"
+  },
+  {
+    "difficulty" : 4,
+    "example" : "There is widespread speculation that the company will merge with its rival.",
+    "exampleTranslation" : "人们普遍推测这家公司将与其竞争对手合并。",
+    "id" : "custom-speculation",
+    "meaning" : "推测；投机",
+    "mnemonic" : "spec-（看）+ -ul-（小）+ -ation（名词后缀）：看小细节来猜测，即推测；投机也是看准时机下注。",
+    "partOfSpeech" : "n.",
+    "phonetic" : "\/ˌspekjuˈleɪʃn\/",
+    "phraseTranslations" : [
+      "无根据的猜测",
+      "对未来的推测",
+      "金融投机"
+    ],
+    "phrases" : [
+      "wild speculation",
+      "speculation about the future",
+      "financial speculation"
+    ],
+    "tag" : "阅读高频、写作替换、词根",
+    "word" : "speculation"
+  },
+  {
+    "difficulty" : 3,
+    "example" : "The artist painted a portrait of the president.",
+    "exampleTranslation" : "这位艺术家画了一幅总统的肖像。",
+    "id" : "custom-portrait",
+    "meaning" : "肖像；描绘；描写",
+    "mnemonic" : "por- 向前 + trait 特征：描绘出人的特征就是肖像",
+    "partOfSpeech" : "n.",
+    "phonetic" : "\/ˈpɔːrtrɪt\/",
+    "phraseTranslations" : [
+      "肖像画家",
+      "自画像",
+      "社会写照"
+    ],
+    "phrases" : [
+      "portrait painter",
+      "self-portrait",
+      "portrait of society"
+    ],
+    "tag" : "阅读高频",
+    "word" : "portrait"
+  },
+  {
+    "difficulty" : 4,
+    "example" : "The parliamentary system requires the government to be accountable to the legislature.",
+    "exampleTranslation" : "议会制度要求政府对立法机构负责。",
+    "id" : "custom-parliamentary",
+    "meaning" : "议会的；国会的；议会制度的",
+    "mnemonic" : "parliament（议会）+ ary（形容词后缀）：与议会相关的",
+    "partOfSpeech" : "adj.",
+    "phonetic" : "\/ˌpɑːrləˈmentəri\/",
+    "phraseTranslations" : [
+      "议会选举",
+      "议会辩论",
+      "议会程序"
+    ],
+    "phrases" : [
+      "parliamentary election",
+      "parliamentary debate",
+      "parliamentary procedure"
+    ],
+    "tag" : "阅读高频、政治词汇、词根",
+    "word" : "parliamentary"
+  },
+  {
+    "difficulty" : 1,
+    "example" : "The sudden noise frightened the children.",
+    "exampleTranslation" : "突然的响声吓到了孩子们。",
+    "id" : "custom-frighten",
+    "meaning" : "使惊吓；吓唬",
+    "mnemonic" : "fright（恐惧）+ en（使）：使恐惧",
+    "partOfSpeech" : "v.",
+    "phonetic" : "\/ˈfraɪtn\/",
+    "phraseTranslations" : [
+      "吓跑",
+      "吓得做某事",
+      "吓走"
+    ],
+    "phrases" : [
+      "frighten away",
+      "frighten into doing",
+      "frighten off"
+    ],
+    "tag" : "基础词",
+    "word" : "frighten"
+  },
+  {
+    "difficulty" : 4,
+    "example" : "Each contestant must answer three questions in the final round.",
+    "exampleTranslation" : "每位参赛者必须在最后一轮回答三个问题。",
+    "id" : "custom-contestant",
+    "meaning" : "参赛者；竞争者",
+    "mnemonic" : "con-共同 + test测试 + -ant人：一起参加测试的人就是参赛者",
+    "partOfSpeech" : "n.",
+    "phonetic" : "\/kənˈtestənt\/",
+    "phraseTranslations" : [
+      "比赛中的参赛者",
+      "同场参赛者"
+    ],
+    "phrases" : [
+      "contestant in a competition",
+      "fellow contestant"
+    ],
+    "tag" : "阅读高频、听力高频、词根",
+    "word" : "contestant"
+  },
+  {
+    "difficulty" : 3,
+    "example" : "This model is superior to the previous one in terms of performance.",
+    "exampleTranslation" : "这款型号在性能上优于前一款。",
+    "id" : "custom-superior",
+    "meaning" : "上级的；优越的；高傲的",
+    "mnemonic" : "super- 在...之上 + -ior 比较级：在上的就是优越的",
+    "partOfSpeech" : "adj.",
+    "phonetic" : "\/suːˈpɪriər\/",
+    "phraseTranslations" : [
+      "优于",
+      "优质",
+      "上级军官"
+    ],
+    "phrases" : [
+      "superior to",
+      "superior quality",
+      "superior officer"
+    ],
+    "tag" : "阅读高频、写作替换、词根",
+    "word" : "superior"
+  },
+  {
+    "difficulty" : 4,
     "example" : "The new policy sparked a heated controversy among citizens.",
     "exampleTranslation" : "新政策在市民中引发了激烈的争论。",
     "id" : "custom-controversy",
@@ -3002,26 +6044,6 @@
     ],
     "tag" : "阅读高频、写作替换、词根",
     "word" : "vocal"
-  },
-  {
-    "difficulty" : 4,
-    "example" : "Students should allocate time for vocabulary review.",
-    "exampleTranslation" : "学生应该分配时间进行词汇复习。",
-    "id" : "custom-allocate",
-    "meaning" : "分配；拨出",
-    "mnemonic" : "al- 去 + locate 放置：把资源放到合适位置就是分配",
-    "partOfSpeech" : "v.",
-    "phonetic" : "\/ˈæləkeɪt\/",
-    "phraseTranslations" : [
-      "分配资源",
-      "分配时间学习"
-    ],
-    "phrases" : [
-      "allocate resources",
-      "allocate time to study"
-    ],
-    "tag" : "计划表达",
-    "word" : "allocate"
   },
   {
     "difficulty" : 4,

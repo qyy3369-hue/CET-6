@@ -6,6 +6,21 @@ struct DesktopWidgetView: View {
     @ObservedObject var store: TaskStore
     var onOpenStudyWindow: () -> Void = {}
     @State private var newTaskTitle = ""
+    @State private var selectedGoalID: String
+    @State private var selectedGoalTitle: String
+    @State private var widgetGoals: [GoalPlan]
+
+    private static let allGoalsID = "__all_goals__"
+
+    init(store: TaskStore, onOpenStudyWindow: @escaping () -> Void = {}) {
+        self.store = store
+        self.onOpenStudyWindow = onOpenStudyWindow
+        let loadedGoals = GoalPlanStore01.load(defaultPlanText: "")
+        let selectedGoal = Self.loadSelectedWidgetGoal(from: loadedGoals)
+        _widgetGoals = State(initialValue: loadedGoals)
+        _selectedGoalID = State(initialValue: selectedGoal.id)
+        _selectedGoalTitle = State(initialValue: selectedGoal.title)
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -32,7 +47,7 @@ struct DesktopWidgetView: View {
             HStack(spacing: 10) {
                 statusChip
                 Spacer(minLength: 0)
-                Text("\(store.todayTasks.filter { !$0.isDone }.count) 待完成")
+                Text("\(widgetTasks.filter { !$0.isDone }.count) 待完成")
                     .font(.system(size: 12, weight: .semibold))
                     .foregroundStyle(StudyTheme.secondaryInk)
             }
@@ -63,17 +78,55 @@ struct DesktopWidgetView: View {
         }
         .shadow(color: .black.opacity(0.18), radius: 22, x: 0, y: 12)
         .preferredColorScheme(.light)
+        .onReceive(NotificationCenter.default.publisher(for: .goalSelectionDidChange)) { _ in
+            refreshSelectedGoal()
+        }
     }
 
     private var header: some View {
         VStack(alignment: .leading, spacing: 5) {
-            Text("CET-6")
-                .font(.system(size: 26, weight: .semibold, design: .serif))
-                .foregroundStyle(StudyTheme.ink)
-            Text("今日计划")
+            HStack(spacing: 6) {
+                Text(selectedGoalTitle)
+                    .font(.system(size: 26, weight: .semibold, design: .serif))
+                    .foregroundStyle(StudyTheme.ink)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.72)
+
+                goalMenu
+            }
+            Text("今日目标")
                 .font(.system(size: 13, weight: .medium))
                 .foregroundStyle(StudyTheme.secondaryInk)
         }
+    }
+
+    private var goalMenu: some View {
+        Menu {
+            Button {
+                selectWidgetGoal(id: Self.allGoalsID, title: "所有")
+            } label: {
+                Label("所有", systemImage: selectedGoalID == Self.allGoalsID ? "checkmark" : "")
+            }
+
+            Divider()
+
+            ForEach(widgetGoals) { goal in
+                Button {
+                    selectWidgetGoal(id: goal.id, title: goal.title)
+                } label: {
+                    Label(goal.title, systemImage: selectedGoalID == goal.id ? "checkmark" : "")
+                }
+            }
+        } label: {
+            Image(systemName: "chevron.down")
+                .font(.system(size: 15, weight: .bold))
+                .foregroundStyle(StudyTheme.secondaryInk)
+                .frame(width: 24, height: 24)
+                .contentShape(Rectangle())
+        }
+        .menuStyle(.borderlessButton)
+        .buttonStyle(.plain)
+        .help("切换日程项目")
     }
 
     private var statusChip: some View {
@@ -123,8 +176,8 @@ struct DesktopWidgetView: View {
 
     private var taskList: some View {
         VStack(alignment: .leading, spacing: 9) {
-            if store.todayTasks.isEmpty {
-                Text("今天还没有任务。")
+            if widgetTasks.isEmpty {
+                Text(selectedGoalID == Self.allGoalsID ? "今天还没有任何目标任务。" : "这个目标今天还没有任务。")
                     .font(.system(size: 14, weight: .semibold))
                     .foregroundStyle(StudyTheme.secondaryInk)
                     .padding(.vertical, 2)
@@ -132,7 +185,7 @@ struct DesktopWidgetView: View {
             } else {
                 ScrollView {
                     LazyVStack(alignment: .leading, spacing: 7) {
-                        ForEach(store.todayTasks) { task in
+                        ForEach(widgetTasks) { task in
                             Button {
                                 store.toggleDone(task)
                             } label: {
@@ -146,6 +199,15 @@ struct DesktopWidgetView: View {
                                         .foregroundStyle(task.isDone ? StudyTheme.mutedInk : StudyTheme.ink)
                                         .strikethrough(task.isDone)
                                         .multilineTextAlignment(.leading)
+                                    if selectedGoalID == Self.allGoalsID {
+                                        Text(task.goalTitle)
+                                            .font(.system(size: 10, weight: .bold))
+                                            .foregroundStyle(StudyTheme.secondaryInk)
+                                            .padding(.horizontal, 6)
+                                            .padding(.vertical, 3)
+                                            .background(StudyTheme.paper)
+                                            .clipShape(Capsule())
+                                    }
                                     Spacer(minLength: 0)
                                 }
                                 .padding(.vertical, 4)
@@ -161,9 +223,36 @@ struct DesktopWidgetView: View {
         }
     }
 
+    private var widgetTasks: [StudyTask] {
+        selectedGoalID == Self.allGoalsID ? store.todayTasks : store.todayTasks(for: selectedGoalID)
+    }
+
     private func addTask() {
-        store.addTaskForToday(newTaskTitle)
+        let targetGoal = selectedGoalID == Self.allGoalsID ? Self.loadSelectedWidgetGoal(from: widgetGoals) : (id: selectedGoalID, title: selectedGoalTitle)
+        store.addTaskForToday(newTaskTitle, goalID: targetGoal.id, goalTitle: targetGoal.title)
         newTaskTitle = ""
+    }
+
+    private func refreshSelectedGoal() {
+        let loadedGoals = GoalPlanStore01.load(defaultPlanText: "")
+        widgetGoals = loadedGoals
+
+        if selectedGoalID != Self.allGoalsID {
+            let selectedGoal = Self.loadSelectedWidgetGoal(from: loadedGoals)
+            selectedGoalID = selectedGoal.id
+            selectedGoalTitle = selectedGoal.title
+        }
+    }
+
+    private func selectWidgetGoal(id: String, title: String) {
+        selectedGoalID = id
+        selectedGoalTitle = title
+    }
+
+    private static func loadSelectedWidgetGoal(from goals: [GoalPlan]) -> (id: String, title: String) {
+        let selectedGoalID = GoalPlanStore01.loadSelectedGoalID()
+        let goal = goals.first { $0.id == selectedGoalID } ?? goals.first
+        return (goal?.id ?? GoalPlanStore01.defaultGoalID, goal?.title ?? GoalPlanStore01.defaultGoalTitle)
     }
 }
 
@@ -266,6 +355,7 @@ private struct SelectableEssayTextView: NSViewRepresentable {
 }
 
 private enum StudyCategory: String, CaseIterable, Identifiable {
+    case goals
     case plan
     case today
     case words
@@ -279,6 +369,7 @@ private enum StudyCategory: String, CaseIterable, Identifiable {
 
     var title: String {
         switch self {
+        case .goals: "目标总览"
         case .plan: "计划书"
         case .today: "今日日程"
         case .words: "单词本"
@@ -292,6 +383,7 @@ private enum StudyCategory: String, CaseIterable, Identifiable {
 
     var subtitle: String {
         switch self {
+        case .goals: "多目标与多计划表"
         case .plan: "手动输入与 AI 生成"
         case .today: "任务进度与勾选"
         case .words: "高频词与例句"
@@ -305,6 +397,7 @@ private enum StudyCategory: String, CaseIterable, Identifiable {
 
     var icon: String {
         switch self {
+        case .goals: "target"
         case .plan: "doc.text.magnifyingglass"
         case .today: "calendar.badge.clock"
         case .words: "book.closed.fill"
@@ -318,6 +411,7 @@ private enum StudyCategory: String, CaseIterable, Identifiable {
 
     var tint: Color {
         switch self {
+        case .goals: Color(red: 0.42, green: 0.30, blue: 0.56)
         case .plan: Color(red: 0.18, green: 0.36, blue: 0.52)
         case .today: Color(red: 0.13, green: 0.45, blue: 0.39)
         case .words: Color(red: 0.58, green: 0.24, blue: 0.25)
@@ -330,20 +424,7 @@ private enum StudyCategory: String, CaseIterable, Identifiable {
     }
 }
 
-struct ScheduleBlock: Identifiable {
-    let id = UUID()
-    let dateKey: String
-    let timeLabel: String
-    let title: String
-    let note: String
-    let category: String
-
-    var dateLabel: String {
-        DateKey.displayLabel(for: dateKey)
-    }
-}
-
-private struct VocabularyWord: Codable, Equatable, Identifiable {
+private struct VocabularyWord: Codable, Equatable, Identifiable, Sendable {
     let id: String
     let word: String
     let phonetic: String
@@ -573,24 +654,52 @@ private struct FloatingWindowSwitchStyle: ToggleStyle {
 }
 
 struct StudyWindowView: View {
+    private static let emergencyPlan = GoalPlanSheet(
+        id: "emergency-plan",
+        title: "计划表01",
+        planText: "",
+        createdAt: Date(timeIntervalSinceReferenceDate: 0),
+        updatedAt: Date(timeIntervalSinceReferenceDate: 0)
+    )
+    private static let emergencyGoal = GoalPlan(
+        id: "emergency-goal",
+        title: "待恢复目标",
+        mode: "恢复模式",
+        focus: "请重新打开应用以恢复目标数据。",
+        plans: [emergencyPlan]
+    )
+
     @ObservedObject var store: TaskStore
     @ObservedObject var widgetVisibility: WidgetVisibilityController
-    @State private var selectedCategory: StudyCategory = .plan
+    @State private var selectedCategory: StudyCategory = .goals
     @State private var planWorkspaceMode: PlanWorkspaceMode = .manual
+    @State private var goals: [GoalPlan]
+    @State private var selectedGoalID: String
+    @State private var selectedPlanID: String
     @State private var planText: String
     @State private var scheduleBlocks: [ScheduleBlock]
     @State private var isGeneratingSchedule = false
     @State private var scheduleStatus = "本地规则预览"
+    @State private var isPlanEditorCollapsed = false
+    @State private var isLoadingPlanText = false
+    @State private var planLoadGeneration = 0
     @State private var aiPlanPrompt = ""
     @State private var aiPlanDraft = ""
-    @State private var aiPlanStatus = "填写备考情况后，AI 会生成一份可保存、可同步的 CET-6 计划。"
+    @State private var aiPlanStatus = "填写目标背景后，AI 会生成一份可保存、可同步的计划。"
     @State private var isRevisingPlan = false
     @State private var quickTaskTitle = ""
+    @State private var newGoalTitle = ""
+    @State private var newGoalMode = "生活目标"
+    @State private var newGoalFocus = ""
+    @State private var newPlanTitle = ""
+    @State private var goalStatus = "选择一个目标，再查看它的计划表和今日任务。"
     @State private var wordSearch = ""
     @State private var newWordText = ""
     @State private var wordBankStatus = "回车即可加入单词本"
     @State private var isCompletingWord = false
     @State private var customWords: [VocabularyWord]
+    @State private var isLoadingCustomWords = false
+    @State private var customWordsLoadGeneration = 0
     @State private var favoriteWordIDs: Set<String> = []
     @State private var deletedWordIDs: Set<String>
     @State private var revealedDeleteWordID: String?
@@ -620,10 +729,19 @@ struct StudyWindowView: View {
     init(store: TaskStore, widgetVisibility: WidgetVisibilityController = WidgetVisibilityController()) {
         self.store = store
         self.widgetVisibility = widgetVisibility
-        let plan = PlanStore.load() ?? Self.defaultPlanText
+        let loadedGoals = GoalPlanStore01.load(defaultPlanText: Self.defaultPlanText)
+        let preferredGoalID = GoalPlanStore01.loadSelectedGoalID()
+        let selectedGoal = loadedGoals.first { $0.id == preferredGoalID } ?? loadedGoals.first ?? Self.emergencyGoal
+        let preferredPlanID = GoalPlanStore01.loadSelectedPlanID()
+        let selectedPlan = selectedGoal.plans.first { $0.id == preferredPlanID } ?? selectedGoal.plans.first ?? Self.emergencyPlan
+        let plan = selectedPlan.planText
+        _goals = State(initialValue: loadedGoals.isEmpty ? [selectedGoal] : loadedGoals)
+        _selectedGoalID = State(initialValue: selectedGoal.id)
+        _selectedPlanID = State(initialValue: selectedPlan.id)
         _planText = State(initialValue: plan)
-        _scheduleBlocks = State(initialValue: Self.generateSchedule(from: plan))
-        _customWords = State(initialValue: Self.loadCustomWords())
+        let initialBlocks = selectedPlan.generatedSchedule ?? Self.generateSchedule(from: plan, anchorDateKey: DateKey.from(selectedPlan.createdAt))
+        _scheduleBlocks = State(initialValue: store.resolvedPlanBlocks(initialBlocks, goalID: selectedGoal.id, planID: selectedPlan.id))
+        _customWords = State(initialValue: [])
         _favoriteWordIDs = State(initialValue: Self.loadFavoriteWordIDs())
         _deletedWordIDs = State(initialValue: Self.loadDeletedWordIDs())
         _translationRecords = State(initialValue: Self.loadTranslationRecords())
@@ -647,11 +765,19 @@ struct StudyWindowView: View {
         .foregroundStyle(StudyTheme.ink)
         .preferredColorScheme(.light)
         .onChange(of: planText) { _, newValue in
-            guard !isGeneratingSchedule else { return }
-            scheduleBlocks = Self.generateSchedule(from: newValue)
+            guard !isGeneratingSchedule, !isLoadingPlanText else { return }
+            scheduleBlocks = resolvedScheduleBlocks(from: newValue)
             scheduleStatus = "本地规则预览"
+            autosavePlanText(newValue)
+        }
+        .onChange(of: selectedGoalID) { _, newValue in
+            selectGoal(newValue)
+        }
+        .onChange(of: selectedPlanID) { _, newValue in
+            selectPlan(newValue)
         }
         .onChange(of: customWords) { _, newValue in
+            guard !isLoadingCustomWords else { return }
             Self.saveCustomWords(newValue)
         }
         .onChange(of: favoriteWordIDs) { _, newValue in
@@ -667,10 +793,12 @@ struct StudyWindowView: View {
             Self.saveWritingRecords(newValue)
         }
         .onReceive(NotificationCenter.default.publisher(for: .dailyVocabularyDidImport)) { _ in
-            customWords = Self.loadCustomWords()
-            wordBankStatus = "已自动导入今日 20 个词"
-            reviewIndex = 0
-            showsCardBack = false
+            Task {
+                await reloadCustomWords(status: "已自动导入今日 20 个词")
+            }
+        }
+        .task {
+            await reloadCustomWords(status: nil)
         }
     }
 
@@ -679,10 +807,10 @@ struct StudyWindowView: View {
             VStack(alignment: .leading, spacing: 8) {
                 HStack(alignment: .top, spacing: 12) {
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("CET-6")
+                        Text("Goals")
                             .font(.system(size: 31, weight: .semibold, design: .serif))
                             .foregroundStyle(StudyTheme.ink)
-                        Text("Study Desk")
+                        Text("Life Desk")
                             .font(.system(size: 11, weight: .semibold))
                             .foregroundStyle(StudyTheme.mutedInk)
                     }
@@ -692,7 +820,7 @@ struct StudyWindowView: View {
                         .toggleStyle(FloatingWindowSwitchStyle())
                         .help(widgetVisibility.isVisible ? "关闭悬浮窗" : "打开悬浮窗")
                 }
-                Text("计划 · 词汇 · 写作 · 复习")
+                Text("目标 · 计划 · 执行 · 复盘")
                     .font(.system(size: 12, weight: .semibold))
                     .foregroundStyle(StudyTheme.secondaryInk)
             }
@@ -701,7 +829,7 @@ struct StudyWindowView: View {
 
             ScrollView {
                 VStack(spacing: 4) {
-                    ForEach(StudyCategory.allCases) { category in
+                    ForEach(availableCategories) { category in
                         sidebarButton(for: category)
                     }
                 }
@@ -737,6 +865,7 @@ struct StudyWindowView: View {
                         .foregroundStyle(StudyTheme.secondaryInk)
                 }
                 Spacer()
+                currentTargetPicker
                 statusPill
             }
             .padding(.horizontal, 28)
@@ -745,6 +874,8 @@ struct StudyWindowView: View {
 
             Group {
                 switch selectedCategory {
+                case .goals:
+                    goalsWorkspace
                 case .plan:
                     combinedPlanWorkspace
                 case .today:
@@ -768,6 +899,65 @@ struct StudyWindowView: View {
         }
     }
 
+    private var currentGoal: GoalPlan {
+        goals.first { $0.id == selectedGoalID } ?? goals.first ?? Self.emergencyGoal
+    }
+
+    private var currentPlan: GoalPlanSheet {
+        currentGoal.plans.first { $0.id == selectedPlanID } ?? currentGoal.plans.first ?? Self.emergencyPlan
+    }
+
+    private func resolvedScheduleBlocks(from text: String) -> [ScheduleBlock] {
+        store.resolvedPlanBlocks(
+            Self.generateSchedule(from: text, anchorDateKey: DateKey.from(currentPlan.createdAt)),
+            goalID: currentGoal.id,
+            planID: currentPlan.id
+        )
+    }
+
+    private var availableCategories: [StudyCategory] {
+        categories(for: currentGoal)
+    }
+
+    private func categories(for goal: GoalPlan) -> [StudyCategory] {
+        let goalCategories: [StudyCategory] = [.goals, .plan, .today]
+        let englishCategories: [StudyCategory] = [.words, .translation, .writing, .roots, .flashcards, .mistakes]
+
+        return goalUsesEnglishTools(goal) ? goalCategories + englishCategories : goalCategories
+    }
+
+    private func goalUsesEnglishTools(_ goal: GoalPlan) -> Bool {
+        let text = "\(goal.title) \(goal.mode) \(goal.focus)".lowercased()
+        let keywords = ["cet", "六级", "英语", "英文", "单词", "词汇", "听力", "阅读", "翻译", "写作", "作文", "词根"]
+        return keywords.contains { text.contains($0) }
+    }
+
+    private func ensureSelectedCategoryVisible(for goal: GoalPlan) {
+        if !categories(for: goal).contains(selectedCategory) {
+            selectedCategory = .goals
+        }
+    }
+
+    private var currentTargetPicker: some View {
+        HStack(spacing: 8) {
+            Picker("当前目标", selection: $selectedGoalID) {
+                ForEach(goals) { goal in
+                    Text(goal.title).tag(goal.id)
+                }
+            }
+            .labelsHidden()
+            .frame(width: 170)
+
+            Picker("当前计划表", selection: $selectedPlanID) {
+                ForEach(currentGoal.plans) { plan in
+                    Text(plan.title).tag(plan.id)
+                }
+            }
+            .labelsHidden()
+            .frame(width: 150)
+        }
+    }
+
     private var shellBackground: some View {
         ZStack {
             StudyTheme.windowBase
@@ -788,15 +978,16 @@ struct StudyWindowView: View {
     }
 
     private var progressSummary: some View {
-        let total = max(store.todayTasks.count, 1)
-        let done = store.todayTasks.filter(\.isDone).count
+        let tasks = store.todayTasks(for: currentGoal.id)
+        let total = max(tasks.count, 1)
+        let done = tasks.filter(\.isDone).count
 
         return VStack(alignment: .leading, spacing: 10) {
             HStack {
                 Text("今日完成")
                     .font(.system(size: 13, weight: .semibold))
                 Spacer()
-                Text("\(done)/\(store.todayTasks.count)")
+                Text("\(done)/\(tasks.count)")
                     .font(.system(size: 13, weight: .bold))
                     .foregroundStyle(StudyTheme.secondaryInk)
             }
@@ -888,6 +1079,212 @@ struct StudyWindowView: View {
         .buttonStyle(.plain)
     }
 
+    private var goalsWorkspace: some View {
+        HStack(alignment: .top, spacing: 18) {
+            VStack(alignment: .leading, spacing: 12) {
+                HStack {
+                    Text("目标")
+                        .font(.system(size: 16, weight: .bold))
+                    Spacer()
+                    Text("\(goals.count) 个")
+                        .font(.system(size: 12, weight: .bold))
+                        .foregroundStyle(StudyTheme.secondaryInk)
+                }
+
+                ScrollView {
+                    LazyVStack(spacing: 10) {
+                        ForEach(goals) { goal in
+                            goalCard(goal)
+                        }
+                    }
+                }
+
+                VStack(alignment: .leading, spacing: 9) {
+                    Text("新建目标")
+                        .font(.system(size: 14, weight: .bold))
+                    TextField("例如：考研、健身、读书、项目作品集", text: $newGoalTitle)
+                        .textFieldStyle(.plain)
+                        .font(.system(size: 14))
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 9)
+                        .background(StudyTheme.panelStrong)
+                        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                    TextField("模式，例如：考试冲刺 / 习惯养成 / 长期项目", text: $newGoalMode)
+                        .textFieldStyle(.plain)
+                        .font(.system(size: 14))
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 9)
+                        .background(StudyTheme.panelStrong)
+                        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                    TextField("这个目标最重要的执行原则", text: $newGoalFocus)
+                        .textFieldStyle(.plain)
+                        .font(.system(size: 14))
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 9)
+                        .background(StudyTheme.panelStrong)
+                        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                        .onSubmit(addGoal)
+                    Button {
+                        addGoal()
+                    } label: {
+                        Label("新增目标", systemImage: "plus")
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .tint(StudyCategory.goals.tint)
+                }
+                .padding(13)
+                .background(StudyTheme.panelBase)
+                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                .overlay {
+                    RoundedRectangle(cornerRadius: 8, style: .continuous)
+                        .stroke(StudyTheme.hairline, lineWidth: 1)
+                }
+            }
+            .frame(width: 330)
+
+            VStack(alignment: .leading, spacing: 14) {
+                HStack(alignment: .top) {
+                    VStack(alignment: .leading, spacing: 5) {
+                        Text(currentGoal.title)
+                            .font(.system(size: 24, weight: .semibold, design: .serif))
+                        Text("\(currentGoal.mode) · \(currentGoal.focus)")
+                            .font(.system(size: 13, weight: .semibold))
+                            .foregroundStyle(StudyTheme.secondaryInk)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                    Spacer()
+                    Text(goalStatus)
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundStyle(StudyTheme.secondaryInk)
+                        .frame(maxWidth: 260, alignment: .trailing)
+                }
+
+                HStack(spacing: 10) {
+                    TextField("新计划表名称", text: $newPlanTitle)
+                        .textFieldStyle(.plain)
+                        .font(.system(size: 14))
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 9)
+                        .background(StudyTheme.panelStrong)
+                        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                        .onSubmit(addPlanToCurrentGoal)
+
+                    Button {
+                        addPlanToCurrentGoal()
+                    } label: {
+                        Label("新计划表", systemImage: "doc.badge.plus")
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .tint(StudyCategory.goals.tint)
+                }
+
+                ScrollView {
+                    LazyVStack(spacing: 10) {
+                        ForEach(currentGoal.plans) { plan in
+                            planSheetCard(plan)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private func goalCard(_ goal: GoalPlan) -> some View {
+        let isSelected = goal.id == selectedGoalID
+        let todayCount = store.todayTasks(for: goal.id).count
+        let doneCount = store.todayTasks(for: goal.id).filter(\.isDone).count
+
+        return Button {
+            selectedGoalID = goal.id
+            selectedCategory = .goals
+        } label: {
+            VStack(alignment: .leading, spacing: 8) {
+                HStack {
+                    Image(systemName: isSelected ? "target" : "circle")
+                        .font(.system(size: 15, weight: .bold))
+                        .foregroundStyle(isSelected ? StudyCategory.goals.tint : StudyTheme.mutedInk)
+                    Text(goal.title)
+                        .font(.system(size: 15, weight: .bold))
+                        .foregroundStyle(StudyTheme.ink)
+                    Spacer()
+                    Text(goal.mode)
+                        .font(.system(size: 11, weight: .bold))
+                        .foregroundStyle(StudyTheme.secondaryInk)
+                }
+                Text(goal.focus)
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundStyle(StudyTheme.secondaryInk)
+                    .lineLimit(2)
+                Text("\(goal.plans.count) 张计划表 · 今日 \(doneCount)/\(todayCount)")
+                    .font(.system(size: 11, weight: .bold))
+                    .foregroundStyle(StudyTheme.mutedInk)
+            }
+            .padding(13)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(isSelected ? StudyTheme.panelStrong : StudyTheme.panelBase)
+            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+            .overlay {
+                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                    .stroke(isSelected ? StudyCategory.goals.tint.opacity(0.45) : StudyTheme.hairline, lineWidth: 1)
+            }
+        }
+        .buttonStyle(.plain)
+        .contextMenu {
+            Button(role: .destructive) {
+                deleteGoal(goal)
+            } label: {
+                Label("删除目标", systemImage: "trash")
+            }
+            .disabled(goals.count <= 1)
+        }
+    }
+
+    private func planSheetCard(_ plan: GoalPlanSheet) -> some View {
+        let isSelected = plan.id == selectedPlanID
+        let sourceBlocks = plan.generatedSchedule ?? Self.generateSchedule(from: plan.planText, anchorDateKey: DateKey.from(plan.createdAt))
+        let blocks = store.resolvedPlanBlocks(sourceBlocks, goalID: currentGoal.id, planID: plan.id)
+        let todayCount = blocks.filter { $0.dateKey == DateKey.today() }.count
+
+        return Button {
+            selectedPlanID = plan.id
+            selectedCategory = .plan
+        } label: {
+            HStack(alignment: .top, spacing: 12) {
+                Image(systemName: isSelected ? "doc.text.fill" : "doc.text")
+                    .font(.system(size: 20, weight: .semibold))
+                    .foregroundStyle(isSelected ? StudyCategory.plan.tint : StudyTheme.mutedInk)
+                    .frame(width: 28)
+                VStack(alignment: .leading, spacing: 5) {
+                    HStack {
+                        Text(plan.title)
+                            .font(.system(size: 15, weight: .bold))
+                            .foregroundStyle(StudyTheme.ink)
+                        Spacer()
+                        Text("\(blocks.count) 项")
+                            .font(.system(size: 11, weight: .bold))
+                            .foregroundStyle(StudyTheme.secondaryInk)
+                    }
+                    Text("今天 \(todayCount) 项 · \(plan.updatedAt.formatted(date: .abbreviated, time: .omitted)) 更新")
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundStyle(StudyTheme.secondaryInk)
+                    Text(plan.planText.components(separatedBy: .newlines).prefix(2).joined(separator: "；"))
+                        .font(.system(size: 12))
+                        .foregroundStyle(StudyTheme.mutedInk)
+                        .lineLimit(2)
+                }
+            }
+            .padding(13)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(isSelected ? StudyTheme.panelStrong : StudyTheme.panelBase)
+            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+            .overlay {
+                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                    .stroke(isSelected ? StudyCategory.plan.tint.opacity(0.45) : StudyTheme.hairline, lineWidth: 1)
+            }
+        }
+        .buttonStyle(.plain)
+    }
+
     private var combinedPlanWorkspace: some View {
         VStack(alignment: .leading, spacing: 14) {
             HStack {
@@ -916,39 +1313,7 @@ struct StudyWindowView: View {
 
     private var planWorkspace: some View {
         HStack(alignment: .top, spacing: 18) {
-            VStack(alignment: .leading, spacing: 12) {
-                HStack {
-                    Text("计划书原文")
-                        .font(.system(size: 16, weight: .bold))
-                        .foregroundStyle(StudyTheme.ink)
-                    Spacer()
-                    Button {
-                        pastePlanFromPasteboard()
-                    } label: {
-                        Label("粘贴", systemImage: "doc.on.clipboard")
-                    }
-                    .buttonStyle(.bordered)
-
-                    Button {
-                        savePlan()
-                    } label: {
-                        Label("保存计划书", systemImage: "square.and.arrow.down")
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .tint(StudyCategory.plan.tint)
-                }
-                TextEditor(text: $planText)
-                    .font(.system(size: 14, weight: .regular, design: .serif))
-                    .foregroundStyle(StudyTheme.ink)
-                    .scrollContentBackground(.hidden)
-                    .padding(12)
-                    .background(StudyTheme.panelStrong)
-                    .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
-                    .overlay {
-                        RoundedRectangle(cornerRadius: 8, style: .continuous)
-                            .stroke(StudyTheme.hairline, lineWidth: 1)
-                    }
-            }
+            planEditorPane
             .frame(width: 360)
 
             VStack(alignment: .leading, spacing: 12) {
@@ -960,6 +1325,9 @@ struct StudyWindowView: View {
                         Text(scheduleStatus)
                             .font(.system(size: 12, weight: .semibold))
                             .foregroundStyle(StudyTheme.secondaryInk)
+                            .lineLimit(2)
+                            .truncationMode(.tail)
+                            .frame(maxWidth: 260, alignment: .leading)
                     }
                     Spacer()
                     Button {
@@ -977,6 +1345,7 @@ struct StudyWindowView: View {
                         Label("复制", systemImage: "doc.on.doc")
                     }
                     .buttonStyle(.bordered)
+                    .disabled(scheduleBlocks.isEmpty)
 
                     Button {
                         syncPlanTasks()
@@ -985,17 +1354,109 @@ struct StudyWindowView: View {
                     }
                     .buttonStyle(.borderless)
                     .foregroundStyle(StudyCategory.plan.tint)
+                    .disabled(scheduleBlocks.isEmpty)
                 }
 
                 ScrollView {
-                    LazyVStack(spacing: 10) {
-                        ForEach(scheduleBlocks) { block in
-                            scheduleCard(block)
+                    if scheduleBlocks.isEmpty {
+                        emptyPanel("这张计划表还没有可生成的日程", hint: "在左侧写入日期、时间段和任务内容后，会在这里生成当前目标的日程。")
+                    } else {
+                        LazyVStack(spacing: 10) {
+                            ForEach(scheduleBlocks) { block in
+                                scheduleCard(block)
+                            }
                         }
+                        .padding(.vertical, 2)
                     }
-                    .padding(.vertical, 2)
                 }
             }
+        }
+    }
+
+    private var planEditorPane: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            if isPlanEditorCollapsed {
+                collapsedPlanEditorPane
+            } else {
+                expandedPlanEditorPane
+            }
+        }
+    }
+
+    private var expandedPlanEditorPane: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Text("\(currentGoal.title) · \(currentPlan.title)")
+                    .font(.system(size: 16, weight: .bold))
+                    .foregroundStyle(StudyTheme.ink)
+                Spacer()
+                Button {
+                    pastePlanFromPasteboard()
+                } label: {
+                    Label("粘贴", systemImage: "doc.on.clipboard")
+                }
+                .buttonStyle(.bordered)
+
+                Button {
+                    savePlan()
+                } label: {
+                    Label("保存计划书", systemImage: "square.and.arrow.down")
+                }
+                .buttonStyle(.borderedProminent)
+                .tint(StudyCategory.plan.tint)
+            }
+            TextEditor(text: $planText)
+                .font(.system(size: 14, weight: .regular, design: .serif))
+                .foregroundStyle(StudyTheme.ink)
+                .scrollContentBackground(.hidden)
+                .padding(12)
+                .background(StudyTheme.panelStrong)
+                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                .overlay {
+                    RoundedRectangle(cornerRadius: 8, style: .continuous)
+                        .stroke(StudyTheme.hairline, lineWidth: 1)
+                }
+        }
+    }
+
+    private var collapsedPlanEditorPane: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 10) {
+                Image(systemName: "checkmark.circle.fill")
+                    .font(.system(size: 20, weight: .semibold))
+                    .foregroundStyle(StudyCategory.today.tint)
+                VStack(alignment: .leading, spacing: 3) {
+                    Text("计划书已同步")
+                        .font(.system(size: 16, weight: .bold))
+                    Text("\(currentGoal.title) · \(currentPlan.title)")
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundStyle(StudyTheme.secondaryInk)
+                        .lineLimit(2)
+                }
+                Spacer()
+            }
+
+            Text("左侧原文已收起，右侧日程和“今日日程”会继续保留。")
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundStyle(StudyTheme.secondaryInk)
+                .fixedSize(horizontal: false, vertical: true)
+
+            Button {
+                isPlanEditorCollapsed = false
+            } label: {
+                Label("显示/编辑原文", systemImage: "pencil")
+                    .padding(.horizontal, 6)
+            }
+            .buttonStyle(.borderedProminent)
+            .tint(StudyCategory.plan.tint)
+        }
+        .padding(14)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(StudyTheme.panelStrong)
+        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+        .overlay {
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                .stroke(StudyTheme.hairline, lineWidth: 1)
         }
     }
 
@@ -1018,23 +1479,45 @@ struct StudyWindowView: View {
         }
 
         planText = text
-        scheduleBlocks = Self.generateSchedule(from: text)
+        isPlanEditorCollapsed = false
+        scheduleBlocks = resolvedScheduleBlocks(from: text)
+        autosavePlanText(text)
         scheduleStatus = "已粘贴计划书，本地规则预览"
     }
 
     private func syncPlanTasks() {
-        store.syncPlanTasks(scheduleBlocks)
-        let todayCount = scheduleBlocks.filter { $0.dateKey == DateKey.today() }.count
-        scheduleStatus = "已同步到任务库，今天 \(todayCount) 项"
+        let blocksToSync = scheduleBlocks
+        guard !blocksToSync.isEmpty else {
+            scheduleStatus = "没有可同步的日程"
+            return
+        }
+
+        do {
+            try updateCurrentPlan(planText: planText, title: currentPlan.title, generatedSchedule: blocksToSync)
+            store.syncPlanTasks(blocksToSync, goal: currentGoal, plan: currentPlan)
+            scheduleBlocks = store.resolvedPlanBlocks(blocksToSync, goalID: currentGoal.id, planID: currentPlan.id)
+            let todayCount = scheduleBlocks.filter { $0.dateKey == DateKey.today() }.count
+            scheduleStatus = "计划书已保存并同步到 \(currentGoal.title)，今天 \(todayCount) 项"
+            isPlanEditorCollapsed = true
+        } catch {
+            scheduleStatus = "同步失败：\(error.localizedDescription)"
+        }
     }
 
     private func savePlan() {
+        let blocksToSync = scheduleBlocks.isEmpty ? Self.generateSchedule(from: planText, anchorDateKey: DateKey.from(currentPlan.createdAt)) : scheduleBlocks
+
         do {
-            try PlanStore.save(planText)
-            scheduleBlocks = Self.generateSchedule(from: planText)
-            store.syncPlanTasks(scheduleBlocks)
+            try updateCurrentPlan(planText: planText, title: currentPlan.title, generatedSchedule: blocksToSync)
+            if !blocksToSync.isEmpty {
+                store.syncPlanTasks(blocksToSync, goal: currentGoal, plan: currentPlan)
+                scheduleBlocks = store.resolvedPlanBlocks(blocksToSync, goalID: currentGoal.id, planID: currentPlan.id)
+            } else {
+                scheduleBlocks = []
+            }
             let todayCount = scheduleBlocks.filter { $0.dateKey == DateKey.today() }.count
-            scheduleStatus = "计划书已保存并同步，今天 \(todayCount) 项"
+            scheduleStatus = "\(currentGoal.title) 的 \(currentPlan.title) 已保存并同步，今天 \(todayCount) 项"
+            isPlanEditorCollapsed = true
         } catch {
             scheduleStatus = "保存失败：\(error.localizedDescription)"
         }
@@ -1049,6 +1532,8 @@ struct StudyWindowView: View {
 
         isGeneratingSchedule = true
         scheduleStatus = "正在调用 DeepSeek 拆解..."
+        let targetGoalID = currentGoal.id
+        let targetPlan = currentPlan
 
         Task {
             do {
@@ -1056,29 +1541,64 @@ struct StudyWindowView: View {
                 let generatedSchedule = try await service.generateSchedule(from: trimmedPlan)
 
                 await MainActor.run {
-                    scheduleBlocks = generatedSchedule
-                    scheduleStatus = "DeepSeek 已生成 \(generatedSchedule.count) 项"
+                    do {
+                        try persistGeneratedSchedule(generatedSchedule, goalID: targetGoalID, planID: targetPlan.id)
+                        if selectedGoalID == targetGoalID, selectedPlanID == targetPlan.id {
+                            scheduleBlocks = store.resolvedPlanBlocks(generatedSchedule, goalID: targetGoalID, planID: targetPlan.id)
+                            scheduleStatus = "DeepSeek 已生成并保存 \(generatedSchedule.count) 项"
+                        } else {
+                            goalStatus = "AI 日程已保存到 \(targetPlan.title)"
+                        }
+                    } catch {
+                        scheduleStatus = "AI 日程已生成，但保存失败：\(error.localizedDescription)"
+                    }
                     isGeneratingSchedule = false
                 }
             } catch {
-                let fallback = Self.generateSchedule(from: trimmedPlan)
+                let fallback = Self.generateSchedule(from: trimmedPlan, anchorDateKey: DateKey.from(targetPlan.createdAt))
 
                 await MainActor.run {
-                    scheduleBlocks = fallback
-                    scheduleStatus = "AI 拆解失败，已回退本地规则：\(error.localizedDescription)"
+                    if selectedGoalID == targetGoalID, selectedPlanID == targetPlan.id {
+                        scheduleBlocks = store.resolvedPlanBlocks(fallback, goalID: targetGoalID, planID: targetPlan.id)
+                        scheduleStatus = scheduleAIErrorMessage(error, fallbackCount: fallback.count)
+                    }
                     isGeneratingSchedule = false
                 }
             }
         }
     }
 
+    private func scheduleAIErrorMessage(_ error: Error, fallbackCount: Int) -> String {
+        let suffix = fallbackCount > 0 ? "，已用本地规则生成 \(fallbackCount) 项" : "，请补充更明确的日期和任务"
+
+        if let serviceError = error as? DeepSeekPlanService.ServiceError {
+            switch serviceError {
+            case .missingAPIKey:
+                return "缺少 DeepSeek API Key\(suffix)"
+            case .invalidResponse:
+                return "AI 返回内容为空或无法解析\(suffix)"
+            case .requestFailed(let message):
+                if message.contains("JSON") || message.contains("格式") {
+                    return "AI 返回格式异常\(suffix)"
+                }
+                return "AI 接口调用失败\(suffix)"
+            }
+        }
+
+        if (error as NSError).domain == NSURLErrorDomain {
+            return "网络连接失败\(suffix)"
+        }
+
+        return "AI 拆解失败\(suffix)"
+    }
+
     private func scheduleCard(_ block: ScheduleBlock) -> some View {
-        let task = store.task(for: block)
+        let task = store.task(for: block, goalID: currentGoal.id, planID: currentPlan.id)
         let isDone = task?.isDone ?? false
 
         return HStack(alignment: .top, spacing: 13) {
             Button {
-                store.toggleDone(for: block)
+                store.toggleDone(for: block, goal: currentGoal, plan: currentPlan)
                 scheduleStatus = isDone ? "已标记为未完成" : "已标记完成"
             } label: {
                 Image(systemName: isDone ? "checkmark.circle.fill" : "circle")
@@ -1129,10 +1649,10 @@ struct StudyWindowView: View {
         HStack(alignment: .top, spacing: 18) {
             VStack(alignment: .leading, spacing: 12) {
                 VStack(alignment: .leading, spacing: 5) {
-                    Text("告诉 AI 你的备考情况")
+                        Text("告诉 AI 你的目标背景")
                         .font(.system(size: 16, weight: .bold))
                         .foregroundStyle(StudyTheme.ink)
-                    Text("例如：距离考试 18 天，每天 2 小时，听力弱，词汇每天 40 个，周末能多学。")
+                    Text("例如：目标期限、每天可用时间、薄弱环节、执行偏好和想要的节奏。")
                         .font(.system(size: 12, weight: .semibold))
                         .foregroundStyle(StudyTheme.secondaryInk)
                 }
@@ -1173,7 +1693,7 @@ struct StudyWindowView: View {
                         Text("AI 计划预览")
                             .font(.system(size: 16, weight: .bold))
                             .foregroundStyle(StudyTheme.ink)
-                        Text(aiPlanDraft.isEmpty ? "生成后会在这里显示完整计划和日程拆分。" : "\(Self.generateSchedule(from: aiPlanDraft).count) 项可同步日程")
+                            Text(aiPlanDraft.isEmpty ? "生成后会在这里显示完整计划和日程拆分。" : "\(Self.generateSchedule(from: aiPlanDraft, anchorDateKey: DateKey.from(currentPlan.createdAt)).count) 项可同步日程")
                             .font(.system(size: 12, weight: .semibold))
                             .foregroundStyle(StudyTheme.secondaryInk)
                     }
@@ -1197,7 +1717,7 @@ struct StudyWindowView: View {
                 }
 
                 if aiPlanDraft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                    emptyPanel("还没有 AI 计划", hint: "在左侧写清楚考试时间、每天可用时间、薄弱项和偏好，点击“AI 定计划”。")
+                    emptyPanel("还没有 AI 计划", hint: "在左侧写清楚目标、期限、每天可用时间、薄弱项和偏好，点击“AI 定计划”。")
                 } else {
                     ScrollView {
                         VStack(alignment: .leading, spacing: 12) {
@@ -1210,7 +1730,7 @@ struct StudyWindowView: View {
                                 .background(StudyTheme.panelStrong)
                                 .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
 
-                            ForEach(Self.generateSchedule(from: aiPlanDraft)) { block in
+                            ForEach(Self.generateSchedule(from: aiPlanDraft, anchorDateKey: DateKey.from(currentPlan.createdAt))) { block in
                                 scheduleCard(block)
                             }
                         }
@@ -1249,12 +1769,16 @@ struct StudyWindowView: View {
         Task {
             do {
                 let service = try DeepSeekPlanService()
-                let generated = try await service.createStudyPlan(userProfile: request)
+                let goalContext = """
+                当前目标：\(currentGoal.title)
+                当前模式：\(currentGoal.mode)
+                执行重点：\(currentGoal.focus)
+                用户补充：\(request)
+                """
+                let generated = try await service.createStudyPlan(userProfile: goalContext)
 
                 await MainActor.run {
                     aiPlanDraft = generated.planText
-                    scheduleBlocks = Self.generateSchedule(from: generated.planText)
-                    scheduleStatus = "AI 已生成计划，待保存或同步"
                     aiPlanStatus = generated.reply
                     isRevisingPlan = false
                 }
@@ -1270,12 +1794,14 @@ struct StudyWindowView: View {
     private func saveAIPlanDraft() {
         let draft = aiPlanDraft.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !draft.isEmpty else { return }
+        let generatedBlocks = Self.generateSchedule(from: draft, anchorDateKey: DateKey.from(currentPlan.createdAt))
 
         do {
-            try PlanStore.save(draft)
-            planText = draft
-            scheduleBlocks = Self.generateSchedule(from: draft)
+            try updateCurrentPlan(planText: draft, title: currentPlan.title, generatedSchedule: generatedBlocks)
+            setPlanTextWithoutAutosave(draft)
+            scheduleBlocks = store.resolvedPlanBlocks(generatedBlocks, goalID: currentGoal.id, planID: currentPlan.id)
             aiPlanStatus = "AI 计划已保存到“计划书”。"
+            isPlanEditorCollapsed = false
         } catch {
             aiPlanStatus = "保存失败：\(error.localizedDescription)"
         }
@@ -1285,10 +1811,17 @@ struct StudyWindowView: View {
         let draft = aiPlanDraft.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !draft.isEmpty else { return }
 
-        planText = draft
-        scheduleBlocks = Self.generateSchedule(from: draft)
-        store.syncPlanTasks(scheduleBlocks)
-        aiPlanStatus = "已同步 \(scheduleBlocks.count) 项任务到任务库。"
+        let generatedBlocks = Self.generateSchedule(from: draft, anchorDateKey: DateKey.from(currentPlan.createdAt))
+        guard !generatedBlocks.isEmpty else {
+            aiPlanStatus = "AI 计划里没有可同步的日程，请先保存或补充日期和任务。"
+            return
+        }
+
+        store.syncPlanTasks(generatedBlocks, goal: currentGoal, plan: currentPlan)
+        scheduleBlocks = store.resolvedPlanBlocks(generatedBlocks, goalID: currentGoal.id, planID: currentPlan.id)
+        aiPlanStatus = "已同步 \(generatedBlocks.count) 项任务到 \(currentGoal.title)，计划书未被替换。"
+        scheduleStatus = "AI 计划草稿已同步到任务库，当前计划书未改"
+        isPlanEditorCollapsed = false
     }
 
     private func sendPlanRevisionRequest() {
@@ -1296,7 +1829,23 @@ struct StudyWindowView: View {
     }
 
     private var todayWorkspace: some View {
-        VStack(alignment: .leading, spacing: 14) {
+        let selectedTasks = store.todayTasks(for: currentGoal.id)
+
+        return VStack(alignment: .leading, spacing: 14) {
+            HStack {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(currentGoal.title)
+                        .font(.system(size: 16, weight: .bold))
+                    Text("只显示这个目标今天要做的事。切换右上角目标即可查看其它计划表。")
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundStyle(StudyTheme.secondaryInk)
+                }
+                Spacer()
+                Text("\(selectedTasks.filter(\.isDone).count)/\(selectedTasks.count)")
+                    .font(.system(size: 13, weight: .bold))
+                    .foregroundStyle(StudyTheme.secondaryInk)
+            }
+
             HStack(spacing: 10) {
                 TextField("添加今日任务", text: $quickTaskTitle)
                     .textFieldStyle(.plain)
@@ -1321,9 +1870,9 @@ struct StudyWindowView: View {
             }
 
             ScrollView {
-                if store.todayTasks.isEmpty {
+                if selectedTasks.isEmpty {
                     VStack(alignment: .leading, spacing: 8) {
-                        Text("今天还没有同步到任务库的计划。")
+                        Text("这个目标今天还没有同步到任务库的计划。")
                             .font(.system(size: 15, weight: .bold))
                             .foregroundStyle(StudyTheme.ink)
                         Text("如果计划书里有今天的日期，请回到“计划书”页点“同步到任务库”。")
@@ -1340,7 +1889,7 @@ struct StudyWindowView: View {
                     }
                 } else {
                     LazyVStack(spacing: 9) {
-                        ForEach(store.todayTasks) { task in
+                        ForEach(selectedTasks) { task in
                             Button {
                                 store.toggleDone(task)
                             } label: {
@@ -2072,9 +2621,9 @@ struct StudyWindowView: View {
                 .buttonStyle(.bordered)
 
                 Button {
-                    markCardAsHard(word)
+                    toggleCardFavorite(word)
                 } label: {
-                    Label(favoriteWordIDs.contains(word.id) ? "已收藏" : "不熟收藏", systemImage: "bookmark")
+                    Label(favoriteWordIDs.contains(word.id) ? "取消收藏" : "不熟收藏", systemImage: "bookmark")
                 }
                 .buttonStyle(.bordered)
                 .tint(StudyCategory.flashcards.tint)
@@ -2258,8 +2807,191 @@ struct StudyWindowView: View {
         }
     }
 
+    private func selectGoal(_ goalID: String) {
+        guard let goal = goals.first(where: { $0.id == goalID }) else {
+            guard let fallback = goals.first else { return }
+            if selectedGoalID != fallback.id {
+                selectedGoalID = fallback.id
+            }
+            return
+        }
+
+        GoalPlanStore01.saveSelectedGoalID(goal.id)
+        guard let plan = goal.plans.first(where: { $0.id == selectedPlanID }) ?? goal.plans.first else { return }
+        selectedPlanID = plan.id
+        loadPlan(plan)
+        ensureSelectedCategoryVisible(for: goal)
+        goalStatus = "已切换到 \(goal.title)"
+    }
+
+    private func selectPlan(_ planID: String) {
+        guard let plan = currentGoal.plans.first(where: { $0.id == planID }) else {
+            guard let fallbackPlan = currentGoal.plans.first else { return }
+            selectedPlanID = fallbackPlan.id
+            loadPlan(fallbackPlan)
+            return
+        }
+
+        GoalPlanStore01.saveSelectedPlanID(plan.id)
+        loadPlan(plan)
+        goalStatus = "正在查看 \(currentGoal.title) 的 \(plan.title)"
+    }
+
+    private func loadPlan(_ plan: GoalPlanSheet) {
+        isPlanEditorCollapsed = false
+        setPlanTextWithoutAutosave(plan.planText)
+        let sourceBlocks = plan.generatedSchedule ?? Self.generateSchedule(from: plan.planText, anchorDateKey: DateKey.from(plan.createdAt))
+        scheduleBlocks = store.resolvedPlanBlocks(sourceBlocks, goalID: currentGoal.id, planID: plan.id)
+        scheduleStatus = "\(currentGoal.title) · \(plan.title) · \(plan.generatedSchedule == nil ? "本地规则预览" : "已保存日程")"
+    }
+
+    private func setPlanTextWithoutAutosave(_ text: String) {
+        isLoadingPlanText = true
+        planLoadGeneration += 1
+        let generation = planLoadGeneration
+        planText = text
+        Task { @MainActor in
+            await Task.yield()
+            if planLoadGeneration == generation {
+                isLoadingPlanText = false
+            }
+        }
+    }
+
+    private func autosavePlanText(_ text: String) {
+        guard !isLoadingPlanText else { return }
+        do {
+            try updateCurrentPlan(planText: text, title: currentPlan.title, generatedSchedule: nil)
+        } catch {
+            scheduleStatus = "自动保存失败：\(error.localizedDescription)"
+        }
+    }
+
+    private func updateCurrentPlan(planText: String, title: String, generatedSchedule: [ScheduleBlock]?) throws {
+        guard let goalIndex = goals.firstIndex(where: { $0.id == selectedGoalID }),
+              let planIndex = goals[goalIndex].plans.firstIndex(where: { $0.id == selectedPlanID }) else {
+            return
+        }
+
+        goals[goalIndex].plans[planIndex].title = title
+        goals[goalIndex].plans[planIndex].planText = planText
+        goals[goalIndex].plans[planIndex].generatedSchedule = generatedSchedule
+        goals[goalIndex].plans[planIndex].updatedAt = Date()
+        try saveGoals()
+    }
+
+    private func persistGeneratedSchedule(_ blocks: [ScheduleBlock], goalID: String, planID: String) throws {
+        guard let goalIndex = goals.firstIndex(where: { $0.id == goalID }),
+              let planIndex = goals[goalIndex].plans.firstIndex(where: { $0.id == planID }) else {
+            return
+        }
+
+        goals[goalIndex].plans[planIndex].generatedSchedule = blocks
+        goals[goalIndex].plans[planIndex].updatedAt = Date()
+        try saveGoals()
+    }
+
+    private func addGoal() {
+        let title = newGoalTitle.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !title.isEmpty else {
+            goalStatus = "请先输入目标名称"
+            return
+        }
+
+        let mode = newGoalMode.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "生活目标" : newGoalMode.trimmingCharacters(in: .whitespacesAndNewlines)
+        let focus = newGoalFocus.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "把目标拆成每天可执行、可勾选、可复盘的任务。" : newGoalFocus.trimmingCharacters(in: .whitespacesAndNewlines)
+        let plan = GoalPlanSheet(
+            title: "计划表01",
+            planText: """
+            第1天 08:00-08:30 明确 \(title) 的本周重点
+            第1天 20:00-20:40 完成一个最小行动并记录结果
+            第2天 20:00-20:45 继续推进，复盘阻力和调整方法
+            """
+        )
+        let goal = GoalPlan(title: title, mode: mode, focus: focus, plans: [plan])
+
+        goals.append(goal)
+
+        do {
+            try saveGoals()
+            newGoalTitle = ""
+            newGoalMode = "生活目标"
+            newGoalFocus = ""
+            selectedGoalID = goal.id
+            selectedPlanID = plan.id
+            selectedCategory = .plan
+            goalStatus = "已新增 \(title)"
+        } catch {
+            goalStatus = "新增失败：\(error.localizedDescription)"
+        }
+    }
+
+    private func deleteGoal(_ goal: GoalPlan) {
+        guard goals.count > 1 else {
+            goalStatus = "至少要保留一个目标"
+            return
+        }
+
+        let deletedTitle = goal.title
+        goals.removeAll { $0.id == goal.id }
+        store.removeTasks(for: goal.id)
+
+        if selectedGoalID == goal.id {
+            guard let fallback = goals.first, let fallbackPlan = fallback.plans.first else { return }
+            selectedGoalID = fallback.id
+            selectedPlanID = fallbackPlan.id
+            loadPlan(fallbackPlan)
+            ensureSelectedCategoryVisible(for: fallback)
+        }
+
+        do {
+            try saveGoals()
+            goalStatus = "已删除 \(deletedTitle)"
+        } catch {
+            goalStatus = "删除失败：\(error.localizedDescription)"
+        }
+    }
+
+    private func addPlanToCurrentGoal() {
+        let title = newPlanTitle.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nextPlanTitle(for: currentGoal) : newPlanTitle.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard let goalIndex = goals.firstIndex(where: { $0.id == selectedGoalID }) else { return }
+
+        let plan = GoalPlanSheet(
+            title: title,
+            planText: """
+            第1天 08:00-08:30 \(currentGoal.title) 第一项行动
+            第1天 20:00-20:30 记录今天完成情况
+            第2天 20:00-20:45 根据反馈继续推进
+            """
+        )
+
+        goals[goalIndex].plans.append(plan)
+
+        do {
+            try saveGoals()
+            newPlanTitle = ""
+            selectedPlanID = plan.id
+            selectedCategory = .plan
+            goalStatus = "已新增 \(title)"
+        } catch {
+            goalStatus = "新增计划表失败：\(error.localizedDescription)"
+        }
+    }
+
+    private func saveGoals() throws {
+        try GoalPlanStore01.save(goals)
+    }
+
+    private func nextPlanTitle(for goal: GoalPlan) -> String {
+        var index = goal.plans.count + 1
+        while goal.plans.contains(where: { $0.title == String(format: "计划表%02d", index) }) {
+            index += 1
+        }
+        return String(format: "计划表%02d", index)
+    }
+
     private func addQuickTask() {
-        store.addTaskForToday(quickTaskTitle)
+        store.addTaskForToday(quickTaskTitle, goalID: currentGoal.id, goalTitle: currentGoal.title)
         quickTaskTitle = ""
     }
 
@@ -2505,8 +3237,8 @@ struct StudyWindowView: View {
         showsCardBack = false
     }
 
-    private func markCardAsHard(_ word: VocabularyWord) {
-        favoriteWordIDs.insert(word.id)
+    private func toggleCardFavorite(_ word: VocabularyWord) {
+        toggleFavorite(word)
         nextCard()
     }
 
@@ -2604,7 +3336,7 @@ struct StudyWindowView: View {
         return String(cleaned.prefix(180)) + "..."
     }
 
-    private static func loadCustomWords() -> [VocabularyWord] {
+    nonisolated private static func loadCustomWords() -> [VocabularyWord] {
         let defaultsWords: [VocabularyWord]
         if let data = UserDefaults.standard.data(forKey: customWordsKey),
            let words = try? JSONDecoder().decode([VocabularyWord].self, from: data) {
@@ -2622,6 +3354,28 @@ struct StudyWindowView: View {
         return mergeWords(fileWords + defaultsWords)
     }
 
+    @MainActor
+    private func reloadCustomWords(status: String?) async {
+        customWordsLoadGeneration += 1
+        let generation = customWordsLoadGeneration
+        let loadedWords = await Task.detached(priority: .userInitiated) {
+            Self.loadCustomWords()
+        }.value
+        guard !Task.isCancelled, customWordsLoadGeneration == generation else { return }
+
+        isLoadingCustomWords = true
+        customWords = loadedWords
+        if let status {
+            wordBankStatus = status
+        }
+        reviewIndex = 0
+        showsCardBack = false
+        await Task.yield()
+        if customWordsLoadGeneration == generation {
+            isLoadingCustomWords = false
+        }
+    }
+
     private static func saveCustomWords(_ words: [VocabularyWord]) {
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
@@ -2633,7 +3387,7 @@ struct StudyWindowView: View {
         }
     }
 
-    private static func mergeWords(_ words: [VocabularyWord]) -> [VocabularyWord] {
+    nonisolated private static func mergeWords(_ words: [VocabularyWord]) -> [VocabularyWord] {
         var seen: Set<String> = []
         var merged: [VocabularyWord] = []
 
@@ -2647,7 +3401,7 @@ struct StudyWindowView: View {
         return merged
     }
 
-    private static func customWordsFileURL() -> URL? {
+    nonisolated private static func customWordsFileURL() -> URL? {
         let folderURL = FileManager.default.homeDirectoryForCurrentUser
             .appendingPathComponent("Documents", isDirectory: true)
             .appendingPathComponent("CET-6", isDirectory: true)
@@ -2661,7 +3415,7 @@ struct StudyWindowView: View {
 
         if let latest = existing
             .filter({ $0.lastPathComponent.range(of: #"^custom_words\d+\.json$"#, options: .regularExpression) != nil })
-            .sorted(by: { $0.lastPathComponent > $1.lastPathComponent })
+            .sorted(by: numberedFileSort)
             .first {
             return latest
         }
@@ -2691,7 +3445,7 @@ struct StudyWindowView: View {
         saveRecords(records, defaultsKey: writingRecordsKey, fileURL: numberedDataFileURL(prefix: "writing_records"))
     }
 
-    private static func loadRecords<T: Decodable>(defaultsKey: String, fileURL: URL?) -> [T] {
+    private static func loadRecords<T: Decodable & Identifiable>(defaultsKey: String, fileURL: URL?) -> [T] where T.ID: Hashable {
         let defaultsRecords: [T]
         if let data = UserDefaults.standard.data(forKey: defaultsKey),
            let records = try? JSONDecoder().decode([T].self, from: data) {
@@ -2706,7 +3460,12 @@ struct StudyWindowView: View {
             return defaultsRecords
         }
 
-        return fileRecords.isEmpty ? defaultsRecords : fileRecords
+        return mergeRecords(preferred: fileRecords, fallback: defaultsRecords)
+    }
+
+    static func mergeRecords<T: Identifiable>(preferred: [T], fallback: [T]) -> [T] where T.ID: Hashable {
+        var seenIDs: Set<T.ID> = []
+        return (preferred + fallback).filter { seenIDs.insert($0.id).inserted }
     }
 
     private static func saveRecords<T: Encodable>(_ records: [T], defaultsKey: String, fileURL: URL?) {
@@ -2734,12 +3493,27 @@ struct StudyWindowView: View {
         let pattern = "^\(NSRegularExpression.escapedPattern(for: prefix))\\d+\\.json$"
         if let latest = existing
             .filter({ $0.lastPathComponent.range(of: pattern, options: .regularExpression) != nil })
-            .sorted(by: { $0.lastPathComponent > $1.lastPathComponent })
+            .sorted(by: numberedFileSort)
             .first {
             return latest
         }
 
         return folderURL.appendingPathComponent("\(prefix)01.json")
+    }
+
+    nonisolated static func numberedFileSort(_ lhs: URL, _ rhs: URL) -> Bool {
+        let lhsIndex = numberedFileIndex(lhs)
+        let rhsIndex = numberedFileIndex(rhs)
+        if lhsIndex == rhsIndex {
+            return lhs.lastPathComponent > rhs.lastPathComponent
+        }
+        return lhsIndex > rhsIndex
+    }
+
+    nonisolated private static func numberedFileIndex(_ url: URL) -> Int {
+        let stem = url.deletingPathExtension().lastPathComponent
+        let suffix = String(stem.reversed().prefix(while: \Character.isNumber).reversed())
+        return Int(suffix) ?? 0
     }
 
     private static func loadFavoriteWordIDs() -> Set<String> {
@@ -2765,13 +3539,13 @@ struct StudyWindowView: View {
         return formatter.string(from: date)
     }
 
-    private static let customWordsKey = "CET6DesktopWidget.customWords"
+    nonisolated private static let customWordsKey = "CET6DesktopWidget.customWords"
     private static let favoriteWordsKey = "CET6DesktopWidget.favoriteWordIDs"
     private static let deletedWordsKey = "CET6DesktopWidget.deletedWordIDs"
     private static let translationRecordsKey = "CET6DesktopWidget.translationRecords"
     private static let writingRecordsKey = "CET6DesktopWidget.writingRecords"
 
-    private static let defaultPlanText = """
+    static let defaultPlanText = """
     第1天 08:00-08:40 高频词 60 个，重点看同义替换
     第1天 20:30-21:10 听力 Section A 精听 2 篇
     第2天 08:00-08:45 词根词缀复盘，整理错词
@@ -2803,8 +3577,18 @@ struct StudyWindowView: View {
         RootItem(root: "-ive", meaning: "具有某种倾向的", pattern: "后缀", examples: "effective 有效的 · objective 客观的 · productive 高产的", cue: "-ive 多把动词/名词变成形容词，表示属性。")
     ]
 
-    private static func generateSchedule(from text: String) -> [ScheduleBlock] {
-        let sectionBlocks = scheduleBlocksFromSections(text)
+    static func generateSchedule(from text: String, anchorDateKey: String = DateKey.today()) -> [ScheduleBlock] {
+        let dayBlocks = scheduleBlocksFromDayHeadings(text, anchorDateKey: anchorDateKey)
+        if !dayBlocks.isEmpty {
+            return dayBlocks
+        }
+
+        let datedHeadingBlocks = scheduleBlocksFromDatedHeadings(text, anchorDateKey: anchorDateKey)
+        if !datedHeadingBlocks.isEmpty {
+            return datedHeadingBlocks
+        }
+
+        let sectionBlocks = scheduleBlocksFromSections(text, anchorDateKey: anchorDateKey)
         if !sectionBlocks.isEmpty {
             return sectionBlocks
         }
@@ -2815,11 +3599,11 @@ struct StudyWindowView: View {
             .map { cleanPlanLine($0) }
             .filter { !$0.isEmpty }
 
-        let source = fragments.isEmpty ? ["高频词 60 个", "听力精听 2 篇", "阅读真题 1 套", "写作翻译各 1 组"] : fragments
+        guard !fragments.isEmpty else { return [] }
 
-        return source.prefix(12).enumerated().flatMap { index, line in
+        return fragments.prefix(80).enumerated().flatMap { index, line in
             let title = titleFromPlanLine(line)
-            return dateKeys(from: line).map { dateKey in
+            return dateKeys(from: line, anchorDateKey: anchorDateKey).map { dateKey in
                 ScheduleBlock(
                     dateKey: dateKey,
                     timeLabel: timeLabel(from: line, index: index),
@@ -2831,7 +3615,120 @@ struct StudyWindowView: View {
         }
     }
 
-    private static func scheduleBlocksFromSections(_ text: String) -> [ScheduleBlock] {
+    private static func scheduleBlocksFromDayHeadings(_ text: String, anchorDateKey: String) -> [ScheduleBlock] {
+        let lines = text.components(separatedBy: .newlines)
+        let headingPattern = #"^\s*#+\s*Day\s*([0-9]+)\s*[:：]\s*(.+)$"#
+        guard let regex = try? NSRegularExpression(pattern: headingPattern, options: [.caseInsensitive]) else { return [] }
+        var sections: [(day: Int, title: String, body: [String])] = []
+        var currentIndex: Int?
+
+        for rawLine in lines {
+            let line = rawLine.trimmingCharacters(in: .whitespacesAndNewlines)
+            let nsLine = line as NSString
+            let range = NSRange(location: 0, length: nsLine.length)
+
+            if let match = regex.firstMatch(in: line, range: range),
+               match.numberOfRanges >= 3,
+               let day = Int(nsLine.substring(with: match.range(at: 1))) {
+                let title = cleanPlanLine(nsLine.substring(with: match.range(at: 2)))
+                sections.append((day: day, title: title.isEmpty ? "第\(day)天任务" : title, body: []))
+                currentIndex = sections.count - 1
+                continue
+            }
+
+            guard let currentIndex else { continue }
+            let cleaned = cleanPlanLine(line)
+            guard !cleaned.isEmpty, !cleaned.hasPrefix("---") else { continue }
+            sections[currentIndex].body.append(cleaned)
+        }
+
+        return sections.compactMap { section in
+            guard let dateKey = DateKey.addingDays(section.day - 1, to: anchorDateKey) else { return nil }
+            let note = daySectionNote(from: section.body)
+            return ScheduleBlock(
+                dateKey: dateKey,
+                timeLabel: "1-2 小时",
+                title: section.title,
+                note: note,
+                category: category(from: "\(section.title) \(note)")
+            )
+        }
+    }
+
+    private static func daySectionNote(from lines: [String]) -> String {
+        let importantPrefixes = ["今日产出", "今日任务", "学习内容", "重点理解", "适用题型"]
+        var picked: [String] = []
+        var shouldTakeNext = false
+
+        for line in lines {
+            if importantPrefixes.contains(where: { line.hasPrefix($0) }) {
+                picked.append(line)
+                shouldTakeNext = true
+                continue
+            }
+
+            if shouldTakeNext, !line.hasPrefix("#") {
+                picked.append(line)
+                shouldTakeNext = false
+                if picked.count >= 4 { break }
+            }
+        }
+
+        if picked.isEmpty {
+            picked = lines
+                .filter { !$0.hasPrefix("#") && !$0.hasPrefix("[") && !$0.hasPrefix("]") }
+                .prefix(3)
+                .map { $0 }
+        }
+
+        let note = picked
+            .map { $0.trimmingCharacters(in: CharacterSet(charactersIn: " -*")) }
+            .filter { !$0.isEmpty }
+            .prefix(4)
+            .joined(separator: "；")
+        return note.isEmpty ? "按计划完成案例、代码和复盘。" : note
+    }
+
+    private static func scheduleBlocksFromDatedHeadings(_ text: String, anchorDateKey: String) -> [ScheduleBlock] {
+        let lines = text.components(separatedBy: .newlines)
+        let headingPattern = #"^\s*#+\s*([0-9]{1,2}|[一二三四五六七八九十]+)\s*月\s*([0-9]{1,2}|[一二三四五六七八九十]+)\s*(?:日|号)?\s*$"#
+        guard let regex = try? NSRegularExpression(pattern: headingPattern) else { return [] }
+
+        var currentDateKey: String?
+        var blocks: [ScheduleBlock] = []
+
+        for rawLine in lines {
+            let line = rawLine.trimmingCharacters(in: .whitespacesAndNewlines)
+            let nsLine = line as NSString
+            let range = NSRange(location: 0, length: nsLine.length)
+
+            if let match = regex.firstMatch(in: line, range: range),
+               match.numberOfRanges >= 3,
+               let month = numberValue(nsLine.substring(with: match.range(at: 1))),
+               let day = numberValue(nsLine.substring(with: match.range(at: 2))) {
+                currentDateKey = DateKey.from(month: month, day: day, relativeTo: anchorDateKey)
+                continue
+            }
+
+            guard let dateKey = currentDateKey else { continue }
+            let cleaned = listItemTitle(from: cleanPlanLine(line))
+            guard !cleaned.isEmpty, !cleaned.hasPrefix("```") else { continue }
+
+            blocks.append(
+                ScheduleBlock(
+                    dateKey: dateKey,
+                    timeLabel: "今日任务",
+                    title: cleaned,
+                    note: "按计划完成并复盘。",
+                    category: category(from: cleaned)
+                )
+            )
+        }
+
+        return blocks
+    }
+
+    private static func scheduleBlocksFromSections(_ text: String, anchorDateKey: String) -> [ScheduleBlock] {
         let pattern = #"第\s*[0-9一二三四五六七八九十]+\s*次[:：]"#
         guard let regex = try? NSRegularExpression(pattern: pattern) else { return [] }
         let nsText = text as NSString
@@ -2842,7 +3739,7 @@ struct StudyWindowView: View {
             let start = match.range.location
             let end = index + 1 < matches.count ? matches[index + 1].range.location : nsText.length
             let section = nsText.substring(with: NSRange(location: start, length: end - start))
-            let keys = dateKeys(from: section)
+            let keys = dateKeys(from: section, anchorDateKey: anchorDateKey)
             let title = taskTitle(fromSection: section)
             let note = sectionNote(fromSection: section)
 
@@ -2861,7 +3758,13 @@ struct StudyWindowView: View {
     private static func cleanPlanLine(_ line: String) -> String {
         line
             .trimmingCharacters(in: .whitespacesAndNewlines)
-            .trimmingCharacters(in: CharacterSet(charactersIn: "-•* "))
+            .trimmingCharacters(in: CharacterSet(charactersIn: "-•*# "))
+    }
+
+    private static func listItemTitle(from line: String) -> String {
+        line
+            .replacingOccurrences(of: #"^\s*[0-9一二三四五六七八九十]+[\.\、\)]\s*"#, with: "", options: .regularExpression)
+            .trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
     private static func titleFromPlanLine(_ line: String) -> String {
@@ -2907,7 +3810,12 @@ struct StudyWindowView: View {
         return line
     }
 
-    private static func dateKeys(from text: String) -> [String] {
+    private static func dateKeys(from text: String, anchorDateKey: String) -> [String] {
+        if let relativeDay = relativeDayNumber(from: text),
+           let dateKey = DateKey.addingDays(relativeDay - 1, to: anchorDateKey) {
+            return [dateKey]
+        }
+
         guard let regex = try? NSRegularExpression(pattern: #"([0-9]{1,2}|[一二三四五六七八九十]+)\s*月\s*([0-9]{1,2}|[一二三四五六七八九十]+)"#) else {
             return [DateKey.today()]
         }
@@ -2923,22 +3831,34 @@ struct StudyWindowView: View {
                 continue
             }
 
-            appendDateKey(month: month, day: firstDay, to: &keys)
+            appendDateKey(month: month, day: firstDay, anchorDateKey: anchorDateKey, to: &keys)
 
             let tailStart = match.range.location + match.range.length
             let tail = nsText.substring(from: tailStart)
             for day in extraDays(afterMonthDayIn: tail) {
-                appendDateKey(month: month, day: day, to: &keys)
+                appendDateKey(month: month, day: day, anchorDateKey: anchorDateKey, to: &keys)
             }
         }
 
         return keys.isEmpty ? [DateKey.today()] : Array(NSOrderedSet(array: keys)) as? [String] ?? keys
     }
 
-    private static func appendDateKey(month: Int, day: Int, to keys: inout [String]) {
+    private static func relativeDayNumber(from text: String) -> Int? {
+        guard let range = text.range(of: #"第\s*([0-9一二三四五六七八九十]+)\s*天"#, options: .regularExpression) else {
+            return nil
+        }
+
+        let matched = String(text[range])
+            .replacingOccurrences(of: "第", with: "")
+            .replacingOccurrences(of: "天", with: "")
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        return numberValue(matched)
+    }
+
+    private static func appendDateKey(month: Int, day: Int, anchorDateKey: String, to keys: inout [String]) {
         guard (1...12).contains(month),
               (1...31).contains(day),
-              let key = DateKey.from(month: month, day: day),
+              let key = DateKey.from(month: month, day: day, relativeTo: anchorDateKey),
               !keys.contains(key) else {
             return
         }
@@ -2984,6 +3904,9 @@ struct StudyWindowView: View {
             "五": 5, "六": 6, "七": 7, "八": 8, "九": 9
         ]
 
+        if text.count == 1, let character = text.first, let value = digits[character] {
+            return value
+        }
         if text == "十" { return 10 }
         if text.hasPrefix("十"), let last = text.last, let value = digits[last] {
             return 10 + value
