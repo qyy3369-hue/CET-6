@@ -350,13 +350,22 @@
     "title" : "闪卡复习：今日新增 20 个词（infringe, warranty, entertain, contribute, previously 等）"
   },
   {
-    "date" : "2026-07-13",
+    "date" : "2026-07-14",
     "goalID" : "cet6-default-goal",
     "goalTitle" : "CET-6 备考",
     "id" : "60902834-BC75-412C-ABD9-92D0DC2A2207",
     "isDone" : false,
     "source" : "manual",
     "title" : "闪卡复习：今日新增 20 个词（proceeding, primitive, priority, ideal, terrain 等）"
+  },
+  {
+    "date" : "2026-07-14",
+    "goalID" : "cet6-default-goal",
+    "goalTitle" : "CET-6 备考",
+    "id" : "0F8288E8-27D9-4399-BB7B-CADF6018ECC1",
+    "isDone" : false,
+    "source" : "manual",
+    "title" : "闪卡复习：今日新增 20 个词（irrigation, federal, refrain, vivid, conspicuous 等）"
   },
   {
     "completedAt" : "2026-07-08",

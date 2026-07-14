@@ -646,9 +646,9 @@ private enum StudyTheme {
 
 // ── 古典按钮样式 ──────────────────────────────────────────
 
-/// 印章风格按钮（主要操作）
+/// 印章风格按钮（真实朱砂材质贴图）
 struct SealButtonStyle: ButtonStyle {
-    var tint: Color = StudyTheme.indigo
+    var tint: Color = StudyTheme.indigo // 保留以兼容旧代码调用
     var isFilled: Bool = true
     
     func makeBody(configuration: Configuration) -> some View {
@@ -656,23 +656,32 @@ struct SealButtonStyle: ButtonStyle {
             .font(StudyTheme.songti(size: 14, weight: .semibold))
             .padding(.horizontal, 16)
             .padding(.vertical, 7)
-            .foregroundStyle(isFilled ? StudyTheme.paper : tint)
+            .foregroundStyle(isFilled ? .white : tint)
             .background(
                 ZStack {
                     if isFilled {
-                        tint.opacity(configuration.isPressed ? 0.8 : 1.0)
+                        Image(nsImage: NSImage(named: "seal_texture.jpg") ?? NSImage())
+                            .resizable(resizingMode: .tile)
+                            .opacity(configuration.isPressed ? 0.8 : 1.0)
+                            // 极简内阴影实现雕刻立体感
+                            .overlay(
+                                Rectangle()
+                                    .stroke(Color.black.opacity(0.4), lineWidth: 1)
+                                    .shadow(color: .black.opacity(0.6), radius: 2, x: 0, y: 1)
+                                    .clipShape(Rectangle())
+                            )
                     } else {
                         StudyTheme.paper.opacity(configuration.isPressed ? 0.6 : 0.001)
                     }
                 }
             )
-            .border(tint.opacity(configuration.isPressed ? 0.8 : 1.0), width: 1.5)
+            .border(isFilled ? Color.black.opacity(0.3) : tint.opacity(configuration.isPressed ? 0.8 : 1.0), width: 1)
             .scaleEffect(configuration.isPressed ? 0.97 : 1.0)
             .animation(.spring(response: 0.36, dampingFraction: 0.80), value: configuration.isPressed)
     }
 }
 
-/// 书签便签风格按钮（次要操作）
+/// 书签便签风格按钮（真实旧纸贴图）
 struct BookmarkButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
@@ -681,8 +690,15 @@ struct BookmarkButtonStyle: ButtonStyle {
             .padding(.vertical, 6)
             .foregroundStyle(StudyTheme.ink)
             .background(
-                StudyTheme.sidebarBase
-                    .brightness(configuration.isPressed ? -0.03 : 0)
+                Image(nsImage: NSImage(named: "bookmark_texture.jpg") ?? NSImage())
+                    .resizable(resizingMode: .tile)
+                    .brightness(configuration.isPressed ? -0.05 : 0)
+                    .overlay(
+                        Rectangle()
+                            .stroke(Color.black.opacity(0.15), lineWidth: 1)
+                            .shadow(color: .black.opacity(0.2), radius: 1, x: 0, y: 0.5)
+                            .clipShape(Rectangle())
+                    )
             )
             .border(StudyTheme.hairline, width: 1)
             .scaleEffect(configuration.isPressed ? 0.98 : 1.0)

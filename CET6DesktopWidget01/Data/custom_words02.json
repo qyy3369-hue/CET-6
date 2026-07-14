@@ -1,6 +1,438 @@
 [
   {
     "difficulty" : 4,
+    "example" : "The government invested heavily in irrigation projects to improve agricultural productivity.",
+    "exampleTranslation" : "政府大力投资灌溉项目以提高农业生产力。",
+    "id" : "custom-irrigation",
+    "meaning" : "灌溉；水利",
+    "mnemonic" : "ir-（进入）+ rig（水渠）+ ation（名词后缀）：水进入水渠就是灌溉。",
+    "partOfSpeech" : "n.",
+    "phonetic" : "\/ˌɪrɪˈɡeɪʃən\/",
+    "phraseTranslations" : [
+      "灌溉系统",
+      "滴灌",
+      "灌溉渠"
+    ],
+    "phrases" : [
+      "irrigation system",
+      "drip irrigation",
+      "irrigation canal"
+    ],
+    "tag" : "阅读高频、环境话题、农业词汇",
+    "word" : "irrigation"
+  },
+  {
+    "difficulty" : 3,
+    "example" : "The federal government has implemented new policies to boost the economy.",
+    "exampleTranslation" : "联邦政府已实施新政策以促进经济。",
+    "id" : "custom-federal",
+    "meaning" : "联邦的；联邦政府的",
+    "mnemonic" : "feder-（联盟）+ -al（形容词后缀）→ 联盟的，即联邦的",
+    "partOfSpeech" : "adj.",
+    "phonetic" : "\/ˈfedərəl\/",
+    "phraseTranslations" : [
+      "联邦政府",
+      "联邦法律",
+      "联邦机构"
+    ],
+    "phrases" : [
+      "federal government",
+      "federal law",
+      "federal agency"
+    ],
+    "tag" : "阅读高频、政治词汇、写作替换",
+    "word" : "federal"
+  },
+  {
+    "difficulty" : 4,
+    "example" : "Please refrain from smoking in the building.",
+    "exampleTranslation" : "请避免在大楼内吸烟。",
+    "id" : "custom-refrain",
+    "meaning" : "克制；忍住；避免",
+    "mnemonic" : "re- 回 + frain（=fren 缰绳）：拉回缰绳，即克制自己。",
+    "partOfSpeech" : "v.",
+    "phonetic" : "\/rɪˈfreɪn\/",
+    "phraseTranslations" : [
+      "克制做某事",
+      "忍住眼泪",
+      "避免评论"
+    ],
+    "phrases" : [
+      "refrain from doing something",
+      "refrain from tears",
+      "refrain from comment"
+    ],
+    "tag" : "阅读高频、写作替换、词根",
+    "word" : "refrain"
+  },
+  {
+    "difficulty" : 3,
+    "example" : "The author's vivid description brought the scene to life.",
+    "exampleTranslation" : "作者生动的描述使场景栩栩如生。",
+    "id" : "custom-vivid",
+    "meaning" : "生动的；鲜明的；鲜艳的",
+    "mnemonic" : "viv-（生命）+ -id（形容词后缀）→ 有生命的 → 生动的",
+    "partOfSpeech" : "adj.",
+    "phonetic" : "\/ˈvɪvɪd\/",
+    "phraseTranslations" : [
+      "清晰的记忆",
+      "丰富的想象力",
+      "鲜艳的色彩"
+    ],
+    "phrases" : [
+      "vivid memory",
+      "vivid imagination",
+      "vivid colors"
+    ],
+    "tag" : "阅读高频、写作替换、词根",
+    "word" : "vivid"
+  },
+  {
+    "difficulty" : 4,
+    "example" : "Her red dress made her conspicuous in the crowd.",
+    "exampleTranslation" : "她的红裙子使她在人群中引人注目。",
+    "id" : "custom-conspicuous",
+    "meaning" : "显著的；引人注目的",
+    "mnemonic" : "con- 共同 + spic 看 + uous：大家都看，就是显眼的",
+    "partOfSpeech" : "adj.",
+    "phonetic" : "\/kənˈspɪkjuəs\/",
+    "phraseTranslations" : [
+      "炫耀性消费",
+      "因缺席而引人注目"
+    ],
+    "phrases" : [
+      "conspicuous consumption",
+      "conspicuous by one's absence"
+    ],
+    "tag" : "阅读高频",
+    "word" : "conspicuous"
+  },
+  {
+    "difficulty" : 4,
+    "example" : "She was in agony after twisting her ankle during the race.",
+    "exampleTranslation" : "她在比赛中扭伤脚踝后处于极度痛苦之中。",
+    "id" : "custom-agony",
+    "meaning" : "极度痛苦；苦恼",
+    "mnemonic" : "a（一个）+ go（去）+ ny（你）：一个痛苦去了又来，让你备受折磨。",
+    "partOfSpeech" : "n.",
+    "phonetic" : "\/ˈæɡəni\/",
+    "phraseTranslations" : [
+      "在痛苦中",
+      "失败的痛苦",
+      "延长痛苦"
+    ],
+    "phrases" : [
+      "in agony",
+      "agony of defeat",
+      "prolong the agony"
+    ],
+    "tag" : "阅读高频、写作替换、情感表达",
+    "word" : "agony"
+  },
+  {
+    "difficulty" : 4,
+    "example" : "This ticket entitles you to a free meal.",
+    "exampleTranslation" : "这张票使你有资格获得一顿免费餐。",
+    "id" : "custom-entitle",
+    "meaning" : "使有资格；给……命名",
+    "mnemonic" : "en- 使 + title 标题：给标题就是命名，给权利就是有资格",
+    "partOfSpeech" : "v.",
+    "phonetic" : "\/ɪnˈtaɪtl\/",
+    "phraseTranslations" : [
+      "有资格获得",
+      "赋予某人某物的权利"
+    ],
+    "phrases" : [
+      "be entitled to",
+      "entitle someone to something"
+    ],
+    "tag" : "写作替换",
+    "word" : "entitle"
+  },
+  {
+    "difficulty" : 4,
+    "example" : "Companies should diversify their products to reduce risk.",
+    "exampleTranslation" : "公司应该使产品多样化以降低风险。",
+    "id" : "custom-diversify",
+    "meaning" : "使多样化；多样化",
+    "mnemonic" : "di- 分开 + vers 转 + -ify 使：使转向不同方向，即多样化",
+    "partOfSpeech" : "v.",
+    "phonetic" : "\/daɪˈvɜːrsɪfaɪ\/",
+    "phraseTranslations" : [
+      "分散投资",
+      "使经济多样化",
+      "拓展新市场"
+    ],
+    "phrases" : [
+      "diversify one's investments",
+      "diversify the economy",
+      "diversify into new markets"
+    ],
+    "tag" : "写作替换;经济;商业",
+    "word" : "diversify"
+  },
+  {
+    "difficulty" : 3,
+    "example" : "In the summary, you can omit the less important details.",
+    "exampleTranslation" : "在摘要中，你可以省略不太重要的细节。",
+    "id" : "custom-omit",
+    "meaning" : "省略；遗漏；疏忽",
+    "mnemonic" : "o- 出 + mit 送：把内容送出去，即省略或遗漏",
+    "partOfSpeech" : "v.",
+    "phonetic" : "\/əˈmɪt\/",
+    "phraseTranslations" : [
+      "忘记做",
+      "从列表中省略"
+    ],
+    "phrases" : [
+      "omit to do",
+      "omit from the list"
+    ],
+    "tag" : "阅读高频；写作替换",
+    "word" : "omit"
+  },
+  {
+    "difficulty" : 4,
+    "example" : "The government used propaganda to influence public opinion.",
+    "exampleTranslation" : "政府利用宣传来影响公众舆论。",
+    "id" : "custom-propaganda",
+    "meaning" : "宣传；鼓吹",
+    "mnemonic" : "pro-向前 + paganda（来自拉丁语“传播”）：向前传播信息，即宣传",
+    "partOfSpeech" : "n.",
+    "phonetic" : "\/ˌprɒpəˈɡændə\/",
+    "phraseTranslations" : [
+      "政治宣传",
+      "宣传运动",
+      "散布宣传"
+    ],
+    "phrases" : [
+      "political propaganda",
+      "propaganda campaign",
+      "spread propaganda"
+    ],
+    "tag" : "阅读高频",
+    "word" : "propaganda"
+  },
+  {
+    "difficulty" : 4,
+    "example" : "The fireworks display was absolutely spectacular.",
+    "exampleTranslation" : "烟花表演绝对壮观。",
+    "id" : "custom-spectacular",
+    "meaning" : "壮观的；引人注目的；惊人的",
+    "mnemonic" : "spect-看 + acular：值得一看的，就是壮观的",
+    "partOfSpeech" : "adj.",
+    "phonetic" : "\/spekˈtækjələr\/",
+    "phraseTranslations" : [
+      "壮观的景色",
+      "巨大的成功",
+      "惨重的失败"
+    ],
+    "phrases" : [
+      "spectacular view",
+      "spectacular success",
+      "spectacular failure"
+    ],
+    "tag" : "阅读高频、写作替换、词根",
+    "word" : "spectacular"
+  },
+  {
+    "difficulty" : 3,
+    "example" : "The building failed the safety inspection.",
+    "exampleTranslation" : "该建筑未能通过安全检查。",
+    "id" : "custom-inspection",
+    "meaning" : "检查；视察",
+    "mnemonic" : "in- 进入 + spect 看 + -ion 名词后缀：进去看就是检查",
+    "partOfSpeech" : "n.",
+    "phonetic" : "\/ɪnˈspekʃn\/",
+    "phraseTranslations" : [
+      "进行检查",
+      "定期检查",
+      "检查报告"
+    ],
+    "phrases" : [
+      "carry out an inspection",
+      "regular inspection",
+      "inspection report"
+    ],
+    "tag" : "阅读高频；写作替换；词根",
+    "word" : "inspection"
+  },
+  {
+    "difficulty" : 4,
+    "example" : "He was excessively worried about the exam results.",
+    "exampleTranslation" : "他过度担心考试结果。",
+    "id" : "custom-excessively",
+    "meaning" : "过度地；过分地",
+    "mnemonic" : "ex- 出 + cess 走 + ive + ly：走出界限就是过度",
+    "partOfSpeech" : "adv.",
+    "phonetic" : "\/ɪkˈsesɪvli\/",
+    "phraseTranslations" : [
+      "过高地",
+      "过于谨慎",
+      "过度饮酒"
+    ],
+    "phrases" : [
+      "excessively high",
+      "excessively cautious",
+      "drink excessively"
+    ],
+    "tag" : "阅读高频、写作替换、词根",
+    "word" : "excessively"
+  },
+  {
+    "difficulty" : 3,
+    "example" : "The team has won five consecutive games this season.",
+    "exampleTranslation" : "该队本赛季已连续赢得五场比赛。",
+    "id" : "custom-consecutive",
+    "meaning" : "连续的；连贯的",
+    "mnemonic" : "con- 共同 + secut 跟随 + ive：一个跟一个，就是连续的",
+    "partOfSpeech" : "adj.",
+    "phonetic" : "\/kənˈsekjətɪv\/",
+    "phraseTranslations" : [
+      "连续几天",
+      "连续的数字",
+      "连续三年"
+    ],
+    "phrases" : [
+      "consecutive days",
+      "consecutive numbers",
+      "for three consecutive years"
+    ],
+    "tag" : "阅读高频",
+    "word" : "consecutive"
+  },
+  {
+    "difficulty" : 4,
+    "example" : "The attainment of a college degree requires years of hard work.",
+    "exampleTranslation" : "获得大学学位需要多年的努力。",
+    "id" : "custom-attainment",
+    "meaning" : "达到；成就；造诣",
+    "mnemonic" : "attain（达到）+ ment（名词后缀）→ 达到的状态或结果",
+    "partOfSpeech" : "n.",
+    "phonetic" : "\/əˈteɪnmənt\/",
+    "phraseTranslations" : [
+      "教育程度",
+      "目标的实现",
+      "学术成就"
+    ],
+    "phrases" : [
+      "educational attainment",
+      "attainment of goals",
+      "academic attainment"
+    ],
+    "tag" : "阅读高频、写作替换、词根",
+    "word" : "attainment"
+  },
+  {
+    "difficulty" : 4,
+    "example" : "The court's decision set a precedent for future cases.",
+    "exampleTranslation" : "法院的判决为未来的案件树立了先例。",
+    "id" : "custom-precedent",
+    "meaning" : "先例；前例",
+    "mnemonic" : "pre- 前 + ced 走 + ent 名词后缀：走在前面的事就是先例",
+    "partOfSpeech" : "n.",
+    "phonetic" : "\/ˈpresɪdənt\/",
+    "phraseTranslations" : [
+      "开创先例",
+      "史无前例",
+      "法律先例"
+    ],
+    "phrases" : [
+      "set a precedent",
+      "without precedent",
+      "legal precedent"
+    ],
+    "tag" : "阅读高频、法律词汇、词根",
+    "word" : "precedent"
+  },
+  {
+    "difficulty" : 4,
+    "example" : "Solar and wind energy are renewable sources that help reduce carbon emissions.",
+    "exampleTranslation" : "太阳能和风能是可再生能源，有助于减少碳排放。",
+    "id" : "custom-renewable",
+    "meaning" : "可再生的；可更新的",
+    "mnemonic" : "re- 再 + new 新 + -able 能：能再次变新的就是可再生的",
+    "partOfSpeech" : "adj.",
+    "phonetic" : "\/rɪˈnjuːəbl\/",
+    "phraseTranslations" : [
+      "可再生能源",
+      "可再生资源",
+      "可再生来源"
+    ],
+    "phrases" : [
+      "renewable energy",
+      "renewable resources",
+      "renewable sources"
+    ],
+    "tag" : "阅读高频；写作替换；环保话题",
+    "word" : "renewable"
+  },
+  {
+    "difficulty" : 3,
+    "example" : "The primary goal of education is to foster critical thinking.",
+    "exampleTranslation" : "教育的主要目标是培养批判性思维。",
+    "id" : "custom-primary",
+    "meaning" : "主要的；初级的；基本的",
+    "mnemonic" : "prim- 第一 + -ary 形容词后缀：排在第一的就是主要的",
+    "partOfSpeech" : "adj.",
+    "phonetic" : "\/ˈpraɪməri\/",
+    "phraseTranslations" : [
+      "小学",
+      "主要关注点",
+      "主要来源"
+    ],
+    "phrases" : [
+      "primary school",
+      "primary concern",
+      "primary source"
+    ],
+    "tag" : "阅读高频；写作替换；基础词",
+    "word" : "primary"
+  },
+  {
+    "difficulty" : 4,
+    "example" : "Admittedly, the task is challenging, but we can still succeed.",
+    "exampleTranslation" : "诚然，这项任务很有挑战性，但我们仍然可以成功。",
+    "id" : "custom-admittedly",
+    "meaning" : "诚然；不可否认地",
+    "mnemonic" : "admit（承认）+ ed + ly：承认地，即诚然。",
+    "partOfSpeech" : "adv.",
+    "phonetic" : "\/ədˈmɪtɪdli\/",
+    "phraseTranslations" : [
+      "诚然困难",
+      "不可否认地真实"
+    ],
+    "phrases" : [
+      "admittedly difficult",
+      "admittedly true"
+    ],
+    "tag" : "写作替换、阅读高频、副词",
+    "word" : "admittedly"
+  },
+  {
+    "difficulty" : 4,
+    "example" : "The manager authorized the payment for the new equipment.",
+    "exampleTranslation" : "经理批准了新设备的付款。",
+    "id" : "custom-authorize",
+    "meaning" : "授权；批准；委托",
+    "mnemonic" : "author（作者）+ ize（动词后缀）→ 作者有权授权他人使用作品",
+    "partOfSpeech" : "v.",
+    "phonetic" : "\/ˈɔːθəraɪz\/",
+    "phraseTranslations" : [
+      "授权交易",
+      "被授权做某事",
+      "授权访问"
+    ],
+    "phrases" : [
+      "authorize a transaction",
+      "be authorized to do something",
+      "authorize access"
+    ],
+    "tag" : "写作替换、阅读高频、词根",
+    "word" : "authorize"
+  },
+  {
+    "difficulty" : 4,
     "example" : "The proceedings of the conference will be published next month.",
     "exampleTranslation" : "会议的记录将于下个月出版。",
     "id" : "custom-proceeding",
