@@ -1,0 +1,85 @@
+<UserControl x:Class="Goals.Windows.Views.DashboardPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+        <StackPanel Margin="40,30,40,44">
+            <TextBlock Text="目标总览" Style="{StaticResource PageTitle}"/>
+            <TextBlock Text="从这里建立学习方向，再为每个目标安排计划和今日日程。" Style="{StaticResource Caption}" FontSize="15" Margin="0,5,0,18"/>
+
+            <Border Style="{StaticResource Card}" Padding="18,14" Margin="0,0,0,22" Background="#7FFFFFFF">
+                <Grid>
+                    <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="28"/><ColumnDefinition/><ColumnDefinition Width="28"/><ColumnDefinition/></Grid.ColumnDefinitions>
+                    <StackPanel Orientation="Horizontal"><Border Background="{StaticResource NavyBrush}" CornerRadius="14" Width="28" Height="28"><TextBlock Text="1" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold"/></Border><StackPanel Margin="10,0,0,0"><TextBlock Text="选择或创建目标" FontWeight="SemiBold"/><TextBlock Text="决定学习语言与方向" Style="{StaticResource Caption}"/></StackPanel></StackPanel>
+                    <TextBlock Grid.Column="1" Text="→" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{StaticResource MutedBrush}"/>
+                    <StackPanel Grid.Column="2" Orientation="Horizontal"><Border Background="{StaticResource PlumBrush}" CornerRadius="14" Width="28" Height="28"><TextBlock Text="2" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold"/></Border><StackPanel Margin="10,0,0,0"><TextBlock Text="建立计划表" FontWeight="SemiBold"/><TextBlock Text="手动编写或交给 AI 拆解" Style="{StaticResource Caption}"/></StackPanel></StackPanel>
+                    <TextBlock Grid.Column="3" Text="→" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{StaticResource MutedBrush}"/>
+                    <StackPanel Grid.Column="4" Orientation="Horizontal"><Border Background="#3B806E" CornerRadius="14" Width="28" Height="28"><TextBlock Text="3" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold"/></Border><StackPanel Margin="10,0,0,0"><TextBlock Text="执行今日日程" FontWeight="SemiBold"/><TextBlock Text="逐项勾选并查看完成度" Style="{StaticResource Caption}"/></StackPanel></StackPanel>
+                </Grid>
+            </Border>
+
+            <Grid>
+                <Grid.ColumnDefinitions><ColumnDefinition Width="1.05*"/><ColumnDefinition Width="24"/><ColumnDefinition Width="0.95*"/></Grid.ColumnDefinitions>
+                <StackPanel>
+                    <Grid><StackPanel Orientation="Horizontal"><Border Background="{StaticResource NavyBrush}" CornerRadius="13" Width="26" Height="26"><TextBlock Text="1" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold"/></Border><TextBlock Text="选择学习目标" Style="{StaticResource SectionTitle}" Margin="10,0,0,0"/></StackPanel><TextBlock x:Name="GoalCount" HorizontalAlignment="Right" VerticalAlignment="Center" Style="{StaticResource Caption}"/></Grid>
+                    <TextBlock Text="直接点击下面任意一张目标卡片即可切换。词库、闪卡和日程会随目标独立保存。" Style="{StaticResource Caption}" Margin="0,7,0,13"/>
+                    <ListBox x:Name="GoalList" Background="Transparent" BorderThickness="0" SelectionChanged="GoalList_SelectionChanged">
+                        <ListBox.ItemContainerStyle><Style TargetType="ListBoxItem" BasedOn="{StaticResource CleanListItem}"><Setter Property="Margin" Value="0,0,0,10"/></Style></ListBox.ItemContainerStyle>
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Border x:Name="GoalCard" Style="{StaticResource Card}" Padding="18" Cursor="Hand" Tag="{Binding}" MouseLeftButtonUp="GoalCard_Click">
+                                    <StackPanel>
+                                        <Grid><TextBlock Text="{Binding Title}" FontSize="19" FontWeight="SemiBold"/><StackPanel HorizontalAlignment="Right" Orientation="Horizontal"><Border x:Name="CurrentGoalBadge" Visibility="Collapsed" Background="#D8DFEE" CornerRadius="10" Padding="9,3" Margin="0,0,8,0"><TextBlock Text="当前目标" Foreground="{StaticResource NavyBrush}" FontSize="11" FontWeight="SemiBold"/></Border><TextBlock Text="{Binding Category}" Style="{StaticResource Caption}" VerticalAlignment="Center"/></StackPanel></Grid>
+                                        <TextBlock Text="{Binding Focus}" Margin="0,10,0,7" Foreground="{StaticResource MutedBrush}"/>
+                                        <TextBlock Text="{Binding ModeLabel}" Style="{StaticResource Caption}"/>
+                                    </StackPanel>
+                                </Border>
+                                <DataTemplate.Triggers>
+                                    <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem}, Path=IsMouseOver}" Value="True"><Setter TargetName="GoalCard" Property="Background" Value="#F1F1ED"/></DataTrigger>
+                                    <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem}, Path=IsSelected}" Value="True"><Setter TargetName="GoalCard" Property="BorderBrush" Value="{StaticResource NavyBrush}"/><Setter TargetName="GoalCard" Property="BorderThickness" Value="1.5"/><Setter TargetName="CurrentGoalBadge" Property="Visibility" Value="Visible"/></DataTrigger>
+                                </DataTemplate.Triggers>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+
+                    <Border Style="{StaticResource Card}" Margin="0,8,0,0">
+                        <StackPanel>
+                            <TextBlock Text="创建新目标" Style="{StaticResource SectionTitle}"/>
+                            <TextBlock Text="适合新增另一门语言、考试或长期学习方向。创建后会自动切换过去。" Style="{StaticResource Caption}" Margin="0,6,0,15"/>
+                            <TextBlock Text="目标名称" FontWeight="SemiBold" Margin="0,0,0,6"/>
+                            <TextBox x:Name="NewGoalTitle" Tag="例如：JLPT N3、考研英语、每日阅读" Margin="0,0,0,12"/>
+                            <TextBlock Text="学习类型" FontWeight="SemiBold" Margin="0,0,0,6"/>
+                            <ComboBox x:Name="NewGoalMode" SelectedIndex="0" Margin="0,0,0,12"><ComboBoxItem Content="英语目标" Tag="English"/><ComboBoxItem Content="日语目标" Tag="Japanese"/><ComboBoxItem Content="其他目标" Tag="Other"/></ComboBox>
+                            <TextBlock Text="执行重点（可选）" FontWeight="SemiBold" Margin="0,0,0,6"/>
+                            <TextBox x:Name="NewGoalFocus" Height="72" AcceptsReturn="True" TextWrapping="Wrap" Tag="例如：每天 30 分钟，以词汇和阅读为主"/>
+                            <StackPanel Orientation="Horizontal" Margin="0,14,0,0"><Button Content="＋ 创建并切换" Style="{StaticResource PrimaryButton}" Click="AddGoal_Click"/><Button Content="删除当前目标" Style="{StaticResource SoftButton}" Margin="9,0,0,0" Click="DeleteGoal_Click"/></StackPanel>
+                            <TextBlock x:Name="GoalStatus" Style="{StaticResource Caption}" Margin="0,10,0,0"/>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+
+                <StackPanel Grid.Column="2">
+                    <StackPanel Orientation="Horizontal"><Border Background="{StaticResource PlumBrush}" CornerRadius="13" Width="26" Height="26"><TextBlock Text="2" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold"/></Border><TextBlock Text="管理计划表" Style="{StaticResource SectionTitle}" Margin="10,0,0,0"/></StackPanel>
+                    <TextBlock Text="一个目标可以有多套计划。点击计划卡片即可切换当前计划。" Style="{StaticResource Caption}" Margin="0,7,0,13"/>
+
+                    <Border Style="{StaticResource Card}" Background="#70FFFFFF" Margin="0,0,0,12">
+                        <StackPanel><TextBlock Text="当前正在规划" Style="{StaticResource Caption}"/><TextBlock x:Name="SelectedTitle" FontFamily="{StaticResource SerifFont}" FontSize="28" FontWeight="SemiBold" Margin="0,5,0,0"/><TextBlock x:Name="SelectedDescription" Margin="0,8,0,0" Foreground="{StaticResource MutedBrush}"/></StackPanel>
+                    </Border>
+
+                    <Border Style="{StaticResource Card}" Padding="15" Margin="0,0,0,12">
+                        <StackPanel><TextBlock Text="新计划表名称" FontWeight="SemiBold"/><TextBlock Text="例如按月份、冲刺阶段或学习主题分别建表。" Style="{StaticResource Caption}" Margin="0,4,0,8"/><Grid><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><TextBox x:Name="NewPlanTitle" Tag="例如：8 月 N4 冲刺计划" Margin="0,0,9,0"/><Button Grid.Column="1" Content="＋ 新建计划表" Style="{StaticResource PrimaryButton}" Click="AddPlan_Click"/></Grid></StackPanel>
+                    </Border>
+
+                    <TextBlock Text="已有计划表" FontWeight="SemiBold" Margin="2,0,0,9"/>
+                    <ListBox x:Name="PlanList" Background="Transparent" BorderThickness="0" SelectionChanged="PlanList_SelectionChanged">
+                        <ListBox.ItemContainerStyle><Style TargetType="ListBoxItem" BasedOn="{StaticResource CleanListItem}"><Setter Property="Margin" Value="0,0,0,10"/></Style></ListBox.ItemContainerStyle>
+                        <ListBox.ItemTemplate><DataTemplate><Border x:Name="PlanCard" Style="{StaticResource Card}"><StackPanel><Grid><TextBlock Text="{Binding Title}" FontSize="18" FontWeight="SemiBold"/><Border x:Name="CurrentPlanBadge" Visibility="Collapsed" HorizontalAlignment="Right" Background="#E8DDE3" CornerRadius="10" Padding="9,3"><TextBlock Text="当前计划" Foreground="{StaticResource PlumBrush}" FontSize="11" FontWeight="SemiBold"/></Border></Grid><TextBlock Text="{Binding Content}" MaxHeight="58" TextTrimming="CharacterEllipsis" Margin="0,8,0,0" Foreground="{StaticResource MutedBrush}"/><TextBlock Text="{Binding UpdatedAt, StringFormat='yyyy-MM-dd 更新'}" Style="{StaticResource Caption}" Margin="0,10,0,0"/></StackPanel></Border><DataTemplate.Triggers><DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem}, Path=IsSelected}" Value="True"><Setter TargetName="PlanCard" Property="BorderBrush" Value="{StaticResource PlumBrush}"/><Setter TargetName="PlanCard" Property="BorderThickness" Value="1.5"/><Setter TargetName="CurrentPlanBadge" Property="Visibility" Value="Visible"/></DataTrigger></DataTemplate.Triggers></DataTemplate></ListBox.ItemTemplate>
+                    </ListBox>
+
+                    <Border Style="{StaticResource Card}" Background="#EEF1EA" Margin="0,5,0,0">
+                        <StackPanel><StackPanel Orientation="Horizontal"><Border Background="#3B806E" CornerRadius="13" Width="26" Height="26"><TextBlock Text="3" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold"/></Border><TextBlock Text="下一步：完善计划并开始执行" FontWeight="SemiBold" FontSize="17" Margin="10,0,0,0"/></StackPanel><TextBlock Text="进入计划书可手动编辑或让 AI 自动拆成日程；生成后到“今日日程”逐项完成。" Style="{StaticResource Caption}" Margin="0,9,0,12"/><StackPanel Orientation="Horizontal"><Button Content="编辑当前计划书" Style="{StaticResource PrimaryButton}" Click="OpenPlan_Click"/><Button Content="查看今日日程" Style="{StaticResource SoftButton}" Margin="9,0,0,0" Click="OpenToday_Click"/></StackPanel></StackPanel>
+                    </Border>
+                </StackPanel>
+            </Grid>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

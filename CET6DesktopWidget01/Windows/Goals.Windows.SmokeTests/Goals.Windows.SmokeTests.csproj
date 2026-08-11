@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <SelfContained>true</SelfContained>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Goals.Windows\Goals.Windows.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Fixtures\import-smoke.mdx" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="Fixtures\import-smoke.mdd" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="Fixtures\import-smoke.css" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\Goals.Windows\Views\WordbooksPage.xaml" Link="Fixtures\WordbooksPage.xaml" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\Goals.Windows\Views\VocabularyPage.xaml" Link="Fixtures\VocabularyPage.xaml" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,1 @@
+Resource companion for the MDX import smoke dictionary.

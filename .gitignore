@@ -4,3 +4,8 @@ CET6DesktopWidget01/.build/
 CET6DesktopWidget01/Build/
 CET6DesktopWidget01/Scripts/__pycache__/
 *.pyc
+
+# Windows desktop build outputs and local update packages
+CET6DesktopWidget01/Windows/**/bin/
+CET6DesktopWidget01/Windows/**/obj/
+CET6DesktopWidget01/Windows/Release/

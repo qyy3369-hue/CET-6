@@ -1,0 +1,76 @@
+<Window x:Class="Goals.Windows.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="目标计划中心" Width="1440" Height="900" MinWidth="1080" MinHeight="700"
+        ResizeMode="CanResize" Background="{StaticResource PaperBrush}" Icon="/Assets/Goals.ico">
+    <Border BorderThickness="0">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="0"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="252"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Border Grid.Column="0" Background="{StaticResource PaperDeepBrush}" BorderBrush="{StaticResource LineBrush}" BorderThickness="0,0,1,0">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid Margin="22,22,22,12">
+                            <StackPanel>
+                                <TextBlock Text="Goals" FontFamily="{StaticResource SerifFont}" FontSize="34" FontWeight="SemiBold"/>
+                                <TextBlock Text="Life Desk" Style="{StaticResource Caption}" Margin="0,5,0,0"/>
+                                <TextBlock Text="目标 · 计划 · 执行 · 复盘" FontWeight="SemiBold" Margin="0,11,0,0"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                            <StackPanel x:Name="NavPanel">
+                                <Button x:Name="GoalsButton" Style="{StaticResource NavButton}" Tag="goals" Click="Nav_Click"><Grid><Grid.ColumnDefinitions><ColumnDefinition Width="42"/><ColumnDefinition/></Grid.ColumnDefinitions><TextBlock Text="◎" FontSize="24" Foreground="{StaticResource NavyBrush}"/><StackPanel Grid.Column="1"><TextBlock Text="目标总览" FontSize="16" FontWeight="SemiBold"/><TextBlock Text="多目标与多计划表" Style="{StaticResource Caption}"/></StackPanel></Grid></Button>
+                                <Button x:Name="PlanButton" Style="{StaticResource NavButton}" Tag="plan" Click="Nav_Click"><Grid><Grid.ColumnDefinitions><ColumnDefinition Width="42"/><ColumnDefinition/></Grid.ColumnDefinitions><TextBlock Text="▧" FontSize="21"/><StackPanel Grid.Column="1"><TextBlock Text="计划书" FontSize="16" FontWeight="SemiBold"/><TextBlock Text="手动输入与 AI 生成" Style="{StaticResource Caption}"/></StackPanel></Grid></Button>
+                                <Button x:Name="TodayButton" Style="{StaticResource NavButton}" Tag="today" Click="Nav_Click"><Grid><Grid.ColumnDefinitions><ColumnDefinition Width="42"/><ColumnDefinition/></Grid.ColumnDefinitions><TextBlock Text="▦" FontSize="21"/><StackPanel Grid.Column="1"><TextBlock Text="今日日程" FontSize="16" FontWeight="SemiBold"/><TextBlock Text="任务进度与勾选" Style="{StaticResource Caption}"/></StackPanel></Grid></Button>
+                                <Button x:Name="WordbooksButton" Style="{StaticResource NavButton}" Tag="wordbooks" Click="Nav_Click"><Grid><Grid.ColumnDefinitions><ColumnDefinition Width="42"/><ColumnDefinition/></Grid.ColumnDefinitions><TextBlock Text="▤" FontSize="22" Foreground="{StaticResource NavyBrush}"/><StackPanel Grid.Column="1"><TextBlock Text="词书" FontSize="16" FontWeight="SemiBold"/><TextBlock Text="导入、浏览与选词" Style="{StaticResource Caption}"/></StackPanel></Grid></Button>
+                                <Button x:Name="WordsButton" Style="{StaticResource NavButton}" Tag="words" Click="Nav_Click"><Grid><Grid.ColumnDefinitions><ColumnDefinition Width="42"/><ColumnDefinition/></Grid.ColumnDefinitions><TextBlock Text="▣" FontSize="21"/><StackPanel Grid.Column="1"><TextBlock Text="单词本" FontSize="16" FontWeight="SemiBold"/><TextBlock x:Name="WordsCaption" Text="高频词与例句" Style="{StaticResource Caption}"/></StackPanel></Grid></Button>
+                                <Button x:Name="TranslationButton" Style="{StaticResource NavButton}" Tag="translation" Click="Nav_Click"><Grid><Grid.ColumnDefinitions><ColumnDefinition Width="42"/><ColumnDefinition/></Grid.ColumnDefinitions><TextBlock Text="译" FontSize="19"/><StackPanel Grid.Column="1"><TextBlock Text="翻译训练" FontSize="16" FontWeight="SemiBold"/><TextBlock Text="中译英与英文润色" Style="{StaticResource Caption}"/></StackPanel></Grid></Button>
+                                <Button x:Name="WritingButton" Style="{StaticResource NavButton}" Tag="writing" Click="Nav_Click"><Grid><Grid.ColumnDefinitions><ColumnDefinition Width="42"/><ColumnDefinition/></Grid.ColumnDefinitions><TextBlock Text="✎" FontSize="20"/><StackPanel Grid.Column="1"><TextBlock Text="写作训练" FontSize="16" FontWeight="SemiBold"/><TextBlock Text="150–200 词范文" Style="{StaticResource Caption}"/></StackPanel></Grid></Button>
+                                <Button x:Name="RootsButton" Style="{StaticResource NavButton}" Tag="roots" Click="Nav_Click"><Grid><Grid.ColumnDefinitions><ColumnDefinition Width="42"/><ColumnDefinition/></Grid.ColumnDefinitions><TextBlock Text="⌘" FontSize="20"/><StackPanel Grid.Column="1"><TextBlock Text="词根词缀" FontSize="16" FontWeight="SemiBold"/><TextBlock Text="按构词法记忆" Style="{StaticResource Caption}"/></StackPanel></Grid></Button>
+                                <Button x:Name="FlashcardsButton" Style="{StaticResource NavButton}" Tag="flashcards" Click="Nav_Click"><Grid><Grid.ColumnDefinitions><ColumnDefinition Width="42"/><ColumnDefinition/></Grid.ColumnDefinitions><TextBlock Text="▱" FontSize="22" Foreground="{StaticResource PlumBrush}"/><StackPanel Grid.Column="1"><TextBlock Text="闪卡复习" FontSize="16" FontWeight="SemiBold"/><TextBlock Text="正反面快速过" Style="{StaticResource Caption}"/></StackPanel></Grid></Button>
+                                <Button x:Name="MistakesButton" Style="{StaticResource NavButton}" Tag="mistakes" Click="Nav_Click"><Grid><Grid.ColumnDefinitions><ColumnDefinition Width="42"/><ColumnDefinition/></Grid.ColumnDefinitions><TextBlock Text="★" FontSize="20"/><StackPanel Grid.Column="1"><TextBlock Text="错词收藏" FontSize="16" FontWeight="SemiBold"/><TextBlock Text="收藏与斩词管理" Style="{StaticResource Caption}"/></StackPanel></Grid></Button>
+                                <Button x:Name="SettingsButton" Style="{StaticResource NavButton}" Tag="settings" Click="Nav_Click"><Grid><Grid.ColumnDefinitions><ColumnDefinition Width="42"/><ColumnDefinition/></Grid.ColumnDefinitions><TextBlock Text="⚙" FontSize="20"/><StackPanel Grid.Column="1"><TextBlock Text="设置" FontSize="16" FontWeight="SemiBold"/><TextBlock Text="DeepSeek 与数据安全" Style="{StaticResource Caption}"/></StackPanel></Grid></Button>
+                            </StackPanel>
+                        </ScrollViewer>
+
+                        <Border Grid.Row="2" Style="{StaticResource Card}" Margin="16,10,16,18" Padding="15">
+                            <StackPanel>
+                                <Grid><TextBlock Text="今日完成" FontWeight="SemiBold"/><TextBlock x:Name="CompletionText" HorizontalAlignment="Right" FontWeight="SemiBold"/></Grid>
+                                <ProgressBar x:Name="CompletionBar" Margin="0,12,0,0"/>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+                </Border>
+
+                <Grid Grid.Column="1">
+                    <Grid.RowDefinitions><RowDefinition Height="82"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+                    <Border Grid.Row="0" BorderBrush="{StaticResource LineBrush}" BorderThickness="0,0,0,1" Background="#45FFFFFF">
+                        <Grid Margin="36,0,32,0">
+                            <TextBlock x:Name="ContextLabel" VerticalAlignment="Center" FontSize="13" Foreground="{StaticResource MutedBrush}"/>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                <StackPanel><TextBlock Text="当前目标" Style="{StaticResource Caption}" FontSize="11" Margin="3,0,0,4"/><ComboBox x:Name="TrackBox" Width="220" ItemsSource="{Binding Tracks}" DisplayMemberPath="Title" SelectedItem="{Binding CurrentTrack, Mode=TwoWay}"/></StackPanel>
+                                <StackPanel Margin="10,0,0,0"><TextBlock Text="当前计划" Style="{StaticResource Caption}" FontSize="11" Margin="3,0,0,4"/><ComboBox x:Name="PlanBox" Width="190" ItemsSource="{Binding CurrentTrack.Plans}" DisplayMemberPath="Title" SelectedItem="{Binding CurrentPlan, Mode=TwoWay}"/></StackPanel>
+                                <StackPanel Margin="10,0,0,0"><TextBlock Text="今天" Style="{StaticResource Caption}" FontSize="11" Margin="3,0,0,4"/><Border CornerRadius="8" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" Padding="14,11" Background="#FDFDFC"><StackPanel Orientation="Horizontal"><Ellipse x:Name="DateDot" Width="8" Height="8" Fill="{StaticResource NavyBrush}" Margin="0,0,9,0"/><TextBlock Text="{Binding DateLabel}" FontWeight="SemiBold"/></StackPanel></Border></StackPanel>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                    <ContentControl x:Name="PageHost" Grid.Row="1"/>
+                </Grid>
+            </Grid>
+        </Grid>
+    </Border>
+</Window>
