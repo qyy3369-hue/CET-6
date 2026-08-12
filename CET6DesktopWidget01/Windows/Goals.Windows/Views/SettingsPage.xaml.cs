@@ -20,12 +20,37 @@ public partial class SettingsPage : UserControl
         Loaded += (_, _) =>
         {
             RefreshBadge();
+            RefreshLocalModel();
             ModelText.Text = _vm.DeepSeek.ModelName;
             DataPath.Text = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "GoalsStudyDesk", "study-data.json");
             WordLibraryPath.Text = _vm.Library.DataPath;
             CurrentVersionText.Text = $"当前 v{_updates.CurrentVersion}";
         };
     }
+    private void RefreshLocalModel()
+    {
+        var t = _vm.LocalTranslation;
+        LocalModelName.Text = t.ModelName ?? "未找到模型文件";
+        if (t.IsLoaded)
+            LocalModelStatus.Text = $"已就绪（{FormatSize(t.ModelSizeBytes)}），可离线翻译日语释义。";
+        else if (t.LoadError is not null)
+            LocalModelStatus.Text = $"加载失败：{t.LoadError}";
+        else if (t.ModelFound)
+            LocalModelStatus.Text = $"已找到模型（{FormatSize(t.ModelSizeBytes)}），首次点击翻译时自动加载。";
+        else
+            LocalModelStatus.Text = "未找到 GGUF 模型文件。";
+        LocalModelHelp.Text = t.ModelFound
+            ? ""
+            : "获取方式：运行 Scripts/fetch_translation_model.ps1 下载，或把 qwen2.5-0.5b-instruct-q4_k_m.gguf 放进下面打开的文件夹。";
+    }
+    private static string FormatSize(long bytes) => bytes > 0 ? $"{bytes / 1024d / 1024d:F0} MB" : "—";
+    private void OpenModelFolder_Click(object sender, RoutedEventArgs e)
+    {
+        var dir = LocalTranslationService.ModelsDirectory;
+        Directory.CreateDirectory(dir);
+        System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo { FileName = dir, UseShellExecute = true });
+    }
+    private void RefreshLocalModel_Click(object sender, RoutedEventArgs e) => RefreshLocalModel();
     private void RefreshBadge() { KeyBadge.Text = _vm.DeepSeek.HasKey ? "已安全配置" : "尚未配置"; Status.Text = _vm.DeepSeek.HasKey ? "已保存的密钥不会在此页面回显。输入新密钥可覆盖。" : "配置密钥后才能使用 AI 计划、补词、智能判分、翻译和写作。"; }
     private void KeyPassword_PasswordChanged(object sender, RoutedEventArgs e) { if (_syncing) return; _syncing = true; KeyVisible.Text = KeyPassword.Password; _syncing = false; }
     private void KeyVisible_TextChanged(object sender, TextChangedEventArgs e) { if (_syncing) return; _syncing = true; KeyPassword.Password = KeyVisible.Text; _syncing = false; }

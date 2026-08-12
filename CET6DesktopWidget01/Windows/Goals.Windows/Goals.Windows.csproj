@@ -15,16 +15,18 @@
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <PublishReadyToRun>true</PublishReadyToRun>
     <DebugType>embedded</DebugType>
-    <Version>1.0.0</Version>
+    <Version>1.1.0</Version>
   </PropertyGroup>
   <ItemGroup>
     <Resource Include="Assets\AppIcon04.png" />
     <Resource Include="Assets\Goals.ico" />
     <Content Include="THIRD-PARTY-NOTICES.txt" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="Models\opus-mt-ja-zh\**" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="MDict.Csharp" Version="0.1.2" />
     <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.2" />
+    <PackageReference Include="Microsoft.ML.OnnxRuntime" Version="1.29.0" />
     <PackageReference Include="Velopack" Version="1.2.0" />
   </ItemGroup>
 </Project>

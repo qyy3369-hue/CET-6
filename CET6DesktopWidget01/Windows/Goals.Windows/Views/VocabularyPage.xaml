@@ -3,7 +3,9 @@
         <Style x:Key="SelectableVocabularyText" TargetType="TextBox">
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Padding" Value="8,5"/>
+            <Setter Property="MinHeight" Value="28"/>
+            <Setter Property="FontSize" Value="15"/>
             <Setter Property="IsReadOnly" Value="True"/>
             <Setter Property="IsReadOnlyCaretVisible" Value="False"/>
             <Setter Property="TextWrapping" Value="Wrap"/>
@@ -12,25 +14,25 @@
             <Setter Property="Cursor" Value="IBeam"/>
         </Style>
     </UserControl.Resources>
-    <Grid Margin="40,30,40,40" HorizontalAlignment="Stretch">
+    <Grid Margin="36,18,36,28" HorizontalAlignment="Stretch">
         <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
         <StackPanel>
             <TextBlock Text="单词本" Style="{StaticResource PageTitle}"/>
-            <TextBlock x:Name="Subtitle" Style="{StaticResource Caption}" FontSize="15" Margin="0,5,0,20"/>
+            <TextBlock x:Name="Subtitle" Style="{StaticResource Caption}" FontSize="15" Margin="0,4,0,12"/>
         </StackPanel>
 
-        <Border Grid.Row="1" Style="{StaticResource Card}" Padding="18" Margin="0,0,0,13">
+        <Border Grid.Row="1" Style="{StaticResource Card}" Padding="13" Margin="0,0,0,10">
             <Grid>
                 <Grid.ColumnDefinitions><ColumnDefinition MinWidth="0"/><ColumnDefinition Width="1"/><ColumnDefinition MinWidth="0"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-                <StackPanel Margin="0,0,20,0">
-                    <StackPanel Orientation="Horizontal"><Border Background="{StaticResource NavyBrush}" CornerRadius="12" Width="24" Height="24"><TextBlock Text="1" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold"/></Border><TextBlock Text="搜索现有词条" FontWeight="SemiBold" FontSize="16" Margin="9,0,0,0"/></StackPanel>
-                    <TextBlock Text="只筛选当前单词本，不会调用 AI。可搜索词语、读音、中文释义或标签。" Style="{StaticResource Caption}" Margin="0,7,0,10" TextWrapping="Wrap"/>
+                <StackPanel Margin="0,0,14,0">
+                    <StackPanel Orientation="Horizontal"><Border Background="{StaticResource NavyBrush}" CornerRadius="12" Width="24" Height="24"><TextBlock Text="1" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold"/></Border><TextBlock Text="搜索现有词条" FontWeight="SemiBold" FontSize="15" Margin="9,0,0,0"/></StackPanel>
+                    <TextBlock Text="只筛选当前单词本，不会调用 AI。可搜索词语、读音、中文释义或标签。" Style="{StaticResource Caption}" Margin="0,5,0,8" TextWrapping="Wrap"/>
                     <TextBox x:Name="SearchBox" Tag="输入关键词，例如：経験、けいけん、经验" TextChanged="SearchBox_TextChanged"/>
                 </StackPanel>
                 <Border Grid.Column="1" Background="{StaticResource LineBrush}"/>
-                <StackPanel Grid.Column="2" Margin="20,0,14,0">
-                    <StackPanel Orientation="Horizontal"><Border Background="{StaticResource PlumBrush}" CornerRadius="12" Width="24" Height="24"><TextBlock Text="2" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold"/></Border><TextBlock Text="添加一个新词条" FontWeight="SemiBold" FontSize="16" Margin="9,0,0,0"/></StackPanel>
-                    <TextBlock Text="输入一个词，DeepSeek 会补全读音、释义、词性、例句和难度。需要先在设置中配置密钥。" Style="{StaticResource Caption}" Margin="0,7,0,10" TextWrapping="Wrap"/>
+                <StackPanel Grid.Column="2" Margin="14,0,10,0">
+                    <StackPanel Orientation="Horizontal"><Border Background="{StaticResource PlumBrush}" CornerRadius="12" Width="24" Height="24"><TextBlock Text="2" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold"/></Border><TextBlock Text="添加一个新词条" FontWeight="SemiBold" FontSize="15" Margin="9,0,0,0"/></StackPanel>
+                    <TextBlock Text="输入一个词，DeepSeek 会补全读音、释义、词性、例句和难度。需要先在设置中配置密钥。" Style="{StaticResource Caption}" Margin="0,5,0,8" TextWrapping="Wrap"/>
                     <TextBox x:Name="WordInput" Tag="输入新词，例如：連絡 / consecutive"/>
                 </StackPanel>
                 <Button x:Name="AddButton" Grid.Column="3" Content="✦ AI 补全并添加" Style="{StaticResource PrimaryButton}" VerticalAlignment="Bottom" Margin="0,0,0,1" Click="AddButton_Click"/>
@@ -52,7 +54,7 @@
             <Grid>
                 <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                 <StackPanel>
-                    <TextBlock Text="DeepSeek 选中翻译" FontWeight="SemiBold" Foreground="{StaticResource NavyBrush}"/>
+                    <TextBlock Text="日语选中翻译" FontWeight="SemiBold" Foreground="{StaticResource NavyBrush}"/>
                     <TextBlock x:Name="SelectedJapaneseText" Margin="0,5,0,0" Foreground="{StaticResource MutedBrush}" TextWrapping="Wrap"/>
                     <TextBlock x:Name="SelectedTranslationText" Margin="0,5,0,0" TextWrapping="Wrap"/>
                 </StackPanel>
@@ -61,28 +63,39 @@
         </Border>
 
         <ListBox x:Name="WordList" Grid.Row="4" Background="Transparent" BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-            <ListBox.ItemContainerStyle><Style TargetType="ListBoxItem" BasedOn="{StaticResource CleanListItem}"><Setter Property="Margin" Value="0,0,0,10"/></Style></ListBox.ItemContainerStyle>
+            <ListBox.ItemContainerStyle><Style TargetType="ListBoxItem" BasedOn="{StaticResource CleanListItem}"><Setter Property="Margin" Value="0,0,0,3"/></Style></ListBox.ItemContainerStyle>
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <Border Style="{StaticResource Card}" Padding="17">
+                    <Border x:Name="RowBorder" Style="{StaticResource Card}" Padding="10,7">
                         <Grid>
-                            <Grid.ColumnDefinitions><ColumnDefinition Width="220"/><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                            <Grid.ColumnDefinitions><ColumnDefinition Width="170"/><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                             <StackPanel>
-                                <TextBlock Text="{Binding Word}" FontFamily="{StaticResource SerifFont}" FontSize="23" FontWeight="SemiBold"/>
-                                <TextBlock Text="{Binding Pronunciation}" Margin="0,5,0,0" Foreground="{StaticResource MutedBrush}"/>
-                                <TextBlock Text="{Binding Romanization}" Style="{StaticResource Caption}" Margin="0,2,0,0"/>
+                                <TextBlock Text="{Binding Word}" FontFamily="{StaticResource SerifFont}" FontSize="22" FontWeight="SemiBold" TextWrapping="Wrap"/>
+                                <TextBlock Text="{Binding Pronunciation}" Margin="0,2,0,0" Foreground="{StaticResource MutedBrush}" FontSize="15"/>
+                                <TextBlock Text="{Binding Romanization}" Style="{StaticResource Caption}" Margin="0,1,0,0" FontSize="14"/>
                             </StackPanel>
-                            <StackPanel Grid.Column="1">
-                                <TextBlock Text="{Binding PartOfSpeech}" FontWeight="SemiBold" TextWrapping="Wrap"/>
-                                <TextBox Text="{Binding Meaning, Mode=OneWay}" Style="{StaticResource SelectableVocabularyText}" Margin="0,3,0,0" SelectionChanged="JapaneseText_SelectionChanged" ToolTip="选中日文后自动翻译为中文"/>
-                                <TextBox Text="{Binding Example, Mode=OneWay}" Style="{StaticResource SelectableVocabularyText}" Margin="0,8,0,0" SelectionChanged="JapaneseText_SelectionChanged" ToolTip="选中日文后自动翻译为中文"/>
-                                <TextBox Text="{Binding ExampleTranslation, Mode=OneWay}" Style="{StaticResource SelectableVocabularyText}" Foreground="{StaticResource MutedBrush}" FontSize="13" Margin="0,3,0,0"/>
-                                <TextBlock Text="{Binding Tag}" Foreground="{StaticResource PlumBrush}" Margin="0,7,0,0"/>
+                            <StackPanel Grid.Column="1" Margin="0,0,8,0">
+                                <TextBlock Text="{Binding PartOfSpeech}" FontWeight="SemiBold" TextWrapping="Wrap" FontSize="15"/>
+                                <Grid Margin="0,1,0,0">
+                                    <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                    <TextBox Text="{Binding Meaning, Mode=OneWay}" Style="{StaticResource SelectableVocabularyText}" Padding="4,2" FontSize="15" SelectionChanged="JapaneseText_SelectionChanged" ToolTip="选中日文后自动翻译为中文"/>
+                                    <Button Grid.Column="1" Content="译为中文" Padding="10,4" Margin="8,0,0,0" VerticalAlignment="Center" Tag="{Binding}" Click="TranslateRow_Click">
+                                        <Button.Style>
+                                            <Style TargetType="Button" BasedOn="{StaticResource SoftButton}">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                                <Style.Triggers><DataTrigger Binding="{Binding NeedsJapaneseTranslation}" Value="True"><Setter Property="Visibility" Value="Visible"/></DataTrigger></Style.Triggers>
+                                            </Style>
+                                        </Button.Style>
+                                    </Button>
+                                </Grid>
+                                <TextBlock x:Name="RowTranslation" Foreground="#2D6F55" FontSize="14" TextWrapping="Wrap" Margin="4,3,0,0" Visibility="Collapsed"/>
+                                <TextBox Text="{Binding Example, Mode=OneWay}" Style="{StaticResource SelectableVocabularyText}" Padding="4,1" FontSize="14" Margin="0,3,0,0" SelectionChanged="JapaneseText_SelectionChanged" ToolTip="选中日文后自动翻译为中文"/>
+                                <TextBox Text="{Binding ExampleTranslation, Mode=OneWay}" Style="{StaticResource SelectableVocabularyText}" Foreground="{StaticResource MutedBrush}" FontSize="13" Padding="4,1" Margin="0,1,0,0"/>
+                                <TextBlock Text="{Binding Tag}" Foreground="{StaticResource PlumBrush}" Margin="0,1,0,0" FontSize="13"/>
                             </StackPanel>
-                            <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
-                                <CheckBox Content="选择" Tag="{Binding}" VerticalAlignment="Center" Margin="0,0,9,0" Checked="WordSelectionCheckBox_Changed" Unchecked="WordSelectionCheckBox_Changed" Loaded="WordSelectionCheckBox_Loaded"/>
-                                <Button Content="☆" Style="{StaticResource SoftButton}" Width="46" Height="42" Padding="0" FontSize="22" Margin="0,0,7,0" Tag="{Binding}" Click="Favorite_Click" Loaded="FavoriteButton_Loaded"/>
-                                <Button Content="删除" Style="{StaticResource SoftButton}" Padding="13,8" Tag="{Binding}" Click="Delete_Click"/>
+                            <StackPanel Grid.Column="2" VerticalAlignment="Center">
+                                <CheckBox Content="选择" FontSize="15" Tag="{Binding}" VerticalAlignment="Center" Margin="0,0,0,8" Checked="WordSelectionCheckBox_Changed" Unchecked="WordSelectionCheckBox_Changed" Loaded="WordSelectionCheckBox_Loaded"/>
+                                <Button Content="删除" Style="{StaticResource SoftButton}" Padding="10,6" FontSize="14" Tag="{Binding}" Click="Delete_Click"/>
                             </StackPanel>
                         </Grid>
                     </Border>

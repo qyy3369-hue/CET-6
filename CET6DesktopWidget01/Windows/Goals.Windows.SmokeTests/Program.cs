@@ -138,6 +138,34 @@ if (args.Length >= 3 && args[0] == "--wordbook-delete-probe")
     return;
 }
 
+if (args.Length >= 2 && args[0] == "--local-translation-probe")
+{
+    var probeText = args[1];
+    var probeService = new LocalTranslationService();
+    Console.WriteLine($"SOURCE {probeText}");
+    var probeTimer = System.Diagnostics.Stopwatch.StartNew();
+    try
+    {
+        var translation = await probeService.TranslateAsync(probeText);
+        probeTimer.Stop();
+        Console.WriteLine($"RESULT seconds={probeTimer.Elapsed.TotalSeconds:F2}");
+        Console.WriteLine($"TRANSLATED {translation ?? "NULL"}");
+        Assert(!string.IsNullOrWhiteSpace(translation), "local model translates a Japanese dictionary definition to Chinese");
+    }
+    catch (Exception ex)
+    {
+        probeTimer.Stop();
+        Console.WriteLine($"ERROR seconds={probeTimer.Elapsed.TotalSeconds:F2}");
+        Console.WriteLine($"LOAD_ERROR {probeService.LoadError ?? "none"}");
+        Console.WriteLine(ex);
+    }
+    finally
+    {
+        probeService.Dispose();
+    }
+    return;
+}
+
 var state = DefaultDataFactory.Create();
 Assert(state.Tracks.Count >= 2, "at least two learning tracks");
 Assert(typeof(AppState).GetProperty("WidgetEnabled") is null, "floating widget state has been removed");
@@ -149,12 +177,12 @@ Assert(wordbooksXaml.Contains("StatusLabel, Mode=OneWay", StringComparison.Ordin
 Assert(wordbooksXaml.Contains("Word.Example", StringComparison.Ordinal) &&
        wordbooksXaml.Contains("Word.ExampleTranslation", StringComparison.Ordinal),
     "wordbook browsing cards show the same example and translation fields as the focused vocabulary list");
-Assert(wordbooksXaml.Contains("<ColumnDefinition Width=\"220\"/>", StringComparison.Ordinal) &&
-       wordbooksXaml.Contains("FontSize=\"23\"", StringComparison.Ordinal),
+Assert(wordbooksXaml.Contains("<ColumnDefinition Width=\"170\"/>", StringComparison.Ordinal) &&
+       wordbooksXaml.Contains("FontSize=\"22\"", StringComparison.Ordinal),
     "wordbook browsing cards use the same information hierarchy as the focused vocabulary list");
 Assert(wordbooksXaml.Contains("JapaneseText_SelectionChanged", StringComparison.Ordinal) &&
-       wordbooksXaml.Contains("DeepSeek 选中翻译", StringComparison.Ordinal),
-    "Japanese definitions in wordbooks can be selected for automatic DeepSeek translation");
+       wordbooksXaml.Contains("日语选中翻译", StringComparison.Ordinal),
+    "Japanese definitions in wordbooks can be selected for local-first translation");
 Assert(typeof(DeepSeekService).GetMethod("TranslateJapaneseSelectionAsync") is not null,
     "DeepSeek provides a dedicated Japanese-to-Chinese selection translation request");
 var vocabularyXaml = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "Fixtures", "VocabularyPage.xaml"));
@@ -162,14 +190,20 @@ Assert(vocabularyXaml.Contains("全选本页", StringComparison.Ordinal) &&
        vocabularyXaml.Contains("DeleteSelected_Click", StringComparison.Ordinal) &&
        vocabularyXaml.Contains("WordSelectionCheckBox_Changed", StringComparison.Ordinal),
     "vocabulary pages support selecting the current page and bulk deletion");
-Assert(!vocabularyXaml.Contains("☆/★ 收藏", StringComparison.Ordinal) &&
-       vocabularyXaml.Contains("Content=\"☆\"", StringComparison.Ordinal),
-    "vocabulary favorites use one star button instead of a two-star label");
+Assert(!vocabularyXaml.Contains("Content=\"☆\"", StringComparison.Ordinal) &&
+       !vocabularyXaml.Contains("Favorite_Click", StringComparison.Ordinal) &&
+       vocabularyXaml.Contains("DeleteSelected_Click", StringComparison.Ordinal),
+    "vocabulary favorites stay in the wordbook module; the focused list only keeps selection and delete");
 var japaneseTextDetector = typeof(Goals.Windows.Views.WordbooksPage).GetMethod("ContainsJapaneseText",
     System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
 Assert(japaneseTextDetector?.Invoke(null, ["日本語"]) is true &&
        japaneseTextDetector.Invoke(null, ["English"]) is false,
     "automatic selection translation is limited to Japanese text");
+var looksJapanese = typeof(Goals.Windows.Services.LocalTranslationService).GetMethod("LooksLikeJapanese",
+    System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
+Assert(looksJapanese?.Invoke(null, ["言葉の意味をわかりやすく説明する。"]) is true &&
+       looksJapanese.Invoke(null, ["apple: a round fruit with green or red skin"]) is false,
+    "Japanese dictionary glosses are detected for the local translation button");
 Exception? runParentError = null;
 var runParentResolved = false;
 var scrollWithRunIsSafe = false;
@@ -199,7 +233,7 @@ Assert(runParentError is null && scrollWithRunIsSafe,
 var scrollType = typeof(Goals.Windows.Infrastructure.SmoothScrollBehavior);
 var scrollDistanceFactor = (double)(scrollType.GetField("WheelDistanceFactor", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)?.GetRawConstantValue() ?? 0d);
 var scrollAnimationMilliseconds = (int)(scrollType.GetField("ScrollAnimationMilliseconds", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)?.GetRawConstantValue() ?? 0);
-Assert(scrollDistanceFactor == 0.86 && scrollAnimationMilliseconds == 130,
+Assert(scrollDistanceFactor == 1.0 && scrollAnimationMilliseconds == 100,
     "all pages use the lighter unified smooth-scroll response");
 var english = state.Tracks.Single(x => x.Id == "cet6");
 var japanese = state.Tracks.Single(x => x.Id == "japanese-n4");
@@ -317,12 +351,15 @@ foreach (var expectedHoursFromNow in expectedHours)
     Assert(Math.Abs(actualHours - expectedHoursFromNow) < 0.02, $"memory curve level {curve.Level} interval is {expectedHoursFromNow:g} hours");
 }
 
-var credentials = new WindowsCredentialStore();
+var realCredentials = new WindowsCredentialStore();
+var realCredentialBefore = realCredentials.Read();
+var testCredentials = new WindowsCredentialStore("GoalsStudyDesk.SmokeTestCredential." + Guid.NewGuid().ToString("N"));
 const string temporary = "goals-temporary-credential-self-test";
-credentials.Save(temporary);
-Assert(credentials.Read() == temporary, "credential round-trip through Windows Credential Manager");
-credentials.Delete();
-Assert(credentials.Read() is null, "temporary credential is securely deleted");
+testCredentials.Save(temporary);
+Assert(testCredentials.Read() == temporary, "credential round-trip through Windows Credential Manager");
+testCredentials.Delete();
+Assert(testCredentials.Read() is null, "temporary credential is securely deleted");
+Assert(realCredentials.Read() == realCredentialBefore, "self-test leaves the real API credential untouched");
 
 Console.WriteLine("SELF TESTS COMPLETE");
 

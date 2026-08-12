@@ -5,6 +5,7 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Media3D;
+using System.Windows.Threading;
 using Goals.Windows.Models;
 using Goals.Windows.Services;
 using Goals.Windows.ViewModels;
@@ -27,11 +28,19 @@ public partial class WordbooksPage : UserControl
     private int _translationRequestVersion;
     private bool _isStateSubscribed;
     private int _refreshRequestVersion;
+    private readonly Dictionary<string, bool> _rowTranslateUsedDeepSeek = [];
+    private readonly DispatcherTimer _searchDebounce = new() { Interval = TimeSpan.FromMilliseconds(300) };
 
     public WordbooksPage(MainViewModel vm)
     {
         InitializeComponent();
         _vm = vm;
+        _searchDebounce.Tick += (_, _) =>
+        {
+            _searchDebounce.Stop();
+            _page = 0;
+            Refresh();
+        };
         Loaded += Page_Loaded;
         Unloaded += Page_Unloaded;
     }
@@ -52,6 +61,7 @@ public partial class WordbooksPage : UserControl
 
     private void Page_Unloaded(object sender, RoutedEventArgs e)
     {
+        _searchDebounce.Stop();
         if (_isStateSubscribed)
         {
             _vm.StateChanged -= Changed;
@@ -60,6 +70,7 @@ public partial class WordbooksPage : UserControl
             _importCancellation?.Cancel();
             _selectionTranslationCancellation?.Cancel();
             _selectionTranslationCancellation?.Dispose();
+            _selectionTranslationCancellation = null;
     }
 
     private void Changed(object? sender, EventArgs e) => Dispatcher.Invoke(() =>
@@ -80,12 +91,14 @@ public partial class WordbooksPage : UserControl
     private async Task RefreshAsync()
     {
         var requestVersion = ++_refreshRequestVersion;
+        _rowTranslateUsedDeepSeek.Clear();
         var trackId = _trackId;
         var sourceId = _sourceId;
         var query = SearchBox.Text?.Trim() ?? "";
         var page = _page;
         var isJapanese = _vm.CurrentTrack.Mode == LearningMode.Japanese;
         if (_importCancellation is null) StatusText.Text = "正在读取词书…";
+        RefreshingBar.Visibility = Visibility.Visible;
 
         var snapshot = await Task.Run(() =>
         {
@@ -100,6 +113,7 @@ public partial class WordbooksPage : UserControl
             return (books, result, page, pageCount);
         });
         if (!IsLoaded || requestVersion != _refreshRequestVersion || trackId != _trackId) return;
+        RefreshingBar.Visibility = Visibility.Collapsed;
 
         var books = snapshot.books;
         _page = snapshot.page;
@@ -137,9 +151,7 @@ public partial class WordbooksPage : UserControl
         for (var element = e.OriginalSource as DependencyObject; element is not null && !ReferenceEquals(element, sender); element = GetInteractionParent(element))
             if (element is Button) return;
         if ((sender as FrameworkElement)?.Tag is not WordbookInfo book) return;
-        _sourceId = book.Id;
-        _page = 0;
-        Refresh();
+        BookList.SelectedItem = book;
     }
 
     private static DependencyObject? GetInteractionParent(DependencyObject element)
@@ -161,8 +173,8 @@ public partial class WordbooksPage : UserControl
     private void SearchBox_TextChanged(object sender, TextChangedEventArgs e)
     {
         if (!IsLoaded) return;
-        _page = 0;
-        Refresh();
+        _searchDebounce.Stop();
+        _searchDebounce.Start();
     }
 
     private void PreviousPage_Click(object sender, RoutedEventArgs e) { if (_page > 0) { _page--; Refresh(); } }
@@ -182,21 +194,26 @@ public partial class WordbooksPage : UserControl
 
         SelectionTranslationPanel.Visibility = Visibility.Visible;
         SelectedJapaneseText.Text = $"日文：{selected}";
-        SelectedTranslationText.Text = _vm.DeepSeek.HasKey ? "正在通过 DeepSeek 翻译…" : "尚未配置 DeepSeek 密钥，请先到“设置”页面保存密钥。";
-        if (!_vm.DeepSeek.HasKey) return;
+        var canTranslate = _vm.LocalTranslation.ModelFound || _vm.LocalTranslation.IsLoaded || _vm.DeepSeek.HasKey;
+        SelectedTranslationText.Text = canTranslate
+            ? "正在翻译…"
+            : "暂无可用翻译：需要本地模型或 DeepSeek 密钥。";
+        if (!canTranslate) return;
 
         try
         {
             await Task.Delay(360, cancellation.Token);
-            var translation = await _vm.DeepSeek.TranslateJapaneseSelectionAsync(selected, cancellation.Token);
+            var result = await _vm.TranslateJapaneseAsync(selected, cancellation.Token);
             if (cancellation.IsCancellationRequested || requestVersion != _translationRequestVersion) return;
-            SelectedTranslationText.Text = $"中文：{translation.Trim()}";
+            SelectedTranslationText.Text = result is null
+                ? "暂时无法翻译，请检查本地模型或 DeepSeek 密钥。"
+                : $"中文：{result.Text}（{result.Engine}）";
         }
         catch (OperationCanceledException) { }
         catch (Exception ex)
         {
-            if (requestVersion == _translationRequestVersion)
-                SelectedTranslationText.Text = ex.Message;
+            if (ex is ObjectDisposedException || requestVersion != _translationRequestVersion) return;
+            SelectedTranslationText.Text = ex.Message;
         }
     }
 
@@ -218,7 +235,52 @@ public partial class WordbooksPage : UserControl
         if ((sender as Button)?.Tag is not WordbookEntry entry) return;
         _statusMessage = entry.IsActive ? $"“{entry.Word.Word}”已从单词本移除；历史复习记录仍保留。" : $"“{entry.Word.Word}”已加入单词本和闪卡队列。";
         _vm.ToggleStudyList(entry.Word);
-        Refresh();
+    }
+
+    private async void TranslateRow_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is not Button button || button.Tag is not VocabularyWord word) return;
+        var root = FindRowRoot(button);
+        var rowText = root?.FindName("RowTranslation") as TextBlock;
+        var useDeepSeek = _rowTranslateUsedDeepSeek.TryGetValue(word.Id, out var used) && used;
+        button.IsEnabled = false;
+        button.Content = "翻译中…";
+        if (rowText is not null)
+        {
+            rowText.Visibility = Visibility.Visible;
+            rowText.Text = "正在翻译…";
+        }
+        try
+        {
+            var result = useDeepSeek
+                ? await _vm.TranslateJapaneseWithDeepSeekAsync(word.Meaning)
+                : await _vm.TranslateJapaneseLocalAsync(word.Meaning);
+            _rowTranslateUsedDeepSeek[word.Id] = true;
+            if (rowText is not null)
+                rowText.Text = result is null
+                    ? (useDeepSeek ? "DeepSeek 未能翻译（未配置密钥或失败）。" : "本地模型无法翻译此释义。")
+                    : $"中文：{result.Text}（{result.Engine}）";
+            button.Content = useDeepSeek ? "重译" : "用 DeepSeek 重译";
+        }
+        catch (Exception ex)
+        {
+            if (rowText is not null) rowText.Text = "翻译失败：" + ex.Message;
+        }
+        finally
+        {
+            button.IsEnabled = true;
+        }
+    }
+
+    private static FrameworkElement? FindRowRoot(object source)
+    {
+        var current = source as DependencyObject;
+        while (current is not null)
+        {
+            if (current is FrameworkElement { Name: "RowBorder" } element) return element;
+            current = VisualTreeHelper.GetParent(current);
+        }
+        return null;
     }
 
     private void SaveDailyCount_Click(object sender, RoutedEventArgs e)

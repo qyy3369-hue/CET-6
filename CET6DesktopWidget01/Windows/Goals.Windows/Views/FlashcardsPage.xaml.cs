@@ -3,6 +3,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
+using System.Threading;
 using Goals.Windows.Models;
 using Goals.Windows.Services;
 using Goals.Windows.ViewModels;
@@ -23,6 +24,10 @@ public partial class FlashcardsPage : UserControl
     private bool _isStateSubscribed;
     private int _queueLoadVersion;
     private ReviewPhase _phase = ReviewPhase.Answering;
+    private bool _isTranslating;
+    private int _translationRequestVersion;
+    private bool _translateUsedDeepSeek;
+    private CancellationTokenSource? _translationCancellation;
     private VocabularyWord? Current => _queue.Count == 0 ? null : _queue[Math.Clamp(_index, 0, _queue.Count - 1)];
 
     public FlashcardsPage(MainViewModel vm)
@@ -49,6 +54,9 @@ public partial class FlashcardsPage : UserControl
     private void Page_Unloaded(object sender, RoutedEventArgs e)
     {
         _queueLoadVersion++;
+        _translationCancellation?.Cancel();
+        _translationCancellation?.Dispose();
+        _translationCancellation = null;
         if (_isStateSubscribed)
         {
             _vm.StateChanged -= Changed;
@@ -100,6 +108,17 @@ public partial class FlashcardsPage : UserControl
 
         var word = Current;
         var available = word is not null;
+        _translationCancellation?.Cancel();
+        _translationCancellation?.Dispose();
+        _translationCancellation = null;
+        _translationRequestVersion++;
+        _isTranslating = false;
+        _translateUsedDeepSeek = false;
+        TranslateButton.Visibility = Visibility.Collapsed;
+        TranslateButton.IsEnabled = true;
+        TranslateButton.Content = "译为中文";
+        MeaningTranslationText.Visibility = Visibility.Collapsed;
+        MeaningTranslationText.Text = "";
         EmptyText.Visibility = available ? Visibility.Collapsed : Visibility.Visible;
         WordText.Visibility = available ? Visibility.Visible : Visibility.Collapsed;
         SubmitButton.IsEnabled = available;
@@ -119,6 +138,8 @@ public partial class FlashcardsPage : UserControl
         PronunciationText.Text = _vm.IsJapanese ? word.Reading : word.Phonetic;
         RomanizationText.Text = _vm.IsJapanese ? word.Romanization : word.PartOfSpeech;
         MeaningText.Text = $"{word.PartOfSpeech}  {word.Meaning}";
+        if (_vm.IsJapanese && LocalTranslationService.LooksLikeJapanese(word.Meaning))
+            TranslateButton.Visibility = Visibility.Visible;
         MnemonicText.Text = string.IsNullOrWhiteSpace(word.Mnemonic) ? "" : $"助记：{word.Mnemonic}";
         MnemonicText.Visibility = string.IsNullOrWhiteSpace(word.Mnemonic) ? Visibility.Collapsed : Visibility.Visible;
         ExampleText.Text = word.Example;
@@ -133,9 +154,10 @@ public partial class FlashcardsPage : UserControl
         FocusLater(AnswerBox);
     }
 
-    private void UpdateStats()
+    private async void UpdateStats()
     {
-        var summary = _vm.GetReviewSummary();
+        var summary = await Task.Run(_vm.GetReviewSummary);
+        if (!IsLoaded) return;
         DueCount.Text = summary.Due.ToString("N0");
         StartedCount.Text = summary.Started.ToString("N0");
         MasteredCount.Text = summary.Mastered.ToString("N0");
@@ -165,6 +187,55 @@ public partial class FlashcardsPage : UserControl
 
     private async void Submit_Click(object sender, RoutedEventArgs e) => await SubmitAnswer();
     private void Correction_Click(object sender, RoutedEventArgs e) => ConfirmCorrection();
+
+    private async void Translate_Click(object sender, RoutedEventArgs e) => await TranslateCurrentMeaningAsync();
+
+    private async Task TranslateCurrentMeaningAsync()
+    {
+        var word = Current;
+        if (word is null || _isTranslating) return;
+        _translationCancellation?.Cancel();
+        _translationCancellation?.Dispose();
+        _translationCancellation = new CancellationTokenSource();
+        var cancellation = _translationCancellation.Token;
+        var version = ++_translationRequestVersion;
+        var useDeepSeek = _translateUsedDeepSeek;
+        _isTranslating = true;
+        TranslateButton.IsEnabled = false;
+        TranslateButton.Content = "翻译中…";
+        MeaningTranslationText.Visibility = Visibility.Visible;
+        MeaningTranslationText.Text = "正在翻译…";
+        try
+        {
+            var result = useDeepSeek
+                ? await _vm.TranslateJapaneseWithDeepSeekAsync(word.Meaning, cancellation)
+                : await _vm.TranslateJapaneseLocalAsync(word.Meaning, cancellation);
+            _translateUsedDeepSeek = true;
+            if (cancellation.IsCancellationRequested || version != _translationRequestVersion) return;
+            if (result is null)
+            {
+                MeaningTranslationText.Text = useDeepSeek ? "DeepSeek 未能翻译（未配置密钥或失败）。" : "本地模型无法翻译此释义。";
+                TranslateButton.Content = useDeepSeek ? "重译" : "用 DeepSeek 重译";
+            }
+            else
+            {
+                MeaningTranslationText.Text = $"中文：{result.Text}（{result.Engine}）";
+                TranslateButton.Content = useDeepSeek ? "重译" : "用 DeepSeek 重译";
+            }
+        }
+        catch (OperationCanceledException) { }
+        catch (Exception ex)
+        {
+            if (version != _translationRequestVersion) return;
+            MeaningTranslationText.Text = "翻译失败：" + ex.Message;
+            TranslateButton.Content = "重试";
+        }
+        finally
+        {
+            _isTranslating = false;
+            TranslateButton.IsEnabled = true;
+        }
+    }
 
     private async Task SubmitAnswer()
     {
@@ -255,6 +326,9 @@ public partial class FlashcardsPage : UserControl
 
         _phase = ReviewPhase.CorrectionComplete;
         CorrectionEntryPanel.Visibility = Visibility.Collapsed;
+        JudgmentText.Text = "✓ 复述完成";
+        JudgmentText.Foreground = new SolidColorBrush(Color.FromRgb(45, 111, 85));
+        JudgmentBadge.Background = new SolidColorBrush(Color.FromRgb(231, 241, 235));
         ReviewStatus.Text = "复述完成；继续后这个词会移到本轮队列末尾再次回炉。";
         AdvanceButton.Content = "› 继续";
         AdvanceButton.IsEnabled = true;
@@ -282,7 +356,7 @@ public partial class FlashcardsPage : UserControl
 
     private void AdvanceAfterReview()
     {
-        if (_queue.Count == 0) return;
+        if (_queue.Count == 0 || _phase is not (ReviewPhase.CorrectDetail or ReviewPhase.CorrectionComplete)) return;
         var reviewed = Current;
         if (_filter == "due" && reviewed is not null)
         {

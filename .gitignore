@@ -9,3 +9,6 @@ CET6DesktopWidget01/Scripts/__pycache__/
 CET6DesktopWidget01/Windows/**/bin/
 CET6DesktopWidget01/Windows/**/obj/
 CET6DesktopWidget01/Windows/Release/
+
+# Local translation model (downloaded by Scripts/fetch_translation_model.ps1)
+CET6DesktopWidget01/Windows/Goals.Windows/Models/

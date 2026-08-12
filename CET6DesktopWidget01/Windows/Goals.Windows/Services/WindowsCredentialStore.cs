@@ -6,9 +6,12 @@ namespace Goals.Windows.Services;
 
 public sealed class WindowsCredentialStore
 {
-    private const string TargetName = "GoalsStudyDesk.DeepSeekApiKey";
+    private const string DefaultTargetName = "GoalsStudyDesk.DeepSeekApiKey";
     private const uint CredTypeGeneric = 1;
     private const uint CredPersistLocalMachine = 2;
+    private readonly string _targetName;
+
+    public WindowsCredentialStore(string? targetName = null) => _targetName = targetName ?? DefaultTargetName;
 
     public bool HasKey => !string.IsNullOrWhiteSpace(Read());
 
@@ -25,7 +28,7 @@ public sealed class WindowsCredentialStore
             var credential = new NativeCredential
             {
                 Type = CredTypeGeneric,
-                TargetName = TargetName,
+                TargetName = _targetName,
                 CredentialBlobSize = (uint)bytes.Length,
                 CredentialBlob = blob,
                 Persist = CredPersistLocalMachine,
@@ -44,7 +47,7 @@ public sealed class WindowsCredentialStore
 
     public string? Read()
     {
-        if (!CredRead(TargetName, CredTypeGeneric, 0, out var pointer)) return null;
+        if (!CredRead(_targetName, CredTypeGeneric, 0, out var pointer)) return null;
         try
         {
             var credential = Marshal.PtrToStructure<NativeCredential>(pointer);
@@ -60,7 +63,7 @@ public sealed class WindowsCredentialStore
         }
     }
 
-    public void Delete() => CredDelete(TargetName, CredTypeGeneric, 0);
+    public void Delete() => CredDelete(_targetName, CredTypeGeneric, 0);
 
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
     private struct NativeCredential
