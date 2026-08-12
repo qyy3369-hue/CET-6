@@ -55,6 +55,23 @@ public sealed class DeepSeekService
         return word;
     }
 
+    public async Task<VocabularyWord> GenerateRandomWordAsync(StudyTrack track, string level, IReadOnlySet<string>? existingWords = null, CancellationToken cancellationToken = default)
+    {
+        var targetLevel = level is "CET-4" or "CET4" ? "CET-4" : "CET-6";
+        var schema = "{\"word\":\"allocate\",\"phonetic\":\"/ˈæləkeɪt/\",\"partOfSpeech\":\"v.\",\"meaning\":\"分配；拨出\",\"example\":\"自然英文例句\",\"exampleTranslation\":\"中文翻译\",\"phrases\":[\"常用搭配\"],\"mnemonic\":\"中文助记\",\"tag\":\"写作高频\",\"difficulty\":3}";
+        var system = $"你是 {targetLevel} 英语词汇生成助手。随机生成一个 {targetLevel} 考试常考核心词汇的完整词条。只输出 JSON，不要 Markdown。格式：{schema}";
+        var excludeText = existingWords is not null && existingWords.Count > 0
+            ? $"。不要生成以下已有词汇：{string.Join(", ", existingWords.Take(80))}"
+            : "";
+        var text = await CallAsync(system, $"随机生成一个 {targetLevel} 词汇" + excludeText, true, cancellationToken);
+        var word = JsonSerializer.Deserialize<VocabularyWord>(CleanJson(text), _json) ?? throw new InvalidDataException("词条返回内容无法解析。");
+        word.Id = "lib-" + Guid.NewGuid().ToString("N");
+        word.TrackId = track.Id;
+        if (string.IsNullOrWhiteSpace(word.Tag)) word.Tag = targetLevel;
+        word.Difficulty = Math.Clamp(word.Difficulty, 1, 5);
+        return word;
+    }
+
     public async Task<bool> JudgeAnswerAsync(VocabularyWord word, string answer, CancellationToken cancellationToken = default)
     {
         var system = "判断学习者给出的中文含义是否命中词条释义中的任意核心义项。只输出 JSON：{\"correct\":true}。允许近义词，不因附加无关词语直接判错。";

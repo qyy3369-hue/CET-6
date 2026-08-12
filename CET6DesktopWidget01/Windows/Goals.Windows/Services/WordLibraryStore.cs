@@ -739,6 +739,97 @@ public sealed class WordLibraryStore : IDisposable
         if (!string.IsNullOrWhiteSpace(sourceId)) command.Parameters.AddWithValue("$source", sourceId);
     }
 
+    public HashSet<string> GetExistingWordKeys(string trackId)
+    {
+        using var connection = Open();
+        using var command = connection.CreateCommand();
+        command.CommandText = "SELECT word_key FROM words WHERE track_id = $track;";
+        command.Parameters.AddWithValue("$track", trackId);
+        var result = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        using var reader = command.ExecuteReader();
+        while (reader.Read())
+        {
+            if (!reader.IsDBNull(0))
+                result.Add(reader.GetString(0));
+        }
+        return result;
+    }
+
+    public bool InsertAiGeneratedWord(string trackId, string sourceName, VocabularyWord word)
+    {
+        var importId = "ai-book-" + trackId + "-" + sourceName;
+        var nowTicks = DateTime.Now.Ticks;
+        using var connection = Open();
+        using var transaction = connection.BeginTransaction();
+
+        using (var importCmd = connection.CreateCommand())
+        {
+            importCmd.Transaction = transaction;
+            importCmd.CommandText = """
+                INSERT OR IGNORE INTO imports(
+                  id, track_id, file_path, source_name, total_count, processed_count,
+                  added_count, skipped_count, status, updated_ticks)
+                VALUES($id, $track, 'AI Generator', $name, 0, 0, 0, 0, 'complete', $updated);
+                """;
+            importCmd.Parameters.AddWithValue("$id", importId);
+            importCmd.Parameters.AddWithValue("$track", trackId);
+            importCmd.Parameters.AddWithValue("$name", sourceName);
+            importCmd.Parameters.AddWithValue("$updated", nowTicks);
+            importCmd.ExecuteNonQuery();
+        }
+
+        var wordKey = Normalize(word.Word);
+        using var insertCmd = connection.CreateCommand();
+        insertCmd.Transaction = transaction;
+        insertCmd.CommandText = """
+            INSERT OR IGNORE INTO words(
+              id, track_id, source_id, source_name, headword, word_key, reading,
+              romanization, phonetic, part_of_speech, meaning, example,
+              example_translation, phrases_json, mnemonic, tag, difficulty)
+            VALUES($id, $track, $source, $sourceName, $word, $key, $reading,
+              $romanization, $phonetic, $pos, $meaning, $example,
+              $translation, $phrases, $mnemonic, $tag, $difficulty);
+            """;
+        insertCmd.Parameters.AddWithValue("$id", word.Id);
+        insertCmd.Parameters.AddWithValue("$track", trackId);
+        insertCmd.Parameters.AddWithValue("$source", importId);
+        insertCmd.Parameters.AddWithValue("$sourceName", sourceName);
+        insertCmd.Parameters.AddWithValue("$word", word.Word.Trim());
+        insertCmd.Parameters.AddWithValue("$key", wordKey);
+        insertCmd.Parameters.AddWithValue("$reading", word.Reading ?? "");
+        insertCmd.Parameters.AddWithValue("$romanization", word.Romanization ?? "");
+        insertCmd.Parameters.AddWithValue("$phonetic", word.Phonetic ?? "");
+        insertCmd.Parameters.AddWithValue("$pos", word.PartOfSpeech ?? "");
+        insertCmd.Parameters.AddWithValue("$meaning", word.Meaning ?? "");
+        insertCmd.Parameters.AddWithValue("$example", word.Example ?? "");
+        insertCmd.Parameters.AddWithValue("$translation", word.ExampleTranslation ?? "");
+        insertCmd.Parameters.AddWithValue("$phrases", JsonSerializer.Serialize(word.Phrases));
+        insertCmd.Parameters.AddWithValue("$mnemonic", word.Mnemonic ?? "");
+        insertCmd.Parameters.AddWithValue("$tag", word.Tag ?? "");
+        insertCmd.Parameters.AddWithValue("$difficulty", word.Difficulty);
+
+        var rows = insertCmd.ExecuteNonQuery();
+        if (rows > 0)
+        {
+            using var updateCmd = connection.CreateCommand();
+            updateCmd.Transaction = transaction;
+            updateCmd.CommandText = """
+                UPDATE imports
+                SET total_count = total_count + 1,
+                    processed_count = processed_count + 1,
+                    added_count = added_count + 1,
+                    updated_ticks = $updated
+                WHERE id = $id;
+                """;
+            updateCmd.Parameters.AddWithValue("$id", importId);
+            updateCmd.Parameters.AddWithValue("$updated", nowTicks);
+            updateCmd.ExecuteNonQuery();
+        }
+
+        transaction.Commit();
+        return rows > 0;
+    }
+
     private static VocabularyWord ReadWord(SqliteDataReader reader)
     {
         ObservableCollection<string> phrases;

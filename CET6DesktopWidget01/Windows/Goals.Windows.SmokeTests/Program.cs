@@ -327,6 +327,14 @@ try
     Assert(resumedResult.Resumed && resumedResult.Processed == 2_501, "paused import resumes automatically from its last committed batch");
     Assert(library.QueryWordbookEntries(japanese.Id, null, "", 0, 1).Total == 2_501, "resumed import stores every wordbook entry exactly once");
     Assert(library.EnsureDailyWords(japanese.Id, DateTime.Today).AddedNow == 20, "resumed wordbook also follows the daily focused-word quota");
+
+    var aiWord = new VocabularyWord { Word = "ubiquitous", Phonetic = "/juːˈbɪkwɪtəs/", PartOfSpeech = "adj.", Meaning = "无处不在的", Tag = "CET-6" };
+    var insertedAiWord = library.InsertAiGeneratedWord(english.Id, "AI-CET6", aiWord);
+    Assert(insertedAiWord, "AI-generated word is inserted into the wordbook library");
+    var aiWordKeys = library.GetExistingWordKeys(english.Id);
+    Assert(aiWordKeys.Contains("UBIQUITOUS"), "GetExistingWordKeys retrieves the inserted AI word key");
+    var duplicateAiWord = library.InsertAiGeneratedWord(english.Id, "AI-CET6", aiWord);
+    Assert(!duplicateAiWord, "duplicate AI-generated word is safely skipped");
 }
 finally
 {

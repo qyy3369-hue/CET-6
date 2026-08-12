@@ -19,6 +19,7 @@ public partial class WordbooksPage : UserControl
     private readonly VocabularyImportService _importer = new();
     private CancellationTokenSource? _importCancellation;
     private CancellationTokenSource? _selectionTranslationCancellation;
+    private CancellationTokenSource? _aiCancellation;
     private string _trackId = "";
     private string? _sourceId;
     private int _page;
@@ -67,10 +68,11 @@ public partial class WordbooksPage : UserControl
             _vm.StateChanged -= Changed;
             _isStateSubscribed = false;
         }
-            _importCancellation?.Cancel();
-            _selectionTranslationCancellation?.Cancel();
-            _selectionTranslationCancellation?.Dispose();
-            _selectionTranslationCancellation = null;
+        _importCancellation?.Cancel();
+        _selectionTranslationCancellation?.Cancel();
+        _selectionTranslationCancellation?.Dispose();
+        _selectionTranslationCancellation = null;
+        _aiCancellation?.Cancel();
     }
 
     private void Changed(object? sender, EventArgs e) => Dispatcher.Invoke(() =>
@@ -123,6 +125,7 @@ public partial class WordbooksPage : UserControl
         _syncingBooks = false;
         BookCountText.Text = books.Count == 0 ? "尚未导入词书" : $"{books.Count} 本 · 共 {books.Sum(x => x.WordCount):N0} 词";
         DeleteBookButton.IsEnabled = BookList.SelectedItem is WordbookInfo;
+        AiGeneratorSection.Visibility = _vm.CurrentTrack.Mode == LearningMode.English ? Visibility.Visible : Visibility.Collapsed;
 
         var result = snapshot.result;
         var pageCount = snapshot.pageCount;
@@ -414,5 +417,112 @@ public partial class WordbooksPage : UserControl
         {
             BookList.IsEnabled = true;
         }
+    }
+
+    private async void AiGenerate_Click(object sender, RoutedEventArgs e)
+    {
+        if (_vm.CurrentTrack.Mode != LearningMode.English) return;
+        var owner = Window.GetWindow(this);
+        if (!_vm.DeepSeek.HasKey)
+        {
+            MessageBox.Show(owner, "尚未配置 DeepSeek 密钥，请先前往“设置”中配置 API 密钥。", "AI 自动生词", MessageBoxButton.OK, MessageBoxImage.Information);
+            return;
+        }
+
+        var countText = AiCountBox.Text.Trim();
+        if (!int.TryParse(countText, out var targetCount) || targetCount is < 1 or > 50)
+        {
+            MessageBox.Show(owner, "请输入 1–50 之间的生词数量。", "AI 自动生词", MessageBoxButton.OK, MessageBoxImage.Warning);
+            return;
+        }
+
+        var selectedItem = AiLevelCombo.SelectedItem as ComboBoxItem;
+        var level = selectedItem?.Content?.ToString() ?? "CET-6";
+        var sourceName = $"AI-{level}";
+
+        AiGenerateButton.IsEnabled = false;
+        AiLevelCombo.IsEnabled = false;
+        AiCountBox.IsEnabled = false;
+        CancelAiGenerateButton.Visibility = Visibility.Visible;
+        AiStatusText.Visibility = Visibility.Visible;
+        AiProgressBar.Visibility = Visibility.Visible;
+        AiProgressBar.Maximum = targetCount;
+        AiProgressBar.Value = 0;
+        AiStatusText.Text = $"正在准备生成 {targetCount} 个 {level} 词条…";
+
+        _aiCancellation = new CancellationTokenSource();
+        var token = _aiCancellation.Token;
+
+        var addedCount = 0;
+        var skippedCount = 0;
+
+        try
+        {
+            var existingKeys = await Task.Run(() => _vm.Library.GetExistingWordKeys(_trackId), token);
+
+            for (var i = 1; i <= targetCount; i++)
+            {
+                token.ThrowIfCancellationRequested();
+                AiStatusText.Text = $"DeepSeek 正在生成第 {i}/{targetCount} 个 {level} 词条…";
+                AiProgressBar.Value = i - 1;
+
+                VocabularyWord word;
+                try
+                {
+                    word = await _vm.DeepSeek.GenerateRandomWordAsync(_vm.CurrentTrack, level, existingKeys, token);
+                }
+                catch (Exception ex) when (ex is not OperationCanceledException)
+                {
+                    AiStatusText.Text = $"生成第 {i} 个词条失败：{ex.Message}";
+                    await Task.Delay(1000, token);
+                    continue;
+                }
+
+                var trackId = _trackId;
+                var inserted = await Task.Run(() => _vm.Library.InsertAiGeneratedWord(trackId, sourceName, word), token);
+                if (inserted)
+                {
+                    addedCount++;
+                    existingKeys.Add(WordLibraryStore.Normalize(word.Word));
+                }
+                else
+                {
+                    skippedCount++;
+                }
+
+                AiProgressBar.Value = i;
+            }
+
+            _sourceId = _vm.GetWordbooks().FirstOrDefault(x => x.Name == sourceName)?.Id ?? _sourceId;
+            _statusMessage = $"AI 生词完成：已加入词书 {addedCount} 个 {level} 词条" + (skippedCount > 0 ? $"（跳过 {skippedCount} 个重复词）" : "") + "。";
+            AiStatusText.Text = _statusMessage;
+        }
+        catch (OperationCanceledException)
+        {
+            _statusMessage = $"AI 生词已暂停：已加入词书 {addedCount} 个 {level} 词条。";
+            AiStatusText.Text = _statusMessage;
+        }
+        catch (Exception ex)
+        {
+            _statusMessage = $"AI 生词出错：{ex.Message}";
+            AiStatusText.Text = _statusMessage;
+        }
+        finally
+        {
+            _aiCancellation?.Dispose();
+            _aiCancellation = null;
+            AiGenerateButton.IsEnabled = true;
+            AiLevelCombo.IsEnabled = true;
+            AiCountBox.IsEnabled = true;
+            CancelAiGenerateButton.Visibility = Visibility.Collapsed;
+            AiProgressBar.Visibility = Visibility.Collapsed;
+            Refresh();
+        }
+    }
+
+    private void CancelAiGenerate_Click(object sender, RoutedEventArgs e)
+    {
+        AiStatusText.Text = "正在暂停 AI 生词…";
+        _aiCancellation?.Cancel();
     }
 }

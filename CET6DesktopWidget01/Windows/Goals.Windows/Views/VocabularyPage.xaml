@@ -66,7 +66,7 @@
             <ListBox.ItemContainerStyle><Style TargetType="ListBoxItem" BasedOn="{StaticResource CleanListItem}"><Setter Property="Margin" Value="0,0,0,3"/></Style></ListBox.ItemContainerStyle>
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <Border x:Name="RowBorder" Style="{StaticResource Card}" Padding="10,7">
+                    <Border x:Name="RowBorder" Style="{StaticResource Card}" Padding="12,9">
                         <Grid>
                             <Grid.ColumnDefinitions><ColumnDefinition Width="170"/><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                             <StackPanel>
@@ -74,28 +74,25 @@
                                 <TextBlock Text="{Binding Pronunciation}" Margin="0,2,0,0" Foreground="{StaticResource MutedBrush}" FontSize="15"/>
                                 <TextBlock Text="{Binding Romanization}" Style="{StaticResource Caption}" Margin="0,1,0,0" FontSize="14"/>
                             </StackPanel>
-                            <StackPanel Grid.Column="1" Margin="0,0,8,0">
+                            <StackPanel Grid.Column="1" Margin="0,0,16,0">
                                 <TextBlock Text="{Binding PartOfSpeech}" FontWeight="SemiBold" TextWrapping="Wrap" FontSize="15"/>
-                                <Grid Margin="0,1,0,0">
-                                    <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-                                    <TextBox Text="{Binding Meaning, Mode=OneWay}" Style="{StaticResource SelectableVocabularyText}" Padding="4,2" FontSize="15" SelectionChanged="JapaneseText_SelectionChanged" ToolTip="选中日文后自动翻译为中文"/>
-                                    <Button Grid.Column="1" Content="译为中文" Padding="10,4" Margin="8,0,0,0" VerticalAlignment="Center" Tag="{Binding}" Click="TranslateRow_Click">
-                                        <Button.Style>
-                                            <Style TargetType="Button" BasedOn="{StaticResource SoftButton}">
-                                                <Setter Property="Visibility" Value="Collapsed"/>
-                                                <Style.Triggers><DataTrigger Binding="{Binding NeedsJapaneseTranslation}" Value="True"><Setter Property="Visibility" Value="Visible"/></DataTrigger></Style.Triggers>
-                                            </Style>
-                                        </Button.Style>
-                                    </Button>
-                                </Grid>
+                                <TextBox Text="{Binding Meaning, Mode=OneWay}" Style="{StaticResource SelectableVocabularyText}" Padding="4,2" FontSize="15" Margin="0,1,0,0" SelectionChanged="JapaneseText_SelectionChanged" ToolTip="选中日文后自动翻译为中文"/>
                                 <TextBlock x:Name="RowTranslation" Foreground="#2D6F55" FontSize="14" TextWrapping="Wrap" Margin="4,3,0,0" Visibility="Collapsed"/>
                                 <TextBox Text="{Binding Example, Mode=OneWay}" Style="{StaticResource SelectableVocabularyText}" Padding="4,1" FontSize="14" Margin="0,3,0,0" SelectionChanged="JapaneseText_SelectionChanged" ToolTip="选中日文后自动翻译为中文"/>
                                 <TextBox Text="{Binding ExampleTranslation, Mode=OneWay}" Style="{StaticResource SelectableVocabularyText}" Foreground="{StaticResource MutedBrush}" FontSize="13" Padding="4,1" Margin="0,1,0,0"/>
                                 <TextBlock Text="{Binding Tag}" Foreground="{StaticResource PlumBrush}" Margin="0,1,0,0" FontSize="13"/>
                             </StackPanel>
-                            <StackPanel Grid.Column="2" VerticalAlignment="Center">
-                                <CheckBox Content="选择" FontSize="15" Tag="{Binding}" VerticalAlignment="Center" Margin="0,0,0,8" Checked="WordSelectionCheckBox_Changed" Unchecked="WordSelectionCheckBox_Changed" Loaded="WordSelectionCheckBox_Loaded"/>
-                                <Button Content="删除" Style="{StaticResource SoftButton}" Padding="10,6" FontSize="14" Tag="{Binding}" Click="Delete_Click"/>
+                            <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                                <Button Content="译为中文" Padding="10,5" Margin="0,0,10,0" VerticalAlignment="Center" Tag="{Binding}" Click="TranslateRow_Click">
+                                    <Button.Style>
+                                        <Style TargetType="Button" BasedOn="{StaticResource SoftButton}">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                            <Style.Triggers><DataTrigger Binding="{Binding NeedsJapaneseTranslation}" Value="True"><Setter Property="Visibility" Value="Visible"/></DataTrigger></Style.Triggers>
+                                        </Style>
+                                    </Button.Style>
+                                </Button>
+                                <Button Content="删除" Style="{StaticResource SoftButton}" Padding="10,5" FontSize="14" Margin="0,0,12,0" VerticalAlignment="Center" Tag="{Binding}" Click="Delete_Click"/>
+                                <CheckBox Content="选择" FontSize="14" Tag="{Binding}" VerticalAlignment="Center" Checked="WordSelectionCheckBox_Changed" Unchecked="WordSelectionCheckBox_Changed" Loaded="WordSelectionCheckBox_Loaded"/>
                             </StackPanel>
                         </Grid>
                     </Border>
