@@ -15,6 +15,8 @@
                     <StackPanel x:Name="AnswerDetails" Visibility="Collapsed" Margin="0,22,0,0">
                         <Border x:Name="JudgmentBadge" HorizontalAlignment="Center" CornerRadius="7" Padding="11,5" Margin="0,0,0,12"><TextBlock x:Name="JudgmentText" FontWeight="SemiBold"/></Border>
                         <TextBlock x:Name="MeaningText" FontSize="21" FontWeight="SemiBold" TextAlignment="Center"/>
+                        <Button x:Name="TranslateButton" Content="译为中文" Style="{StaticResource SoftButton}" HorizontalAlignment="Center" Margin="0,14,0,0" Padding="14,6" Visibility="Collapsed" Click="Translate_Click"/>
+                        <TextBlock x:Name="MeaningTranslationText" FontSize="15" TextAlignment="Center" TextWrapping="Wrap" Margin="0,8,0,0" Foreground="#2D6F55" Visibility="Collapsed"/>
                         <TextBlock x:Name="MnemonicText" Foreground="{StaticResource MutedBrush}" TextAlignment="Center" Margin="0,12,0,0"/>
                         <TextBlock x:Name="ExampleText" FontSize="16" TextAlignment="Center" Margin="0,16,0,0"/>
                         <TextBlock x:Name="ExampleTranslationText" Foreground="{StaticResource MutedBrush}" TextAlignment="Center" Margin="0,6,0,0"/>

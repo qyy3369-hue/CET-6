@@ -36,6 +36,32 @@
 
                 <Border Style="{StaticResource Card}" Padding="22" Margin="0,14,0,0">
                     <StackPanel>
+                        <TextBlock Text="本地翻译模型" Style="{StaticResource SectionTitle}"/>
+                        <TextBlock Text="把导入的全日文词典释义离线翻译成中文，数据不出本机、断网也能用。" Style="{StaticResource Caption}" Margin="0,7,20,0" TextWrapping="Wrap"/>
+                        <Border Background="#F4F4F1" CornerRadius="7" Padding="14,12" Margin="0,14,0,0">
+                            <Grid>
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="110"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                                <TextBlock Text="模型" Style="{StaticResource Caption}" VerticalAlignment="Center"/>
+                                <TextBlock x:Name="LocalModelName" Grid.Column="1" FontWeight="SemiBold" TextWrapping="Wrap"/>
+                            </Grid>
+                        </Border>
+                        <Border Background="#F4F4F1" CornerRadius="7" Padding="14,12" Margin="0,8,0,0">
+                            <Grid>
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="110"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                                <TextBlock Text="状态" Style="{StaticResource Caption}" VerticalAlignment="Center"/>
+                                <TextBlock x:Name="LocalModelStatus" Grid.Column="1" TextWrapping="Wrap"/>
+                            </Grid>
+                        </Border>
+                        <WrapPanel Margin="0,14,0,0">
+                            <Button Content="打开模型文件夹" Style="{StaticResource SoftButton}" Click="OpenModelFolder_Click" Margin="0,0,8,0"/>
+                            <Button Content="重新检测" Style="{StaticResource SoftButton}" Click="RefreshLocalModel_Click"/>
+                        </WrapPanel>
+                        <TextBlock x:Name="LocalModelHelp" Style="{StaticResource Caption}" Margin="0,10,0,0" TextWrapping="Wrap"/>
+                    </StackPanel>
+                </Border>
+
+                <Border Style="{StaticResource Card}" Padding="22" Margin="0,14,0,0">
+                    <StackPanel>
                         <Grid>
                             <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                             <StackPanel>

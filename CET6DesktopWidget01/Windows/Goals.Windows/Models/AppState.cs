@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using System.Text.Json.Serialization;
+using Goals.Windows.Services;
 
 namespace Goals.Windows.Models;
 
@@ -83,6 +84,10 @@ public sealed class VocabularyWord
 
     [JsonIgnore]
     public string Pronunciation => !string.IsNullOrWhiteSpace(Reading) ? Reading : Phonetic;
+
+    [JsonIgnore]
+    public bool NeedsJapaneseTranslation =>
+        !string.IsNullOrWhiteSpace(Meaning) && LocalTranslationService.LooksLikeJapanese(Meaning);
 }
 
 public sealed class FlashcardProgress

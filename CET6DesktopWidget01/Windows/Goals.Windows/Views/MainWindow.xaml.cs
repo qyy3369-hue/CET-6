@@ -25,7 +25,7 @@ public partial class MainWindow : Window
         {
             if (_lastDailyWordDate == DateTime.Today || !_vm.IsLanguageStudy) return;
             _lastDailyWordDate = DateTime.Today;
-            _vm.EnsureDailyWords();
+            _vm.EnsureDailyWordsInBackground();
         };
         Loaded += (_, _) =>
         {
@@ -33,7 +33,7 @@ public partial class MainWindow : Window
             Navigate("goals");
             _dailyWordTimer.Start();
         };
-        Closed += (_, _) => { _dailyWordTimer.Stop(); _vm.StateChanged -= Vm_StateChanged; };
+        Closed += (_, _) => { _dailyWordTimer.Stop(); _vm.SaveNow(); _vm.StateChanged -= Vm_StateChanged; };
     }
 
     private void Vm_StateChanged(object? sender, EventArgs e) => Dispatcher.Invoke(SyncChrome);

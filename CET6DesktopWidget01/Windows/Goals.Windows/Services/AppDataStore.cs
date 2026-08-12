@@ -14,6 +14,7 @@ public sealed class AppDataStore
         PropertyNameCaseInsensitive = true,
         Converters = { new JsonStringEnumConverter() }
     };
+    private readonly object _saveLock = new();
 
     public string DataPath => Path.Combine(_directory, "study-data.json");
 
@@ -39,10 +40,36 @@ public sealed class AppDataStore
 
     public void Save(AppState state)
     {
-        Directory.CreateDirectory(_directory);
-        var temporary = DataPath + ".tmp";
-        File.WriteAllText(temporary, JsonSerializer.Serialize(state, _options));
-        File.Move(temporary, DataPath, true);
+        lock (_saveLock)
+        {
+            Directory.CreateDirectory(_directory);
+            var temporary = DataPath + ".tmp";
+            File.WriteAllText(temporary, JsonSerializer.Serialize(state, _options));
+            File.Move(temporary, DataPath, true);
+        }
+    }
+
+    /// <summary>
+    /// Serializes on the caller (UI) thread for a consistent snapshot, then writes
+    /// to disk in the background so frequent saves don't block interaction.
+    /// </summary>
+    public void SaveAsync(AppState state)
+    {
+        var json = JsonSerializer.Serialize(state, _options);
+        Task.Run(() =>
+        {
+            lock (_saveLock)
+            {
+                try
+                {
+                    Directory.CreateDirectory(_directory);
+                    var temporary = DataPath + ".tmp";
+                    File.WriteAllText(temporary, json);
+                    File.Move(temporary, DataPath, true);
+                }
+                catch { }
+            }
+        });
     }
 
     public void Reset()

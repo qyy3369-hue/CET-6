@@ -11,10 +11,10 @@ namespace Goals.Windows.Infrastructure;
 public static class SmoothScrollBehavior
 {
     // Applied at the main window, so every page shares one predictable scroll feel.
-    private const double WheelDistanceFactor = 0.86;
-    private const double MinimumWheelDistance = 68;
-    private const double MaximumWheelDistance = 126;
-    private const int ScrollAnimationMilliseconds = 130;
+    private const double WheelDistanceFactor = 1.0;
+    private const double MinimumWheelDistance = 60;
+    private const double MaximumWheelDistance = 140;
+    private const int ScrollAnimationMilliseconds = 100;
 
     private static readonly DependencyProperty AnimatedOffsetProperty = DependencyProperty.RegisterAttached(
         "AnimatedOffset",

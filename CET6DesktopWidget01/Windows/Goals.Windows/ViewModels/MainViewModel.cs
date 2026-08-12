@@ -13,23 +13,25 @@ public sealed class MainViewModel : ObservableObject
     private PlanSheet _currentPlan;
     private string _currentPage = "goals";
 
-    public MainViewModel(AppState state, AppDataStore store, DeepSeekService deepSeek, WordLibraryStore library)
+    public MainViewModel(AppState state, AppDataStore store, DeepSeekService deepSeek, WordLibraryStore library, LocalTranslationService localTranslation)
     {
         State = state;
         _store = store;
         DeepSeek = deepSeek;
         Library = library;
+        LocalTranslation = localTranslation;
         _currentTrack = state.Tracks.FirstOrDefault(x => x.Id == state.CurrentTrackId) ?? state.Tracks[0];
         if (_currentTrack.Plans.Count == 0) _currentTrack.Plans.Add(new PlanSheet());
         _currentPlan = _currentTrack.Plans[0];
         if (_currentTrack.Mode is LearningMode.English or LearningMode.Japanese)
-            Library.EnsureDailyWords(_currentTrack.Id, DateTime.Today);
+            EnsureDailyWordsInBackground();
     }
 
     public event EventHandler? StateChanged;
     public AppState State { get; }
     public DeepSeekService DeepSeek { get; }
     public WordLibraryStore Library { get; }
+    public LocalTranslationService LocalTranslation { get; }
     public ObservableCollection<StudyTrack> Tracks => State.Tracks;
 
     public StudyTrack CurrentTrack
@@ -43,7 +45,7 @@ public sealed class MainViewModel : ObservableObject
             if (value.Plans.Count == 0) value.Plans.Add(new PlanSheet());
             CurrentPlan = value.Plans[0];
             if (value.Mode is LearningMode.English or LearningMode.Japanese)
-                Library.EnsureDailyWords(value.Id, DateTime.Today);
+                EnsureDailyWordsInBackground();
             if (value.Mode == LearningMode.Japanese && CurrentPage is "translation" or "writing" or "roots")
                 CurrentPage = "goals";
             if (value.Mode == LearningMode.Other && CurrentPage is "wordbooks" or "words" or "translation" or "writing" or "roots" or "flashcards" or "mistakes")
@@ -65,10 +67,7 @@ public sealed class MainViewModel : ObservableObject
     public string CurrentPage
     {
         get => _currentPage;
-        set
-        {
-            if (Set(ref _currentPage, value)) Refresh();
-        }
+        set { Set(ref _currentPage, value); }
     }
 
     public bool IsJapanese => CurrentTrack.Mode == LearningMode.Japanese;
@@ -298,6 +297,63 @@ public sealed class MainViewModel : ObservableObject
         Refresh();
     }
 
+    /// <summary>
+    /// Translates Japanese text (dictionary glosses) to Chinese. Prefers the
+    /// offline local model; falls back to DeepSeek when no model is available.
+    /// Returns null when neither engine can serve the request.
+    /// </summary>
+    public async Task<TranslationResult?> TranslateJapaneseAsync(string text, CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(text)) return null;
+        if (LocalTranslation.ModelFound || LocalTranslation.IsLoaded)
+        {
+            try
+            {
+                var local = await LocalTranslation.TranslateAsync(text, cancellationToken);
+                if (!string.IsNullOrWhiteSpace(local)) return new TranslationResult(local, "本地模型");
+            }
+            catch (OperationCanceledException) { throw; }
+            catch { }
+        }
+        if (DeepSeek.HasKey)
+        {
+            try
+            {
+                var result = await DeepSeek.TranslateJapaneseSelectionAsync(text, cancellationToken);
+                if (!string.IsNullOrWhiteSpace(result)) return new TranslationResult(result.Trim(), "DeepSeek");
+            }
+            catch (OperationCanceledException) { throw; }
+            catch { }
+        }
+        return null;
+    }
+
+    public async Task<TranslationResult?> TranslateJapaneseLocalAsync(string text, CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(text)) return null;
+        try
+        {
+            var local = await LocalTranslation.TranslateAsync(text, cancellationToken);
+            if (!string.IsNullOrWhiteSpace(local)) return new TranslationResult(local, "本地模型");
+        }
+        catch (OperationCanceledException) { throw; }
+        catch { }
+        return null;
+    }
+
+    public async Task<TranslationResult?> TranslateJapaneseWithDeepSeekAsync(string text, CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(text) || !DeepSeek.HasKey) return null;
+        try
+        {
+            var result = await DeepSeek.TranslateJapaneseSelectionAsync(text, cancellationToken);
+            if (!string.IsNullOrWhiteSpace(result)) return new TranslationResult(result.Trim(), "DeepSeek");
+        }
+        catch (OperationCanceledException) { throw; }
+        catch { }
+        return null;
+    }
+
     public WordLibraryPage QueryVocabulary(string query, int offset = 0, int limit = WordLibraryStore.PageSize)
     {
         query = query.Trim();
@@ -386,6 +442,12 @@ public sealed class MainViewModel : ObservableObject
         return result;
     }
 
+    public void EnsureDailyWordsInBackground()
+    {
+        var trackId = CurrentTrack.Id;
+        Task.Run(() => Library.EnsureDailyWords(trackId, DateTime.Today));
+    }
+
     public void DeleteWordbook(WordbookInfo wordbook)
     {
         Library.DeleteWordbook(wordbook.Id);
@@ -395,8 +457,13 @@ public sealed class MainViewModel : ObservableObject
 
     public void SaveAndRefresh()
     {
-        _store.Save(State);
         Refresh();
+        _store.SaveAsync(State);
+    }
+
+    public void SaveNow()
+    {
+        _store.Save(State);
     }
 
     public void Refresh()
@@ -414,3 +481,5 @@ public sealed class MainViewModel : ObservableObject
         StateChanged?.Invoke(this, EventArgs.Empty);
     }
 }
+
+public sealed record TranslationResult(string Text, string Engine);

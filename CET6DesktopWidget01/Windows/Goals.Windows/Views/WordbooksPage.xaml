@@ -5,7 +5,9 @@
         <Style x:Key="SelectableDictionaryText" TargetType="TextBox">
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Padding" Value="8,5"/>
+            <Setter Property="MinHeight" Value="28"/>
+            <Setter Property="FontSize" Value="15"/>
             <Setter Property="IsReadOnly" Value="True"/>
             <Setter Property="IsReadOnlyCaretVisible" Value="False"/>
             <Setter Property="TextWrapping" Value="Wrap"/>
@@ -14,7 +16,7 @@
             <Setter Property="Cursor" Value="IBeam"/>
         </Style>
     </UserControl.Resources>
-    <Grid Margin="36,26,36,34">
+    <Grid Margin="36,18,36,28">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
@@ -25,56 +27,47 @@
 
         <StackPanel>
             <TextBlock Text="词书" Style="{StaticResource PageTitle}"/>
-            <TextBlock Text="完整词库放在这里；单词本只保留你当前要背的词。" Style="{StaticResource Caption}" FontSize="15" Margin="0,5,0,16"/>
+            <TextBlock Text="完整词库放在这里；单词本只保留你当前要背的词。" Style="{StaticResource Caption}" FontSize="15" Margin="0,4,0,12"/>
         </StackPanel>
 
-        <Border Grid.Row="1" Style="{StaticResource Card}" Padding="16" Margin="0,0,0,12">
-            <Grid>
-                <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/><ColumnDefinition/><ColumnDefinition Width="Auto"/><ColumnDefinition/></Grid.ColumnDefinitions>
-                <StackPanel Orientation="Horizontal"><Border Width="26" Height="26" CornerRadius="7" Background="{StaticResource NavyBrush}"><TextBlock Text="1" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold"/></Border><StackPanel Margin="9,0,0,0"><TextBlock Text="导入完整词书" FontWeight="SemiBold"/><TextBlock Text="支持大容量本地词典" Style="{StaticResource Caption}"/></StackPanel></StackPanel>
-                <TextBlock Grid.Column="1" Text="→" Margin="14,0" VerticalAlignment="Center" Foreground="{StaticResource MutedBrush}" FontSize="18"/>
-                <StackPanel Grid.Column="2" Orientation="Horizontal"><Border Width="26" Height="26" CornerRadius="7" Background="{StaticResource PlumBrush}"><TextBlock Text="2" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold"/></Border><StackPanel Margin="9,0,0,0"><TextBlock Text="自动抽取或点亮星标" FontWeight="SemiBold"/><TextBlock Text="选中的词进入单词本" Style="{StaticResource Caption}"/></StackPanel></StackPanel>
-                <TextBlock Grid.Column="3" Text="→" Margin="14,0" VerticalAlignment="Center" Foreground="{StaticResource MutedBrush}" FontSize="18"/>
-                <StackPanel Grid.Column="4" Orientation="Horizontal"><Border Width="26" Height="26" CornerRadius="7" Background="#388E7D"><TextBlock Text="3" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold"/></Border><StackPanel Margin="9,0,0,0"><TextBlock Text="进入闪卡记忆曲线" FontWeight="SemiBold"/><TextBlock Text="只复习单词本中的词" Style="{StaticResource Caption}"/></StackPanel></StackPanel>
-            </Grid>
-        </Border>
-
-        <Grid Grid.Row="2" Margin="0,0,0,12">
+        <Grid Grid.Row="2" Margin="0,0,0,10">
             <Grid.ColumnDefinitions><ColumnDefinition Width="0.85*"/><ColumnDefinition Width="12"/><ColumnDefinition Width="1.15*"/></Grid.ColumnDefinitions>
-            <Border Style="{StaticResource Card}" Padding="17">
+            <Border Style="{StaticResource Card}" Padding="13">
                 <Grid>
                     <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                     <StackPanel>
-                        <TextBlock Text="每日自动加入单词本" FontWeight="SemiBold" FontSize="16"/>
-                        <TextBlock Text="每天只抽取尚未加入的词；重启不会重复。当天调高数量会立即补足。" Style="{StaticResource Caption}" TextWrapping="Wrap" Margin="0,5,16,0"/>
+                        <TextBlock Text="每日自动加入单词本" FontWeight="SemiBold" FontSize="15"/>
+                        <TextBlock Text="每天只抽取尚未加入的词；重启不会重复。当天调高数量会立即补足。" Style="{StaticResource Caption}" TextWrapping="Wrap" Margin="0,4,16,0"/>
                     </StackPanel>
                     <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                        <TextBox x:Name="DailyCountBox" Width="78"/>
-                        <TextBlock Text="词/天" VerticalAlignment="Center" Margin="8,0,10,0"/>
-                        <Button Content="保存" Style="{StaticResource PrimaryButton}" Padding="15,9" Click="SaveDailyCount_Click"/>
+                        <TextBox x:Name="DailyCountBox" Width="72"/>
+                        <TextBlock Text="词/天" VerticalAlignment="Center" Margin="7,0,9,0"/>
+                        <Button Content="保存" Style="{StaticResource PrimaryButton}" Padding="14,8" Click="SaveDailyCount_Click"/>
                     </StackPanel>
                 </Grid>
             </Border>
 
-            <Border Grid.Column="2" Style="{StaticResource Card}" Padding="17">
+            <Border Grid.Column="2" Style="{StaticResource Card}" Padding="13">
                 <Grid>
                     <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                     <StackPanel Margin="0,0,18,0">
-                        <TextBlock Text="导入本地词书" FontWeight="SemiBold" FontSize="16"/>
-                        <TextBlock Text="支持 JSON、MDX、MDD、CSS。CSS 和 MDD 会自动匹配配套 MDX；大词书分批保存并支持断点续传。" Style="{StaticResource Caption}" TextWrapping="Wrap" Margin="0,5,0,0"/>
-                        <TextBlock x:Name="ImportFileText" Text="尚未选择文件" Style="{StaticResource Caption}" Margin="0,6,0,0" TextTrimming="CharacterEllipsis"/>
-                        <ProgressBar x:Name="ImportProgressBar" Height="5" Margin="0,8,0,0" Visibility="Collapsed"/>
+                        <TextBlock Text="导入本地词书" FontWeight="SemiBold" FontSize="15"/>
+                        <TextBlock Text="支持 JSON、MDX、MDD、CSS。CSS 和 MDD 会自动匹配配套 MDX；大词书分批保存并支持断点续传。" Style="{StaticResource Caption}" TextWrapping="Wrap" Margin="0,4,0,0"/>
+                        <TextBlock x:Name="ImportFileText" Text="尚未选择文件" Style="{StaticResource Caption}" Margin="0,5,0,0" TextTrimming="CharacterEllipsis"/>
+                        <ProgressBar x:Name="ImportProgressBar" Height="5" Margin="0,7,0,0" Visibility="Collapsed"/>
                     </StackPanel>
                     <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                        <Button x:Name="CancelImportButton" Content="暂停" Style="{StaticResource SoftButton}" Padding="13,9" Margin="0,0,7,0" Visibility="Collapsed" Click="CancelImport_Click"/>
-                        <Button x:Name="ImportButton" Content="↓ 选择并导入" Style="{StaticResource PrimaryButton}" Padding="16,10" Click="Import_Click"/>
+                        <Button x:Name="CancelImportButton" Content="暂停" Style="{StaticResource SoftButton}" Padding="12,8" Margin="0,0,7,0" Visibility="Collapsed" Click="CancelImport_Click"/>
+                        <Button x:Name="ImportButton" Content="↓ 选择并导入" Style="{StaticResource PrimaryButton}" Padding="15,9" Click="Import_Click"/>
                     </StackPanel>
                 </Grid>
             </Border>
         </Grid>
 
         <Grid Grid.Row="3" Margin="2,0,2,10">
+            <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
             <TextBlock x:Name="StatusText" Style="{StaticResource Caption}" TextWrapping="Wrap"/>
+            <ProgressBar x:Name="RefreshingBar" Grid.Row="1" Height="3" Margin="0,7,0,0" IsIndeterminate="True" Visibility="Collapsed" HorizontalAlignment="Stretch"/>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                 <TextBlock x:Name="PageText" Style="{StaticResource Caption}" VerticalAlignment="Center" Margin="0,0,10,0"/>
                 <Button x:Name="PreviousPageButton" Content="‹ 上一页" Style="{StaticResource SoftButton}" Padding="10,5" Margin="0,0,6,0" Click="PreviousPage_Click"/>
@@ -83,7 +76,7 @@
         </Grid>
 
         <Grid Grid.Row="4">
-            <Grid.ColumnDefinitions><ColumnDefinition Width="280"/><ColumnDefinition Width="14"/><ColumnDefinition/></Grid.ColumnDefinitions>
+            <Grid.ColumnDefinitions><ColumnDefinition Width="260"/><ColumnDefinition Width="14"/><ColumnDefinition/></Grid.ColumnDefinitions>
             <Border Style="{StaticResource Card}" Padding="14">
                 <Grid>
                     <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
@@ -126,7 +119,7 @@
                         <Grid>
                             <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                             <StackPanel>
-                                <TextBlock Text="DeepSeek 选中翻译" FontWeight="SemiBold" Foreground="{StaticResource NavyBrush}"/>
+                                <TextBlock Text="日语选中翻译" FontWeight="SemiBold" Foreground="{StaticResource NavyBrush}"/>
                                 <TextBlock x:Name="SelectedJapaneseText" Margin="0,5,0,0" Foreground="{StaticResource MutedBrush}" TextWrapping="Wrap"/>
                                 <TextBlock x:Name="SelectedTranslationText" Margin="0,5,0,0" TextWrapping="Wrap"/>
                             </StackPanel>
@@ -134,33 +127,56 @@
                         </Grid>
                     </Border>
                     <ListBox x:Name="EntryList" Grid.Row="2" Background="Transparent" BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-                        <ListBox.ItemContainerStyle><Style TargetType="ListBoxItem" BasedOn="{StaticResource CleanListItem}"><Setter Property="Margin" Value="0,0,0,8"/></Style></ListBox.ItemContainerStyle>
+                        <ListBox.ItemContainerStyle><Style TargetType="ListBoxItem" BasedOn="{StaticResource CleanListItem}"><Setter Property="Margin" Value="0,0,0,3"/></Style></ListBox.ItemContainerStyle>
                         <ListBox.ItemTemplate>
                             <DataTemplate>
-                                <Border Style="{StaticResource Card}" Padding="17">
+                                <Border x:Name="RowBorder" Style="{StaticResource Card}" Padding="10,7">
                                     <Grid>
-                                        <Grid.ColumnDefinitions><ColumnDefinition Width="220"/><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                        <Grid.ColumnDefinitions><ColumnDefinition Width="170"/><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                                         <StackPanel>
-                                            <TextBlock Text="{Binding Word.Word}" FontFamily="{StaticResource SerifFont}" FontSize="23" FontWeight="SemiBold" TextWrapping="Wrap"/>
-                                            <TextBlock Text="{Binding Word.Pronunciation}" Foreground="{StaticResource MutedBrush}" Margin="0,5,0,0" TextWrapping="Wrap"/>
-                                            <TextBlock Text="{Binding Word.Romanization}" Style="{StaticResource Caption}" Margin="0,2,0,0" TextWrapping="Wrap"/>
+                                            <TextBlock Text="{Binding Word.Word}" FontFamily="{StaticResource SerifFont}" FontSize="22" FontWeight="SemiBold" TextWrapping="Wrap"/>
+                                            <TextBlock Text="{Binding Word.Pronunciation}" Foreground="{StaticResource MutedBrush}" Margin="0,2,0,0" TextWrapping="Wrap" FontSize="15"/>
+                                            <TextBlock Text="{Binding Word.Romanization}" Style="{StaticResource Caption}" Margin="0,1,0,0" TextWrapping="Wrap" FontSize="14"/>
                                         </StackPanel>
-                                        <StackPanel Grid.Column="1" Margin="0,0,16,0">
-                                            <TextBlock Text="{Binding Word.PartOfSpeech}" FontWeight="SemiBold" TextWrapping="Wrap"/>
-                                            <TextBox Text="{Binding Word.Meaning, Mode=OneWay}" Style="{StaticResource SelectableDictionaryText}" Margin="0,3,0,0" SelectionChanged="JapaneseText_SelectionChanged" ToolTip="选中日文后自动翻译为中文"/>
-                                            <TextBox Text="{Binding Word.Example, Mode=OneWay}" Style="{StaticResource SelectableDictionaryText}" Margin="0,8,0,0" SelectionChanged="JapaneseText_SelectionChanged" ToolTip="选中日文后自动翻译为中文"/>
-                                            <TextBox Text="{Binding Word.ExampleTranslation, Mode=OneWay}" Style="{StaticResource SelectableDictionaryText}" Foreground="{StaticResource MutedBrush}" FontSize="13" Margin="0,3,0,0"/>
-                                            <TextBlock Text="{Binding Word.Tag}" Foreground="{StaticResource PlumBrush}" Margin="0,7,0,0"/>
+                                        <StackPanel Grid.Column="1" Margin="0,0,8,0">
+                                            <TextBlock Text="{Binding Word.PartOfSpeech}" FontWeight="SemiBold" TextWrapping="Wrap" FontSize="15"/>
+                                            <Grid Margin="0,1,0,0">
+                                                <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                                <TextBox Text="{Binding Word.Meaning, Mode=OneWay}" Style="{StaticResource SelectableDictionaryText}" Padding="4,2" FontSize="15" SelectionChanged="JapaneseText_SelectionChanged" ToolTip="选中日文后自动翻译为中文"/>
+                                                <Button Grid.Column="1" Content="译为中文" Padding="10,4" Margin="8,0,0,0" VerticalAlignment="Center" Tag="{Binding Word}" Click="TranslateRow_Click">
+                                                    <Button.Style>
+                                                        <Style TargetType="Button" BasedOn="{StaticResource SoftButton}">
+                                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                                            <Style.Triggers><DataTrigger Binding="{Binding Word.NeedsJapaneseTranslation}" Value="True"><Setter Property="Visibility" Value="Visible"/></DataTrigger></Style.Triggers>
+                                                        </Style>
+                                                    </Button.Style>
+                                                </Button>
+                                            </Grid>
+                                            <TextBlock x:Name="RowTranslation" Foreground="#2D6F55" FontSize="14" TextWrapping="Wrap" Margin="4,3,0,0" Visibility="Collapsed"/>
+                                            <TextBox Text="{Binding Word.Example, Mode=OneWay}" Style="{StaticResource SelectableDictionaryText}" Padding="4,1" FontSize="14" Margin="0,3,0,0" SelectionChanged="JapaneseText_SelectionChanged" ToolTip="选中日文后自动翻译为中文"/>
+                                            <TextBox Text="{Binding Word.ExampleTranslation, Mode=OneWay}" Style="{StaticResource SelectableDictionaryText}" Foreground="{StaticResource MutedBrush}" FontSize="13" Padding="4,1" Margin="0,1,0,0"/>
+                                            <TextBlock Text="{Binding Word.Tag}" Foreground="{StaticResource PlumBrush}" Margin="0,1,0,0" FontSize="13"/>
                                         </StackPanel>
-                                        <Button Grid.Column="2" VerticalAlignment="Center" Content="{Binding StarText, Mode=OneWay}" ToolTip="{Binding StarHint, Mode=OneWay}" Tag="{Binding Mode=OneWay}" Click="StudyStar_Click">
-                                            <Button.Style>
-                                                <Style TargetType="Button" BasedOn="{StaticResource SoftButton}">
-                                                    <Setter Property="Foreground" Value="#77756F"/>
-                                                    <Setter Property="Width" Value="48"/><Setter Property="Height" Value="48"/><Setter Property="Padding" Value="0"/><Setter Property="FontSize" Value="27"/>
-                                                    <Style.Triggers><DataTrigger Binding="{Binding IsActive, Mode=OneWay}" Value="True"><Setter Property="Foreground" Value="#A97918"/><Setter Property="Background" Value="#FFF5D8"/><Setter Property="BorderBrush" Value="#E5C467"/></DataTrigger></Style.Triggers>
-                                                </Style>
-                                            </Button.Style>
-                                        </Button>
+                                        <StackPanel Grid.Column="2" VerticalAlignment="Center">
+                                            <Button Content="{Binding StarText, Mode=OneWay}" ToolTip="{Binding StarHint, Mode=OneWay}" Tag="{Binding Mode=OneWay}" Click="StudyStar_Click">
+                                                <Button.Style>
+                                                    <Style TargetType="Button" BasedOn="{StaticResource SoftButton}">
+                                                        <Setter Property="Foreground" Value="#77756F"/>
+                                                        <Setter Property="Width" Value="46"/><Setter Property="Height" Value="46"/><Setter Property="Padding" Value="0"/><Setter Property="FontSize" Value="26"/>
+                                                        <Style.Triggers><DataTrigger Binding="{Binding IsActive, Mode=OneWay}" Value="True"><Setter Property="Foreground" Value="#A97918"/><Setter Property="Background" Value="#FFF5D8"/><Setter Property="BorderBrush" Value="#E5C467"/></DataTrigger></Style.Triggers>
+                                                    </Style>
+                                                </Button.Style>
+                                            </Button>
+                                            <TextBlock HorizontalAlignment="Center" Margin="0,3,0,0" FontSize="12">
+                                                <TextBlock.Style>
+                                                    <Style TargetType="TextBlock">
+                                                        <Setter Property="Text" Value="加入"/>
+                                                        <Setter Property="Foreground" Value="{StaticResource MutedBrush}"/>
+                                                        <Style.Triggers><DataTrigger Binding="{Binding IsActive, Mode=OneWay}" Value="True"><Setter Property="Text" Value="已加入"/><Setter Property="Foreground" Value="#A97918"/></DataTrigger></Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                            </TextBlock>
+                                        </StackPanel>
                                     </Grid>
                                 </Border>
                             </DataTemplate>

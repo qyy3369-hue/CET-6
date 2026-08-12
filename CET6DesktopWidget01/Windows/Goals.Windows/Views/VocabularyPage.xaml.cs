@@ -1,5 +1,7 @@
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
+using System.Windows.Threading;
 using Goals.Windows.Models;
 using Goals.Windows.Services;
 using Goals.Windows.ViewModels;
@@ -20,6 +22,9 @@ public partial class VocabularyPage : UserControl
     private CancellationTokenSource? _selectionTranslationCancellation;
     private string _lastSelectedJapanese = "";
     private int _translationRequestVersion;
+    private int _refreshRequestVersion;
+    private readonly Dictionary<string, bool> _rowTranslateUsedDeepSeek = [];
+    private readonly DispatcherTimer _searchDebounce = new() { Interval = TimeSpan.FromMilliseconds(300) };
 
     public VocabularyPage(MainViewModel vm, MainWindow main)
     {
@@ -27,6 +32,13 @@ public partial class VocabularyPage : UserControl
         _vm = vm;
         _main = main;
         Focusable = true;
+        _searchDebounce.Tick += (_, _) =>
+        {
+            _searchDebounce.Stop();
+            _page = 0;
+            _selectedWordIds.Clear();
+            Refresh();
+        };
         Loaded += Page_Loaded;
         Unloaded += Page_Unloaded;
     }
@@ -48,6 +60,7 @@ public partial class VocabularyPage : UserControl
 
     private void Page_Unloaded(object sender, RoutedEventArgs e)
     {
+        _searchDebounce.Stop();
         if (_isStateSubscribed)
         {
             _vm.StateChanged -= Changed;
@@ -63,23 +76,42 @@ public partial class VocabularyPage : UserControl
         if (!_isBulkDeleting) Refresh();
     });
 
-    private void Refresh()
+    private void Refresh() => _ = RefreshAsync();
+
+    private async Task RefreshAsync()
     {
+        var requestVersion = ++_refreshRequestVersion;
+        _rowTranslateUsedDeepSeek.Clear();
         var query = SearchBox.Text?.Trim() ?? "";
-        var result = _vm.QueryVocabulary(query, _page * VocabularyPageSize, VocabularyPageSize);
-        var pageCount = Math.Max(1, (int)Math.Ceiling(result.Total / (double)VocabularyPageSize));
-        if (_page >= pageCount)
+        var page = _page;
+        WordLibraryPage? snapshot;
+        try
         {
-            _page = pageCount - 1;
-            result = _vm.QueryVocabulary(query, _page * VocabularyPageSize, VocabularyPageSize);
+            snapshot = await Task.Run(() => _vm.QueryVocabulary(query, page * VocabularyPageSize, VocabularyPageSize));
         }
+        catch { return; }
+        if (!IsLoaded || requestVersion != _refreshRequestVersion) return;
+
+        var result = snapshot;
+        var pageCount = Math.Max(1, (int)Math.Ceiling(result.Total / (double)VocabularyPageSize));
+        if (page >= pageCount)
+        {
+            page = pageCount - 1;
+            try
+            {
+                result = await Task.Run(() => _vm.QueryVocabulary(query, page * VocabularyPageSize, VocabularyPageSize));
+            }
+            catch { return; }
+            if (!IsLoaded || requestVersion != _refreshRequestVersion) return;
+        }
+        _page = page;
         _visibleWords = result.Words;
         _selectedWordIds.IntersectWith(_visibleWords.Select(word => word.Id));
         WordList.ItemsSource = result.Words;
         Subtitle.Text = _vm.IsJapanese
             ? "当前重点词 · JLPT N4 假名、罗马音与例句 · 闪卡只从这里取词"
             : "当前重点词 · CET-6 音标、搭配与例句 · 闪卡只从这里取词";
-        Status.Text = $"单词本共 {result.Total:N0} 词 · 收藏 {result.FavoriteCount:N0} 词 · 本页 {result.Words.Count} 词";
+        Status.Text = $"单词本共 {result.Total:N0} 词 · 本页 {result.Words.Count} 词";
         PageText.Text = $"第 {_page + 1:N0} / {pageCount:N0} 页";
         PreviousPageButton.IsEnabled = _page > 0;
         NextPageButton.IsEnabled = _page + 1 < pageCount;
@@ -90,9 +122,8 @@ public partial class VocabularyPage : UserControl
     private void SearchBox_TextChanged(object sender, TextChangedEventArgs e)
     {
         if (!IsLoaded) return;
-        _page = 0;
-        _selectedWordIds.Clear();
-        Refresh();
+        _searchDebounce.Stop();
+        _searchDebounce.Start();
     }
 
     private async void AddButton_Click(object sender, RoutedEventArgs e)
@@ -130,35 +161,86 @@ public partial class VocabularyPage : UserControl
         Refresh();
     }
 
-    private void FavoriteButton_Loaded(object sender, RoutedEventArgs e)
-    {
-        if (sender is not Button button || button.Tag is not VocabularyWord word) return;
-        var favorite = _vm.IsFavorite(word);
-        button.Content = favorite ? "★" : "☆";
-        button.Foreground = favorite ? System.Windows.Media.Brushes.Black : System.Windows.Media.Brushes.DimGray;
-        button.ToolTip = favorite ? "已收藏，点击取消收藏" : "收藏";
-    }
-
-    private void Favorite_Click(object sender, RoutedEventArgs e)
-    {
-        if ((sender as Button)?.Tag is not VocabularyWord word) return;
-        _vm.ToggleFavorite(word);
-    }
-
     private void WordSelectionCheckBox_Loaded(object sender, RoutedEventArgs e)
     {
         if (sender is not CheckBox checkBox || checkBox.Tag is not VocabularyWord word) return;
+        var selected = _selectedWordIds.Contains(word.Id);
         _syncingSelection = true;
-        checkBox.IsChecked = _selectedWordIds.Contains(word.Id);
+        checkBox.IsChecked = selected;
         _syncingSelection = false;
+        ApplyRowSelectionVisual(checkBox, selected);
     }
 
     private void WordSelectionCheckBox_Changed(object sender, RoutedEventArgs e)
     {
         if (_syncingSelection || (sender as CheckBox)?.Tag is not VocabularyWord word) return;
-        if ((sender as CheckBox)?.IsChecked == true) _selectedWordIds.Add(word.Id);
+        var selected = (sender as CheckBox)?.IsChecked == true;
+        if (selected) _selectedWordIds.Add(word.Id);
         else _selectedWordIds.Remove(word.Id);
+        ApplyRowSelectionVisual(sender, selected);
         UpdateSelectionControls();
+    }
+
+    private static void ApplyRowSelectionVisual(object source, bool selected)
+    {
+        var root = FindRowRoot(source);
+        if (root is not Border border) return;
+        if (selected)
+        {
+            border.Background = new SolidColorBrush(Color.FromRgb(241, 246, 252));
+            border.BorderBrush = new SolidColorBrush(Color.FromRgb(176, 199, 228));
+        }
+        else
+        {
+            border.ClearValue(Border.BackgroundProperty);
+            border.ClearValue(Border.BorderBrushProperty);
+        }
+    }
+
+    private static FrameworkElement? FindRowRoot(object source)
+    {
+        var current = source as DependencyObject;
+        while (current is not null)
+        {
+            if (current is FrameworkElement { Name: "RowBorder" } element) return element;
+            current = VisualTreeHelper.GetParent(current);
+        }
+        return null;
+    }
+
+    private async void TranslateRow_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is not Button button || button.Tag is not VocabularyWord word) return;
+        var root = FindRowRoot(button);
+        var rowText = root?.FindName("RowTranslation") as TextBlock;
+        var useDeepSeek = _rowTranslateUsedDeepSeek.TryGetValue(word.Id, out var used) && used;
+        button.IsEnabled = false;
+        button.Content = "翻译中…";
+        if (rowText is not null)
+        {
+            rowText.Visibility = Visibility.Visible;
+            rowText.Text = "正在翻译…";
+        }
+        try
+        {
+            var result = useDeepSeek
+                ? await _vm.TranslateJapaneseWithDeepSeekAsync(word.Meaning)
+                : await _vm.TranslateJapaneseLocalAsync(word.Meaning);
+            _rowTranslateUsedDeepSeek[word.Id] = true;
+            if (rowText is not null)
+                rowText.Text = result is null
+                    ? (useDeepSeek ? "DeepSeek 未能翻译（未配置密钥或失败）。" : "本地模型无法翻译此释义。")
+                    : $"中文：{result.Text}（{result.Engine}）";
+            button.Content = useDeepSeek ? "重译" : "用 DeepSeek 重译";
+        }
+        catch (Exception ex)
+        {
+            if (rowText is not null) rowText.Text = "翻译失败：" + ex.Message;
+        }
+        finally
+        {
+            button.IsEnabled = true;
+        }
     }
 
     private void SelectAllCheckBox_Changed(object sender, RoutedEventArgs e)
@@ -229,22 +311,26 @@ public partial class VocabularyPage : UserControl
 
         SelectionTranslationPanel.Visibility = Visibility.Visible;
         SelectedJapaneseText.Text = $"日文：{selected}";
-        SelectedTranslationText.Text = _vm.DeepSeek.HasKey
-            ? "正在通过 DeepSeek 翻译…"
-            : "尚未配置 DeepSeek 密钥，请先到“设置”页面保存密钥。";
-        if (!_vm.DeepSeek.HasKey) return;
+        var canTranslate = _vm.LocalTranslation.ModelFound || _vm.LocalTranslation.IsLoaded || _vm.DeepSeek.HasKey;
+        SelectedTranslationText.Text = canTranslate
+            ? "正在翻译…"
+            : "暂无可用翻译：需要本地模型或 DeepSeek 密钥。";
+        if (!canTranslate) return;
 
         try
         {
             await Task.Delay(360, cancellation.Token);
-            var translation = await _vm.DeepSeek.TranslateJapaneseSelectionAsync(selected, cancellation.Token);
+            var result = await _vm.TranslateJapaneseAsync(selected, cancellation.Token);
             if (cancellation.IsCancellationRequested || requestVersion != _translationRequestVersion) return;
-            SelectedTranslationText.Text = $"中文：{translation.Trim()}";
+            SelectedTranslationText.Text = result is null
+                ? "暂时无法翻译，请检查本地模型或 DeepSeek 密钥。"
+                : $"中文：{result.Text}（{result.Engine}）";
         }
         catch (OperationCanceledException) { }
         catch (Exception ex)
         {
-            if (requestVersion == _translationRequestVersion) SelectedTranslationText.Text = ex.Message;
+            if (ex is ObjectDisposedException || requestVersion != _translationRequestVersion) return;
+            SelectedTranslationText.Text = ex.Message;
         }
     }
 

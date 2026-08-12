@@ -9,6 +9,7 @@ namespace Goals.Windows;
 public partial class App : Application
 {
     private Mutex? _singleInstanceMutex;
+    private LocalTranslationService? _localTranslation;
     private readonly HashSet<string> _shownUnhandledErrors = new(StringComparer.Ordinal);
     public MainViewModel ViewModel { get; private set; } = null!;
 
@@ -34,7 +35,9 @@ public partial class App : Application
 
         var store = new AppDataStore();
         var state = store.Load();
-        ViewModel = new MainViewModel(state, store, new DeepSeekService(new WindowsCredentialStore()), new WordLibraryStore());
+        var localTranslation = new LocalTranslationService();
+        _localTranslation = localTranslation;
+        ViewModel = new MainViewModel(state, store, new DeepSeekService(new WindowsCredentialStore()), new WordLibraryStore(), localTranslation);
 
         var main = new MainWindow(ViewModel);
         MainWindow = main;
@@ -43,6 +46,7 @@ public partial class App : Application
 
     protected override void OnExit(ExitEventArgs e)
     {
+        _localTranslation?.Dispose();
         if (_singleInstanceMutex is not null)
         {
             _singleInstanceMutex.ReleaseMutex();

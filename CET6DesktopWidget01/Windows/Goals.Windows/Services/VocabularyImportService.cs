@@ -166,7 +166,7 @@ public sealed class VocabularyImportService
                     }
                     else
                     {
-                        var definition = meta.Decoder.Decode(unpacked[localStart..localEnd]);
+                        var definition = SafeDecode(unpacked, localStart, localEnd - localStart, meta.Decoder.Decode(unpacked[localStart..localEnd]), track.Mode == LearningMode.Japanese);
                         if (TryGetMdxLinkTarget(definition, out var target))
                         {
                             var resolved = dictionary.Lookup(target).Item2;
@@ -472,7 +472,7 @@ public sealed class VocabularyImportService
                         continue;
                     }
 
-                    var definition = meta.Decoder.Decode(unpacked[localStart..localEnd]);
+                    var definition = SafeDecode(unpacked, localStart, localEnd - localStart, meta.Decoder.Decode(unpacked[localStart..localEnd]), track.Mode == LearningMode.Japanese);
                     if (TryGetMdxLinkTarget(definition, out var target))
                     {
                         var resolved = dictionary.Lookup(target).Item2;
@@ -536,7 +536,7 @@ public sealed class VocabularyImportService
         }
         else if (track.Mode == LearningMode.Japanese)
         {
-            reading = ExtractMdxDataName(definition, "見出仮名").FirstOrDefault() ?? "";
+            reading = ExtractMdxDataNames(definition, "見出仮名", "読み", "かな", "カナ", "kana").FirstOrDefault() ?? "";
             reading = Regex.Replace(reading, @"\s+", "");
             if (string.IsNullOrWhiteSpace(reading))
             {
@@ -544,14 +544,14 @@ public sealed class VocabularyImportService
                 if (match.Success) reading = Regex.Replace(match.Groups["reading"].Value, @"\s+", "");
             }
 
-            partOfSpeech = string.Join("・", ExtractMdxDataName(definition, "品詞M").Distinct(StringComparer.Ordinal));
-            var meanings = ExtractMdxDataName(definition, "語釈")
+            partOfSpeech = string.Join("・", ExtractMdxDataNames(definition, "品詞M", "品詞", "词性").Distinct(StringComparer.Ordinal));
+            var meanings = ExtractMdxDataNames(definition, "語釈", "意味", "释义", "meaning")
                 .Where(x => !string.IsNullOrWhiteSpace(x))
                 .Distinct(StringComparer.Ordinal)
                 .Take(6)
                 .ToList();
             if (meanings.Count > 0) meaning = string.Join("；", meanings);
-            example = ExtractMdxDataName(definition, "用例").FirstOrDefault() ?? "";
+            example = ExtractMdxDataNames(definition, "用例", "例文", "example").FirstOrDefault() ?? "";
         }
 
         return new VocabularyWord
@@ -587,6 +587,13 @@ public sealed class VocabularyImportService
             var value = CleanDefinition(match.Groups["value"].Value);
             if (!string.IsNullOrWhiteSpace(value)) yield return value;
         }
+    }
+
+    private static IEnumerable<string> ExtractMdxDataNames(string html, params string[] dataNames)
+    {
+        foreach (var name in dataNames)
+            foreach (var value in ExtractMdxDataName(html, name))
+                yield return value;
     }
 
     private static void VisitJson(JsonElement element, StudyTrack track, string sourceName,
@@ -725,6 +732,52 @@ public sealed class VocabularyImportService
         value = Regex.Replace(value, @"<[^>]+>", " ");
         value = WebUtility.HtmlDecode(value).Replace('\0', ' ');
         return Regex.Replace(value, @"\s+", " ").Trim(' ', '；');
+    }
+
+    private static readonly Encoding Gb18030 = LoadGb18030();
+
+    private static Encoding LoadGb18030()
+    {
+        try { return Encoding.GetEncoding("GB18030"); }
+        catch { return Encoding.UTF8; }
+    }
+
+    /// <summary>
+    /// MDX headers sometimes declare the wrong encoding, so a GBK dictionary can
+    /// decode as mojibake. When the declared decode looks garbled on a Japanese
+    /// track, retry the raw bytes as UTF-8 and GB18030 and keep the cleaner result.
+    /// </summary>
+    private static string SafeDecode(byte[] bytes, int start, int length, string declared, bool japanese)
+    {
+        if (!japanese || !LooksGarbled(declared)) return declared;
+        var utf8 = Encoding.UTF8.GetString(bytes, start, length);
+        var gbk = Gb18030.GetString(bytes, start, length);
+        return TextScore(utf8) > TextScore(gbk) ? utf8 : gbk;
+    }
+
+    private static bool LooksGarbled(string text)
+    {
+        if (text.Contains('�')) return true;
+        if (text.Length < 4) return false;
+        var script = 0;
+        foreach (var ch in text)
+        {
+            if (ch is >= '぀' and <= 'ヿ' or >= '㐀' and <= '䶿' or >= '一' and <= '鿿') script++;
+        }
+        return script * 3 < text.Length;
+    }
+
+    private static int TextScore(string text)
+    {
+        var score = 0;
+        foreach (var ch in text)
+        {
+            if (ch == '�' || ch < ' ' && ch != '\t' && ch != '\r' && ch != '\n') score -= 5;
+            else if (ch is >= '぀' and <= 'ヿ' or >= '㐀' and <= '䶿' or >= '一' and <= '鿿') score += 3;
+            else if (char.IsLetterOrDigit(ch) || char.IsWhiteSpace(ch) || char.IsPunctuation(ch)) score += 1;
+            else score -= 1;
+        }
+        return score;
     }
 
     private static bool LooksLikeResource(string value)
