@@ -1,0 +1,222 @@
+[
+  {
+    "id": "custom-adequate",
+    "word": "adequate",
+    "phonetic": "/ˈædɪkwət/",
+    "partOfSpeech": "adj.",
+    "meaning": "足够的；合格的",
+    "example": "The evidence is adequate to support the conclusion.",
+    "exampleTranslation": "这些证据足以支持该结论。",
+    "tag": "写作替换",
+    "difficulty": 3
+  },
+  {
+    "id": "custom-allocate",
+    "word": "allocate",
+    "phonetic": "/ˈæləkeɪt/",
+    "partOfSpeech": "v.",
+    "meaning": "分配；拨出",
+    "example": "Students should allocate time for regular review.",
+    "exampleTranslation": "学生应当为定期复习分配时间。",
+    "tag": "计划表达",
+    "difficulty": 3
+  },
+  {
+    "id": "custom-coherent",
+    "word": "coherent",
+    "phonetic": "/kəʊˈhɪərənt/",
+    "partOfSpeech": "adj.",
+    "meaning": "连贯的；条理清楚的",
+    "example": "A coherent argument is easier to understand.",
+    "exampleTranslation": "连贯的论点更容易理解。",
+    "tag": "写作高频",
+    "difficulty": 4
+  },
+  {
+    "id": "custom-compelling",
+    "word": "compelling",
+    "phonetic": "/kəmˈpelɪŋ/",
+    "partOfSpeech": "adj.",
+    "meaning": "令人信服的；引人入胜的",
+    "example": "She presented a compelling reason for the change.",
+    "exampleTranslation": "她提出了一个令人信服的变革理由。",
+    "tag": "阅读高频",
+    "difficulty": 4
+  },
+  {
+    "id": "custom-derive",
+    "word": "derive",
+    "phonetic": "/dɪˈraɪv/",
+    "partOfSpeech": "v.",
+    "meaning": "获得；源自",
+    "example": "Many English words derive from Latin roots.",
+    "exampleTranslation": "许多英语单词源自拉丁词根。",
+    "tag": "词根",
+    "difficulty": 3
+  },
+  {
+    "id": "custom-diminish",
+    "word": "diminish",
+    "phonetic": "/dɪˈmɪnɪʃ/",
+    "partOfSpeech": "v.",
+    "meaning": "减少；削弱",
+    "example": "Regular breaks can diminish mental fatigue.",
+    "exampleTranslation": "定时休息可以减轻精神疲劳。",
+    "tag": "阅读高频",
+    "difficulty": 4
+  },
+  {
+    "id": "custom-elaborate",
+    "word": "elaborate",
+    "phonetic": "/ɪˈlæbərət/",
+    "partOfSpeech": "adj./v.",
+    "meaning": "详尽的；详细说明",
+    "example": "Could you elaborate on your main point?",
+    "exampleTranslation": "你能详细说明一下主要观点吗？",
+    "tag": "写作表达",
+    "difficulty": 3
+  },
+  {
+    "id": "custom-facilitate",
+    "word": "facilitate",
+    "phonetic": "/fəˈsɪlɪteɪt/",
+    "partOfSpeech": "v.",
+    "meaning": "促进；使便利",
+    "example": "Digital tools facilitate access to information.",
+    "exampleTranslation": "数字工具让获取信息更加便利。",
+    "tag": "写作替换",
+    "difficulty": 4
+  },
+  {
+    "id": "custom-feasible",
+    "word": "feasible",
+    "phonetic": "/ˈfiːzəbl/",
+    "partOfSpeech": "adj.",
+    "meaning": "可行的；办得到的",
+    "example": "The team proposed a feasible solution.",
+    "exampleTranslation": "团队提出了一个可行的解决方案。",
+    "tag": "写作高频",
+    "difficulty": 3
+  },
+  {
+    "id": "custom-inevitable",
+    "word": "inevitable",
+    "phonetic": "/ɪnˈevɪtəbl/",
+    "partOfSpeech": "adj.",
+    "meaning": "不可避免的",
+    "example": "Some degree of uncertainty is inevitable.",
+    "exampleTranslation": "一定程度的不确定性不可避免。",
+    "tag": "阅读高频",
+    "difficulty": 3
+  },
+  {
+    "id": "custom-intricate",
+    "word": "intricate",
+    "phonetic": "/ˈɪntrɪkət/",
+    "partOfSpeech": "adj.",
+    "meaning": "错综复杂的；精细的",
+    "example": "The device contains an intricate network of sensors.",
+    "exampleTranslation": "该设备包含一套复杂的传感器网络。",
+    "tag": "高难词",
+    "difficulty": 5
+  },
+  {
+    "id": "custom-notion",
+    "word": "notion",
+    "phonetic": "/ˈnəʊʃn/",
+    "partOfSpeech": "n.",
+    "meaning": "观念；看法",
+    "example": "The study challenges the traditional notion of success.",
+    "exampleTranslation": "这项研究挑战了传统的成功观。",
+    "tag": "阅读高频",
+    "difficulty": 3
+  },
+  {
+    "id": "custom-prevalent",
+    "word": "prevalent",
+    "phonetic": "/ˈprevələnt/",
+    "partOfSpeech": "adj.",
+    "meaning": "普遍的；盛行的",
+    "example": "Online learning is increasingly prevalent.",
+    "exampleTranslation": "在线学习越来越普遍。",
+    "tag": "写作高频",
+    "difficulty": 4
+  },
+  {
+    "id": "custom-profound",
+    "word": "profound",
+    "phonetic": "/prəˈfaʊnd/",
+    "partOfSpeech": "adj.",
+    "meaning": "深刻的；影响深远的",
+    "example": "Technology has had a profound impact on communication.",
+    "exampleTranslation": "科技对交流产生了深远影响。",
+    "tag": "写作升级",
+    "difficulty": 4
+  },
+  {
+    "id": "custom-resilient",
+    "word": "resilient",
+    "phonetic": "/rɪˈzɪliənt/",
+    "partOfSpeech": "adj.",
+    "meaning": "有韧性的；能迅速恢复的",
+    "example": "Resilient learners view mistakes as useful feedback.",
+    "exampleTranslation": "有韧性的学习者把错误视为有用反馈。",
+    "tag": "写作升级",
+    "difficulty": 4
+  },
+  {
+    "id": "custom-substantial",
+    "word": "substantial",
+    "phonetic": "/səbˈstænʃl/",
+    "partOfSpeech": "adj.",
+    "meaning": "大量的；实质性的",
+    "example": "A substantial improvement requires consistent practice.",
+    "exampleTranslation": "显著进步需要持续练习。",
+    "tag": "写作升级",
+    "difficulty": 5
+  },
+  {
+    "id": "custom-tentative",
+    "word": "tentative",
+    "phonetic": "/ˈtentətɪv/",
+    "partOfSpeech": "adj.",
+    "meaning": "暂定的；试探性的",
+    "example": "We reached a tentative agreement.",
+    "exampleTranslation": "我们达成了初步协议。",
+    "tag": "阅读高频",
+    "difficulty": 4
+  },
+  {
+    "id": "custom-undermine",
+    "word": "undermine",
+    "phonetic": "/ˌʌndəˈmaɪn/",
+    "partOfSpeech": "v.",
+    "meaning": "逐渐削弱；损害",
+    "example": "Lack of sleep can undermine concentration.",
+    "exampleTranslation": "睡眠不足会削弱专注力。",
+    "tag": "阅读高频",
+    "difficulty": 4
+  },
+  {
+    "id": "custom-versatile",
+    "word": "versatile",
+    "phonetic": "/ˈvɜːsətaɪl/",
+    "partOfSpeech": "adj.",
+    "meaning": "多才多艺的；用途广泛的",
+    "example": "The tablet is a versatile learning tool.",
+    "exampleTranslation": "平板电脑是一种多用途学习工具。",
+    "tag": "写作替换",
+    "difficulty": 4
+  },
+  {
+    "id": "custom-viable",
+    "word": "viable",
+    "phonetic": "/ˈvaɪəbl/",
+    "partOfSpeech": "adj.",
+    "meaning": "切实可行的；能生存的",
+    "example": "Public transport is a viable alternative to driving.",
+    "exampleTranslation": "公共交通是开车之外的可行选择。",
+    "tag": "写作高频",
+    "difficulty": 4
+  }
+]

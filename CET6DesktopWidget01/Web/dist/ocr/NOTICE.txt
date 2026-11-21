@@ -1,0 +1,7 @@
+Tesseract.js 6.0.1 and Tesseract.js-core 6.x are distributed under Apache License 2.0.
+https://github.com/naptha/tesseract.js
+https://github.com/naptha/tesseract.js-core
+
+English trained data from @tesseract.js-data/eng 1.0.0, based on Tesseract OCR.
+https://github.com/tesseract-ocr/tessdata_best
+Licensed under Apache License 2.0. See LICENSE.

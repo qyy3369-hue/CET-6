@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="Goals 学习工作台，管理目标、学习计划与单词复习。">
+  <title>Goals 学习</title>
+  <link rel="icon" href="./goals-icon.png">
+  <link rel="stylesheet" href="./style.css">
+  <script type="module" src="./app.js"></script>
+</head>
+<body>
+  <aside class="sidebar" id="sidebar">
+    <a class="brand" href="#goals"><img src="./goals-icon.png" alt="" width="36" height="36"><span><strong>Goals</strong><small id="goal-caption">暂无目标</small></span></a>
+    <nav aria-label="学习工作区">
+      <a href="#goals" data-icon="layout">目标总览</a>
+      <a href="#today" data-icon="calendar">今日日程</a>
+      <a href="#friends" data-icon="users">好友与排行</a>
+      <span class="nav-heading">工作区</span>
+      <a href="#plans" data-icon="file">计划书</a>
+      <span class="nav-heading">英语学习</span>
+      <details open>
+        <summary data-icon="books">词汇</summary>
+        <div class="nav-branch">
+          <a href="#words" data-icon="book">单词本</a>
+          <a href="#cards" data-icon="cards">闪卡复习</a>
+          <a href="#favorites" data-icon="bookmark">错词收藏</a>
+        </div>
+      </details>
+      <details open>
+        <summary data-icon="chat">语言练习</summary>
+        <div class="nav-branch">
+          <a href="#translation" data-icon="translate">翻译训练</a>
+          <a href="#writing" data-icon="pen">写作训练</a>
+          <a href="#roots" data-icon="network">词根词缀</a>
+        </div>
+      </details>
+    </nav>
+    <footer class="sidebar-footer">
+      <div class="row" id="today-progress"><span>今日完成</span><span>0 / 0</span></div>
+      <progress id="today-meter" aria-label="今日完成进度" value="0" max="1"></progress>
+      <a href="#settings" data-icon="gear">设置 <kbd>⌘,</kbd></a>
+    </footer>
+  </aside>
+  <div class="window">
+    <div class="toolbar">
+      <button id="sidebar-toggle" type="button" aria-controls="sidebar" aria-expanded="true" aria-label="切换侧栏" data-icon="sidebar"></button>
+      <div class="breadcrumb"><a href="#goals">Goals</a><span aria-hidden="true">›</span><strong id="crumb"></strong></div>
+      <button id="search-toggle" type="button" data-icon="search">快速搜索 <kbd>⌘K</kbd></button>
+    </div>
+    <main id="main">
+      <header><h1 id="title">目标总览</h1><div class="header-actions" id="header-actions"></div></header>
+      <div id="notice" role="status" aria-live="polite"></div>
+      <section id="content"></section>
+    </main>
+  </div>
+  <dialog id="quick-search" aria-labelledby="search-title">
+    <label id="search-title">快速搜索<input id="quick-query" type="search" placeholder="搜索功能或单词"></label>
+    <div class="list" id="quick-results"></div>
+  </dialog>
+</body>
+</html>
