@@ -1,6 +1,30 @@
 import AppKit
 import SwiftUI
 
+enum GoalsAppearance: String, CaseIterable, Identifiable {
+    case system
+    case light
+    case dark
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .system: "跟随系统"
+        case .light: "浅色"
+        case .dark: "深色"
+        }
+    }
+
+    var appKitAppearance: NSAppearance? {
+        switch self {
+        case .system: nil
+        case .light: NSAppearance(named: .aqua)
+        case .dark: NSAppearance(named: .darkAqua)
+        }
+    }
+}
+
 @MainActor
 final class WidgetVisibilityController: ObservableObject {
     @Published var isVisible: Bool {
@@ -11,14 +35,24 @@ final class WidgetVisibilityController: ObservableObject {
         }
     }
 
+    @Published var appearance: GoalsAppearance {
+        didSet {
+            guard oldValue != appearance else { return }
+            userDefaults.set(appearance.rawValue, forKey: Self.appearanceKey)
+            NSApp.appearance = appearance.appKitAppearance
+        }
+    }
+
     var onVisibilityChange: ((Bool) -> Void)?
 
     private static let userDefaultsKey = "floatingWidgetIsVisible"
+    private static let appearanceKey = "Goals.appearance"
     private let userDefaults: UserDefaults
 
     init(userDefaults: UserDefaults = .standard) {
         self.userDefaults = userDefaults
         self.isVisible = userDefaults.object(forKey: Self.userDefaultsKey) as? Bool ?? true
+        self.appearance = GoalsAppearance(rawValue: userDefaults.string(forKey: Self.appearanceKey) ?? "") ?? .dark
     }
 }
 
@@ -30,9 +64,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var lastKnownDateKey = DateKey.today()
     private let store = TaskStore()
     private let widgetVisibility = WidgetVisibilityController()
+    private let editShortcuts = AppEditShortcuts()
     private lazy var dailyVocabularyImporter = DailyVocabularyImporter01(store: store)
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        editShortcuts.install()
+        NSApp.appearance = widgetVisibility.appearance.appKitAppearance
+        _ = StudyWindowView.prepareBanishedVocabularyLibrary()
         let goals = GoalPlanStore01.load(defaultPlanText: StudyWindowView.defaultPlanText)
         store.refreshPlanTasks(from: goals) { plan in
             plan.generatedSchedule ?? StudyWindowView.generateSchedule(from: plan.planText, anchorDateKey: DateKey.from(plan.createdAt))
@@ -48,7 +86,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             self?.openStudyWindow()
         }
         let hostingView = NSHostingView(rootView: contentView)
-        hostingView.appearance = NSAppearance(named: .aqua)
 
         let window = DraggableWidgetWindow(
             contentRect: NSRect(x: 120, y: 500, width: 360, height: 330),
@@ -67,6 +104,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         window.isMovableByWindowBackground = true
         self.widgetWindow = window
         setWidgetWindowVisible(widgetVisibility.isVisible)
+        openStudyWindow()
     }
 
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
@@ -79,6 +117,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationWillTerminate(_ notification: Notification) {
+        editShortcuts.uninstall()
         dailyVocabularyImporter.stop()
         dateRolloverTimer?.invalidate()
     }
@@ -113,19 +152,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         let contentView = StudyWindowView(store: store, widgetVisibility: widgetVisibility)
         let hostingView = NSHostingView(rootView: contentView)
-        hostingView.appearance = NSAppearance(named: .aqua)
         let window = NSWindow(
-            contentRect: NSRect(x: 180, y: 140, width: 1040, height: 680),
+            contentRect: NSRect(x: 180, y: 140, width: 1120, height: 720),
             styleMask: [.titled, .closable, .miniaturizable, .resizable],
             backing: .buffered,
             defer: false
         )
-        window.title = "目标计划中心"
-        window.appearance = NSAppearance(named: .aqua)
-        window.backgroundColor = NSColor.windowBackgroundColor.withAlphaComponent(0.92)
-        window.isOpaque = false
-        window.titlebarAppearsTransparent = false
-        window.contentMinSize = NSSize(width: 900, height: 560)
+        window.title = "Goals"
+        window.backgroundColor = NSColor.windowBackgroundColor
+        window.contentMinSize = NSSize(width: 940, height: 586)
         window.contentView = hostingView
         window.isReleasedWhenClosed = false
         window.center()

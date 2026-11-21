@@ -7,9 +7,11 @@
 	<key>CFBundleIdentifier</key>
 	<string>local.codex.cet6desktopwidget</string>
 	<key>CFBundleIconFile</key>
-	<string>AppIcon04.icns</string>
+	<string>AppIcon05.icns</string>
+	<key>CFBundleDisplayName</key>
+	<string>Goals</string>
 	<key>CFBundleName</key>
-	<string>CET6DesktopWidget</string>
+	<string>Goals</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>

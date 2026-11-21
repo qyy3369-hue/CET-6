@@ -31,16 +31,10 @@ struct DesktopWidgetView: View {
                 Button(action: onOpenStudyWindow) {
                     Image(systemName: "arrow.up.forward")
                         .font(.system(size: 14, weight: .semibold))
-                        .foregroundStyle(StudyTheme.ink)
                         .frame(width: 32, height: 32)
-                        .background(StudyTheme.paper)
-                        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
-                        .overlay {
-                            RoundedRectangle(cornerRadius: 10, style: .continuous)
-                                .stroke(StudyTheme.hairline, lineWidth: 1)
-                        }
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(GoalsButtonStyle(.icon))
+                .accessibilityLabel("打开学习窗口")
                 .help("打开学习窗口")
             }
 
@@ -59,25 +53,12 @@ struct DesktopWidgetView: View {
         .frame(width: 372, alignment: .topLeading)
         .frame(minHeight: 260, alignment: .topLeading)
         .background {
-            ZStack {
-                RoundedRectangle(cornerRadius: 12, style: .continuous)
-                    .fill(.regularMaterial)
-                RoundedRectangle(cornerRadius: 12, style: .continuous)
-                    .fill(StudyTheme.widgetPaper)
-                VStack(spacing: 0) {
-                    Rectangle().fill(Color.white.opacity(0.72)).frame(height: 1)
-                    Spacer()
-                    Rectangle().fill(Color.black.opacity(0.04)).frame(height: 1)
-                }
-            }
+            RoundedRectangle(cornerRadius: 16)
+                .fill(StudyTheme.paper)
+                .overlay { RoundedRectangle(cornerRadius: 16).strokeBorder(StudyTheme.hairline) }
         }
-        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-        .overlay {
-            RoundedRectangle(cornerRadius: 12, style: .continuous)
-                .stroke(StudyTheme.hairline, lineWidth: 1)
-        }
-        .shadow(color: .black.opacity(0.12), radius: 16, x: 0, y: 8)
-        .preferredColorScheme(.light)
+        .clipShape(.rect(cornerRadius: 16))
+        .shadow(color: .black.opacity(0.10), radius: 14, x: 0, y: 6)
         .onReceive(NotificationCenter.default.publisher(for: .goalSelectionDidChange)) { _ in
             refreshSelectedGoal()
         }
@@ -86,15 +67,15 @@ struct DesktopWidgetView: View {
     private var header: some View {
         VStack(alignment: .leading, spacing: 5) {
             HStack(spacing: 6) {
-                Text(selectedGoalTitle)
-                    .font(StudyTheme.songti(size: 26, weight: .semibold))
+                Text("今天")
+                    .font(StudyTheme.heading(size: 25, weight: .semibold))
                     .foregroundStyle(StudyTheme.ink)
                     .lineLimit(1)
                     .minimumScaleFactor(0.72)
 
                 goalMenu
             }
-            Text("今日目标")
+            Text(selectedGoalID == Self.allGoalsID ? "所有任务" : selectedGoalTitle)
                 .font(.system(size: 13, weight: .medium))
                 .foregroundStyle(StudyTheme.secondaryInk)
         }
@@ -118,14 +99,17 @@ struct DesktopWidgetView: View {
                 }
             }
         } label: {
-            Image(systemName: "chevron.down")
-                .font(.system(size: 15, weight: .bold))
-                .foregroundStyle(StudyTheme.secondaryInk)
-                .frame(width: 24, height: 24)
-                .contentShape(Rectangle())
+            GoalsButtonFace(
+                label: Image(systemName: "chevron.down")
+                    .font(.system(size: 11, weight: .semibold))
+                    .frame(width: 24, height: 24),
+                kind: .icon
+            )
         }
         .menuStyle(.borderlessButton)
+        .menuIndicator(.hidden)
         .buttonStyle(.plain)
+        .accessibilityLabel("切换日程项目")
         .help("切换日程项目")
     }
 
@@ -149,17 +133,9 @@ struct DesktopWidgetView: View {
     private var inputRow: some View {
         HStack(spacing: 8) {
             TextField("写下一件要完成的事", text: $newTaskTitle)
-                .textFieldStyle(.plain)
                 .font(.system(size: 14, weight: .medium))
                 .foregroundStyle(StudyTheme.ink)
-                .padding(.horizontal, 12)
-                .padding(.vertical, 10)
-                .background(StudyTheme.paper)
-                .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
-                .overlay {
-                    RoundedRectangle(cornerRadius: 10, style: .continuous)
-                        .stroke(StudyTheme.hairline, lineWidth: 1)
-                }
+                .goalsInput(minHeight: 34)
                 .onSubmit(addTask)
 
             Button(action: addTask) {
@@ -167,10 +143,8 @@ struct DesktopWidgetView: View {
                     .font(.system(size: 14, weight: .bold))
                     .frame(width: 34, height: 34)
             }
-            .buttonStyle(.plain)
-            .background(StudyTheme.command)
-            .foregroundStyle(.white)
-            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+            .buttonStyle(GoalsButtonStyle(.icon, tint: StudyTheme.blue))
+            .accessibilityLabel("添加任务")
         }
     }
 
@@ -191,7 +165,7 @@ struct DesktopWidgetView: View {
                             } label: {
                                 HStack(alignment: .top, spacing: 10) {
                                     Image(systemName: task.isDone ? "checkmark.circle.fill" : "circle")
-                                        .foregroundStyle(task.isDone ? StudyCategory.today.tint : StudyTheme.mutedInk)
+                                        .foregroundStyle(task.isDone ? StudyTheme.quietGreen : StudyTheme.mutedInk)
                                         .font(.system(size: 15, weight: .medium))
                                         .frame(width: 20)
                                     Text(task.title)
@@ -210,11 +184,12 @@ struct DesktopWidgetView: View {
                                     }
                                     Spacer(minLength: 0)
                                 }
+                                .padding(.horizontal, 5)
                                 .padding(.vertical, 4)
                                 .frame(maxWidth: .infinity, alignment: .leading)
-                                .contentShape(Rectangle())
                             }
-                            .buttonStyle(.plain)
+                            .buttonStyle(GoalsButtonStyle(.row))
+                            .accessibilityValue(task.isDone ? "已完成" : "待完成")
                         }
                     }
                 }
@@ -229,7 +204,11 @@ struct DesktopWidgetView: View {
 
     private func addTask() {
         let targetGoal = selectedGoalID == Self.allGoalsID ? Self.loadSelectedWidgetGoal(from: widgetGoals) : (id: selectedGoalID, title: selectedGoalTitle)
-        store.addTaskForToday(newTaskTitle, goalID: targetGoal.id, goalTitle: targetGoal.title)
+        if targetGoal.id == Self.allGoalsID {
+            store.addTaskForToday(newTaskTitle, goalID: "unassigned", goalTitle: "未归类")
+        } else {
+            store.addTaskForToday(newTaskTitle, goalID: targetGoal.id, goalTitle: targetGoal.title)
+        }
         newTaskTitle = ""
     }
 
@@ -252,7 +231,8 @@ struct DesktopWidgetView: View {
     private static func loadSelectedWidgetGoal(from goals: [GoalPlan]) -> (id: String, title: String) {
         let selectedGoalID = GoalPlanStore01.loadSelectedGoalID()
         let goal = goals.first { $0.id == selectedGoalID } ?? goals.first
-        return (goal?.id ?? GoalPlanStore01.defaultGoalID, goal?.title ?? GoalPlanStore01.defaultGoalTitle)
+        guard let goal else { return (allGoalsID, "所有") }
+        return (goal.id, goal.title)
     }
 }
 
@@ -350,8 +330,10 @@ private struct SelectableEssayTextView: NSViewRepresentable {
     }
 }
 
-#Preview {
-    DesktopWidgetView(store: TaskStore()) {}
+private struct DesktopWidgetPreview: PreviewProvider {
+    static var previews: some View {
+        DesktopWidgetView(store: TaskStore()) {}
+    }
 }
 
 private enum StudyCategory: String, CaseIterable, Identifiable {
@@ -381,26 +363,12 @@ private enum StudyCategory: String, CaseIterable, Identifiable {
         }
     }
 
-    var subtitle: String {
-        switch self {
-        case .goals: "多目标与多计划表"
-        case .plan: "手动输入与 AI 生成"
-        case .today: "任务进度与勾选"
-        case .words: "高频词与例句"
-        case .translation: "中译英与英文润色"
-        case .writing: "150-200 词范文"
-        case .roots: "按构词法记忆"
-        case .flashcards: "正反面快速过"
-        case .mistakes: "收藏与薄弱项"
-        }
-    }
-
     var icon: String {
         switch self {
-        case .goals: "target"
-        case .plan: "doc.text.magnifyingglass"
-        case .today: "calendar.badge.clock"
-        case .words: "book.closed.fill"
+        case .goals: "rectangle.grid.2x2"
+        case .plan: "doc.text"
+        case .today: "calendar"
+        case .words: "book.closed"
         case .translation: "character.book.closed"
         case .writing: "pencil.and.outline"
         case .roots: "point.3.connected.trianglepath.dotted"
@@ -409,22 +377,13 @@ private enum StudyCategory: String, CaseIterable, Identifiable {
         }
     }
 
-    var tint: Color {
-        switch self {
-        case .goals: Color(red: 0.18, green: 0.22, blue: 0.42)       // 靛蓝
-        case .plan: Color(red: 0.14, green: 0.24, blue: 0.38)        // 藏蓝
-        case .today: Color(red: 0.18, green: 0.42, blue: 0.32)       // 松花绿
-        case .words: Color(red: 0.65, green: 0.22, blue: 0.18)       // 朱砂
-        case .translation: Color(red: 0.16, green: 0.34, blue: 0.42) // 石青
-        case .writing: Color(red: 0.52, green: 0.38, blue: 0.18)     // 赭石
-        case .roots: Color(red: 0.56, green: 0.46, blue: 0.16)       // 藤黄
-        case .flashcards: Color(red: 0.38, green: 0.20, blue: 0.30)  // 紫檀
-        case .mistakes: Color(red: 0.60, green: 0.36, blue: 0.12)    // 琥珀
-        }
-    }
+    var tint: Color { StudyTheme.blue }
 }
 
-private struct VocabularyWord: Codable, Equatable, Identifiable, Sendable {
+struct VocabularyWord: Codable, Equatable, Identifiable, Sendable {
+    static let pendingMeaning = "自定义词，待补充释义"
+    static let restoredPendingMeaning = "历史已斩词；恢复后可在单词本中补充释义"
+
     let id: String
     let word: String
     let phonetic: String
@@ -480,6 +439,37 @@ private struct VocabularyWord: Codable, Equatable, Identifiable, Sendable {
         self.mnemonic = try container.decodeIfPresent(String.self, forKey: .mnemonic) ?? ""
         self.tag = try container.decodeIfPresent(String.self, forKey: .tag) ?? "自定义"
         self.difficulty = try container.decodeIfPresent(Int.self, forKey: .difficulty) ?? 3
+    }
+
+    var needsMeaning: Bool { Self.isMissingMeaning(meaning) }
+
+    static func isMissingMeaning(_ meaning: String) -> Bool {
+        switch meaning.trimmingCharacters(in: .whitespacesAndNewlines) {
+        case "", pendingMeaning, restoredPendingMeaning: true
+        default: false
+        }
+    }
+
+    static func starterExample(for word: String) -> String {
+        "Write your own sentence with \(word)."
+    }
+
+    func fillingMeaning(from result: WordLookupResult) -> VocabularyWord {
+        let needsExample = example.isEmpty || example == Self.starterExample(for: word)
+        return VocabularyWord(
+            id: id,
+            word: word,
+            phonetic: phonetic.isEmpty ? result.phonetic : phonetic,
+            partOfSpeech: partOfSpeech.isEmpty || partOfSpeech == "未标注" ? result.partOfSpeech : partOfSpeech,
+            meaning: result.meaning,
+            example: needsExample && !result.example.isEmpty ? result.example : example,
+            exampleTranslation: needsExample && !result.example.isEmpty ? result.exampleTranslation : exampleTranslation,
+            phrases: phrases.isEmpty ? result.phrases : phrases,
+            phraseTranslations: phrases.isEmpty ? result.phraseTranslations : phraseTranslations,
+            mnemonic: mnemonic.isEmpty ? result.mnemonic : mnemonic,
+            tag: tag.isEmpty || tag == "自定义" ? result.tag : tag,
+            difficulty: difficulty
+        )
     }
 
     var trimmedExampleTranslation: String {
@@ -562,6 +552,7 @@ private struct WritingPracticeRecord: Codable, Identifiable, Equatable {
 }
 
 private enum WordReviewMode: String, CaseIterable, Identifiable {
+    case due
     case all
     case favorites
     case hard
@@ -570,6 +561,7 @@ private enum WordReviewMode: String, CaseIterable, Identifiable {
 
     var title: String {
         switch self {
+        case .due: "到期优先"
         case .all: "全部"
         case .favorites: "收藏"
         case .hard: "高难"
@@ -577,9 +569,16 @@ private enum WordReviewMode: String, CaseIterable, Identifiable {
     }
 }
 
+private enum FlashcardReviewFocus01: Hashable {
+    case workspace
+    case answer
+    case correction
+}
+
 private enum MistakeMode: String, CaseIterable, Identifiable {
     case favorites
     case hard
+    case banished
 
     var id: String { rawValue }
 
@@ -587,6 +586,7 @@ private enum MistakeMode: String, CaseIterable, Identifiable {
         switch self {
         case .favorites: "已收藏"
         case .hard: "高难候选"
+        case .banished: "已斩"
         }
     }
 }
@@ -605,143 +605,89 @@ private enum PlanWorkspaceMode: String, CaseIterable, Identifiable {
     }
 }
 
-private enum StudyTheme {
-    // ── 典雅古典色板 ──────────────────────────────────────
-    // 底色：暖宣纸系
-    static let windowBase = Color(red: 0.958, green: 0.945, blue: 0.918)
-    static let sidebarBase = Color(red: 0.930, green: 0.915, blue: 0.882).opacity(0.85)
-    static let paper = Color(red: 0.978, green: 0.968, blue: 0.938)
-    static let widgetPaper = Color(red: 0.965, green: 0.952, blue: 0.918).opacity(0.93)
-    static let panelBase = Color(red: 0.972, green: 0.962, blue: 0.930).opacity(0.75)
-    static let panelStrong = Color(red: 0.988, green: 0.978, blue: 0.948).opacity(0.92)
-    static let field = Color(red: 0.992, green: 0.985, blue: 0.960).opacity(0.96)
+// Goals console · neutral surfaces, hairline borders, and short transitions
+// Pre-emit critique: Philosophy 4, Hierarchy 5, Execution 4, Specificity 4, Restraint 5, Variety 4.
+enum StudyTheme {
+    static let windowBase = surface(light: 0xF7F7F7, dark: 0x141414)
+    static let sidebarBase = surface(light: 0xFAFAFA, dark: 0x171717)
+    static let paper = surface(light: 0xFFFFFF, dark: 0x1D1D1D)
+    static let panelBase = paper
+    static let panelStrong = paper
+    static let field = surface(light: 0xF2F2F2, dark: 0x262626)
+    static let hairline = surface(light: 0xE5E5E5, dark: 0x343434)
+    static let focusBorder = surface(light: 0x777777, dark: 0xA3A3A3)
+    static let ink = surface(light: 0x171717, dark: 0xF3F3F3)
+    static let sidebarInk = surface(light: 0x555555, dark: 0xB7B7B7)
+    static let secondaryInk = surface(light: 0x555555, dark: 0xB5B5B5)
+    static let mutedInk = surface(light: 0x6B6B6B, dark: 0xA3A3A3)
 
-    // 描边 / 分割线：淡墨色
-    static let hairline = Color(red: 0.28, green: 0.22, blue: 0.16).opacity(0.16)
+    static let blue = surface(light: 0x285C9C, dark: 0xA3C7FF)
+    static let command = surface(light: 0x222222, dark: 0x454545)
+    static let quietGreen = surface(light: 0x217153, dark: 0x78D2A9)
+    static let cinnabar = surface(light: 0xAE3B48, dark: 0xFF9CA8)
+    static let ochre = surface(light: 0x8B5B14, dark: 0xF3BC69)
+    static let indigo = blue
+    static let selection = surface(light: 0xE8F0FC, dark: 0x233348)
+    static let buttonSurface = surface(light: 0xFDFCFB, dark: 0x242423)
+    static let buttonPrimary = surface(light: 0xEDEAE6, dark: 0x333230)
+    static let buttonSelected = surface(light: 0xE9E6E2, dark: 0x3A3835)
+    static let buttonBorder = surface(light: 0xE0DCD7, dark: 0x454340)
+    static let buttonBorderStrong = surface(light: 0xC9C4BE, dark: 0x605B56)
+    static let buttonDestructive = surface(light: 0xF8E9EB, dark: 0x39272A)
 
-    // 文字：水墨层级
-    static let ink = Color(red: 0.10, green: 0.08, blue: 0.06)
-    static let sidebarInk = Color(red: 0.14, green: 0.12, blue: 0.10)
-    static let secondaryInk = Color(red: 0.38, green: 0.34, blue: 0.28)
-    static let mutedInk = Color(red: 0.55, green: 0.50, blue: 0.42)
-
-    // 强调色：传统中国色
-    static let command = Color(red: 0.12, green: 0.16, blue: 0.28)        // 靛蓝 — 按钮 / 主操作
-    static let quietGreen = Color(red: 0.18, green: 0.42, blue: 0.32)     // 松花绿 — 完成状态
-    static let blue = Color(red: 0.14, green: 0.22, blue: 0.36)           // 藏蓝 — 链接 / 交互
-    static let cinnabar = Color(red: 0.72, green: 0.22, blue: 0.18)       // 朱砂 — 错误 / 删除
-    static let ochre = Color(red: 0.62, green: 0.42, blue: 0.20)          // 赭石 — 提示 / 标签
-    static let indigo = Color(red: 0.16, green: 0.22, blue: 0.42)         // 靛蓝深 — 标题装饰
-
-    // ── 字体系统 ──────────────────────────────────────────
-    // 标题 — 宋体衬线
-    static func songti(size: CGFloat, weight: Font.Weight = .regular) -> Font {
-        Font.custom("Songti SC", size: size).weight(weight)
+    static func heading(size: CGFloat, weight: Font.Weight = .regular) -> Font {
+        .system(size: size, weight: weight)
     }
-    // 正文 — 系统默认（去掉 .rounded）
-    static func body(size: CGFloat, weight: Font.Weight = .regular) -> Font {
-        Font.system(size: size, weight: weight)
-    }
-}
 
-// ── 古典按钮样式 ──────────────────────────────────────────
-
-/// 古典主操作按钮（圆润、朴素、克制）
-struct SealButtonStyle: ButtonStyle {
-    var tint: Color = StudyTheme.indigo // 默认使用古典靛蓝
-    var isFilled: Bool = true
-    
-    func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .font(StudyTheme.songti(size: 14, weight: .semibold))
-            .padding(.horizontal, 16)
-            .padding(.vertical, 8)
-            .foregroundStyle(isFilled ? .white : tint)
-            .background(
-                Capsule()
-                    .fill(isFilled ? tint : Color.clear)
-                    .opacity(configuration.isPressed ? 0.75 : 0.9)
+    private static func surface(light: UInt32, dark: UInt32) -> Color {
+        Color(nsColor: NSColor(name: nil) { appearance in
+            let hex = appearance.bestMatch(from: [.aqua, .darkAqua]) == .darkAqua ? dark : light
+            return NSColor(
+                srgbRed: Double((hex >> 16) & 0xff) / 255,
+                green: Double((hex >> 8) & 0xff) / 255,
+                blue: Double(hex & 0xff) / 255,
+                alpha: 1
             )
-            .overlay(
-                Capsule()
-                    .stroke(tint.opacity(configuration.isPressed ? 0.4 : 0.3), lineWidth: 1)
-            )
-            .scaleEffect(configuration.isPressed ? 0.97 : 1.0)
-            .animation(.spring(response: 0.3, dampingFraction: 0.7), value: configuration.isPressed)
-    }
-}
-
-/// 古典次级辅助按钮（圆润、极其清淡）
-struct BookmarkButtonStyle: ButtonStyle {
-    func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .font(StudyTheme.songti(size: 13, weight: .regular))
-            .padding(.horizontal, 14)
-            .padding(.vertical, 7)
-            .foregroundStyle(StudyTheme.ink.opacity(0.85))
-            .background(
-                Capsule()
-                    .fill(StudyTheme.sidebarBase)
-                    .brightness(configuration.isPressed ? -0.04 : 0)
-            )
-            .overlay(
-                Capsule()
-                    .stroke(StudyTheme.hairline, lineWidth: 1)
-            )
-            .scaleEffect(configuration.isPressed ? 0.98 : 1.0)
-            .animation(.spring(response: 0.3, dampingFraction: 0.7), value: configuration.isPressed)
-    }
-}
-
-private struct FloatingWindowSwitchStyle: ToggleStyle {
-    func makeBody(configuration: Configuration) -> some View {
-        Button {
-            withAnimation(.spring(response: 0.38, dampingFraction: 0.80)) {
-                configuration.isOn.toggle()
-            }
-        } label: {
-            ZStack(alignment: configuration.isOn ? .trailing : .leading) {
-                Capsule()
-                    .fill(configuration.isOn ? StudyTheme.command : Color.black.opacity(0.10))
-                    .overlay {
-                        Capsule()
-                            .stroke(StudyTheme.hairline, lineWidth: 1)
-                    }
-
-                Circle()
-                    .fill(StudyTheme.paper)
-                    .frame(width: 24, height: 24)
-                    .padding(3)
-                    .shadow(color: .black.opacity(0.10), radius: 1, x: 0, y: 1)
-            }
-            .frame(width: 52, height: 30)
-            .contentShape(Capsule())
-        }
-        .buttonStyle(.plain)
-        .accessibilityLabel("悬浮窗")
-        .accessibilityValue(configuration.isOn ? "已打开" : "已关闭")
+        })
     }
 }
 
 struct StudyWindowView: View {
-    private static let emergencyPlan = GoalPlanSheet(
-        id: "emergency-plan",
-        title: "计划表01",
+    private enum ConsoleOverlay {
+        case search
+        case goals
+    }
+
+    private static let sidebarWidth: CGFloat = 248
+
+    private static let emptyPlan = GoalPlanSheet(
+        id: "empty-plan",
+        title: "暂无计划",
         planText: "",
         createdAt: Date(timeIntervalSinceReferenceDate: 0),
         updatedAt: Date(timeIntervalSinceReferenceDate: 0)
     )
-    private static let emergencyGoal = GoalPlan(
-        id: "emergency-goal",
-        title: "待恢复目标",
-        mode: "恢复模式",
-        focus: "请重新打开应用以恢复目标数据。",
-        plans: [emergencyPlan]
+    private static let emptyGoal = GoalPlan(
+        id: "empty-goal",
+        title: "暂无目标",
+        mode: "",
+        focus: "",
+        plans: []
     )
 
     @ObservedObject var store: TaskStore
     @ObservedObject var widgetVisibility: WidgetVisibilityController
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @AppStorage("Goals.console.sidebarVisible") private var sidebarVisible = true
+    @State private var consoleOverlay: ConsoleOverlay?
+    @State private var plansExpanded = false
+    @State private var vocabularyExpanded = true
+    @State private var practiceExpanded = true
     @State private var selectedCategory: StudyCategory = .goals
+    @State private var settingsPane: GoalsSettingsPane?
+    @State private var showsNewGoal = false
+    @State private var newGoalError: String?
+    @State private var todayGoalID: String?
     @State private var planWorkspaceMode: PlanWorkspaceMode = .manual
     @State private var goals: [GoalPlan]
     @State private var selectedGoalID: String
@@ -754,7 +700,7 @@ struct StudyWindowView: View {
     @State private var isLoadingPlanText = false
     @State private var planLoadGeneration = 0
     @State private var aiPlanPrompt = ""
-    @State private var aiPlanDraft = ""
+    @State private var generatedAIPlan: (planID: String, text: String)?
     @State private var aiPlanStatus = "填写目标背景后，AI 会生成一份可保存、可同步的计划。"
     @State private var isRevisingPlan = false
     @State private var quickTaskTitle = ""
@@ -762,16 +708,24 @@ struct StudyWindowView: View {
     @State private var newGoalMode = "生活目标"
     @State private var newGoalFocus = ""
     @State private var newPlanTitle = ""
-    @State private var goalStatus = "选择一个目标，再查看它的计划表和今日任务。"
+    @State private var goalStatus = ""
     @State private var wordSearch = ""
     @State private var newWordText = ""
-    @State private var wordBankStatus = "回车即可加入单词本"
+    @FocusState private var isWordSearchFocused: Bool
+    @State private var expandedWordIDs: Set<String> = []
+    @State private var wordBankStatus = ""
     @State private var isCompletingWord = false
+    @State private var completingMeaningIDs: Set<String> = []
+    @State private var showsImageWordImport = false
     @State private var customWords: [VocabularyWord]
     @State private var isLoadingCustomWords = false
     @State private var customWordsLoadGeneration = 0
     @State private var favoriteWordIDs: Set<String> = []
     @State private var deletedWordIDs: Set<String>
+    @State private var banishedWordKeys: Set<String>
+    @State private var banishedWordRecords: [BanishedVocabularyRecord01]
+    @State private var lastBanishedRecord: BanishedVocabularyRecord01?
+    @State private var banishUndoTask: Task<Void, Never>?
     @State private var revealedDeleteWordID: String?
     @State private var translationInput = ""
     @State private var translationStatus = "输入中文句子生成多个六级译法；输入英文句子生成润色版本"
@@ -791,7 +745,23 @@ struct StudyWindowView: View {
     @State private var essaySelectionTranslationTask: Task<Void, Never>?
     @State private var reviewIndex = 0
     @State private var showsCardBack = false
-    @State private var reviewMode: WordReviewMode = .all
+    @State private var frontMnemonics = FlashcardMnemonicStore.load()
+    @State private var isGeneratingFrontMnemonics = false
+    @State private var failedFrontMnemonics: [String: String] = [:]
+    @State private var reviewMode: WordReviewMode = .due
+    @State private var reviewAnswer = ""
+    @State private var reviewJudgment: VocabularyAnswerJudgment?
+    @State private var reviewedWordID: String?
+    @State private var reviewCorrectionAnswer = ""
+    @State private var hasCompletedReviewCorrection = false
+    @State private var reviewStatus = "输入一个核心中文含义；输入 、 可直接标记为不认识。"
+    @State private var isJudgingReviewAnswer = false
+    @State private var reviewProgressByWordID: [String: FlashcardReviewProgress01]
+    @State private var reviewDismissedWordIDs: Set<String>
+    @StateObject private var vocabularySpeech = VocabularySpeechService01()
+    @State private var lastAutoSpokenWordID: String?
+    @State private var pendingVocabularySpeechTask: Task<Void, Never>?
+    @FocusState private var flashcardReviewFocus: FlashcardReviewFocus01?
     @State private var rootSearch = ""
     @State private var mistakeSearch = ""
     @State private var mistakeMode: MistakeMode = .favorites
@@ -801,39 +771,93 @@ struct StudyWindowView: View {
         self.widgetVisibility = widgetVisibility
         let loadedGoals = GoalPlanStore01.load(defaultPlanText: Self.defaultPlanText)
         let preferredGoalID = GoalPlanStore01.loadSelectedGoalID()
-        let selectedGoal = loadedGoals.first { $0.id == preferredGoalID } ?? loadedGoals.first ?? Self.emergencyGoal
+        let selectedGoal = loadedGoals.first { $0.id == preferredGoalID } ?? loadedGoals.first ?? Self.emptyGoal
         let preferredPlanID = GoalPlanStore01.loadSelectedPlanID()
-        let selectedPlan = selectedGoal.plans.first { $0.id == preferredPlanID } ?? selectedGoal.plans.first ?? Self.emergencyPlan
+        let selectedPlan = selectedGoal.plans.first { $0.id == preferredPlanID } ?? selectedGoal.plans.first ?? Self.emptyPlan
         let plan = selectedPlan.planText
-        _goals = State(initialValue: loadedGoals.isEmpty ? [selectedGoal] : loadedGoals)
+        _goals = State(initialValue: loadedGoals)
         _selectedGoalID = State(initialValue: selectedGoal.id)
         _selectedPlanID = State(initialValue: selectedPlan.id)
         _planText = State(initialValue: plan)
         let initialBlocks = selectedPlan.generatedSchedule ?? Self.generateSchedule(from: plan, anchorDateKey: DateKey.from(selectedPlan.createdAt))
         _scheduleBlocks = State(initialValue: store.resolvedPlanBlocks(initialBlocks, goalID: selectedGoal.id, planID: selectedPlan.id))
         _customWords = State(initialValue: [])
-        _favoriteWordIDs = State(initialValue: Self.loadFavoriteWordIDs())
+        let initialFavoriteWordIDs = Self.loadFavoriteWordIDs()
+        let initialReviewProgress = FlashcardReviewStore01.load()
+        let inferredDismissedWordIDs = FlashcardReviewQueue01.inferredDismissedWordIDs(
+            progressByWordID: initialReviewProgress,
+            favoriteWordIDs: initialFavoriteWordIDs
+        )
+        let initialDismissedWordIDs = Self.loadReviewDismissedWordIDs().union(inferredDismissedWordIDs)
+        Self.saveReviewDismissedWordIDs(initialDismissedWordIDs)
+        let preparedBanishedLibrary = Self.prepareBanishedVocabularyLibrary()
+        let initialBanishedRecords = preparedBanishedLibrary.records
+        let initialBanishedKeys = preparedBanishedLibrary.keys
+        _favoriteWordIDs = State(initialValue: initialFavoriteWordIDs)
         _deletedWordIDs = State(initialValue: Self.loadDeletedWordIDs())
+        _banishedWordKeys = State(initialValue: initialBanishedKeys)
+        _banishedWordRecords = State(initialValue: initialBanishedRecords)
         _translationRecords = State(initialValue: Self.loadTranslationRecords())
         _writingRecords = State(initialValue: Self.loadWritingRecords())
+        _reviewProgressByWordID = State(initialValue: initialReviewProgress)
+        _reviewDismissedWordIDs = State(initialValue: initialDismissedWordIDs)
     }
 
     var body: some View {
-        HStack(spacing: 0) {
-            sidebar
-                .frame(width: 210)
+        ZStack(alignment: .topLeading) {
+            consoleLayout
+                .allowsHitTesting(consoleOverlay == nil)
+                .accessibilityHidden(consoleOverlay != nil)
 
-            Rectangle()
-                .fill(StudyTheme.hairline)
-                .frame(width: 1)
+            if consoleOverlay == .goals {
+                Color.clear
+                    .contentShape(Rectangle())
+                    .onTapGesture { showConsoleOverlay(nil) }
+                    .accessibilityHidden(true)
+                consoleGoalMenu
+                    .padding(.top, 60)
+                    .padding(.leading, 12)
+                    .transition(reduceMotion ? .opacity : .opacity.combined(with: .scale(scale: 0.95, anchor: .topLeading)))
+                    .zIndex(1)
+            }
 
-            detailPane
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            if consoleOverlay == .search {
+                Rectangle()
+                    .fill(.ultraThinMaterial)
+                    .overlay { StudyTheme.windowBase.opacity(0.32) }
+                    .onTapGesture { showConsoleOverlay(nil) }
+                    .accessibilityHidden(true)
+                    .transition(.opacity)
+                    .zIndex(2)
+
+                ConsoleCommandPalette(search: consoleCommands) { showConsoleOverlay(nil) }
+                    .frame(maxWidth: 540)
+                    .padding(.horizontal, 24)
+                    .frame(maxWidth: .infinity)
+                    .padding(.top, 90)
+                    .onExitCommand { showConsoleOverlay(nil) }
+                    .transition(reduceMotion ? .opacity : .opacity.combined(with: .scale(scale: 0.95, anchor: .top)))
+                    .zIndex(3)
+            }
         }
-        .frame(minWidth: 900, minHeight: 560)
-        .background(shellBackground)
+        .frame(minWidth: 940, minHeight: 586)
+        .background(StudyTheme.windowBase)
         .foregroundStyle(StudyTheme.ink)
-        .preferredColorScheme(.light)
+        .tint(StudyTheme.blue)
+        .sheet(item: $settingsPane) { pane in
+            GoalsSettingsView(display: widgetVisibility, speech: vocabularySpeech, initialPane: pane)
+        }
+        .sheet(isPresented: $showsNewGoal) {
+            newGoalForm
+        }
+        .sheet(isPresented: $showsImageWordImport) {
+            ImageVocabularyImportView(onImport: importImageWords)
+        }
+        .onChange(of: goals.map(\.id)) { _, goalIDs in
+            if let todayGoalID, !goalIDs.contains(todayGoalID) {
+                self.todayGoalID = nil
+            }
+        }
         .onChange(of: planText) { _, newValue in
             guard !isGeneratingSchedule, !isLoadingPlanText else { return }
             scheduleBlocks = resolvedScheduleBlocks(from: newValue)
@@ -862,6 +886,13 @@ struct StudyWindowView: View {
         .onChange(of: writingRecords) { _, newValue in
             Self.saveWritingRecords(newValue)
         }
+        .onChange(of: reviewProgressByWordID) { _, newValue in
+            do {
+                try FlashcardReviewStore01.save(newValue)
+            } catch {
+                reviewStatus = "复习结果已更新，但进度文件保存失败：\(error.localizedDescription)"
+            }
+        }
         .onReceive(NotificationCenter.default.publisher(for: .dailyVocabularyDidImport)) { _ in
             Task {
                 await reloadCustomWords(status: "已自动导入今日 20 个词")
@@ -872,109 +903,389 @@ struct StudyWindowView: View {
         }
     }
 
+    private var consoleLayout: some View {
+        HStack(spacing: 0) {
+            ZStack(alignment: .trailing) {
+                if sidebarVisible {
+                    sidebar
+                        .frame(width: Self.sidebarWidth)
+                        .transition(.opacity)
+                }
+            }
+            .frame(width: sidebarVisible ? Self.sidebarWidth : 0, alignment: .trailing)
+            .clipped()
+            .allowsHitTesting(sidebarVisible)
+            .accessibilityHidden(!sidebarVisible)
+            .animation(reduceMotion ? nil : .easeInOut(duration: 0.3), value: sidebarVisible)
+
+            VStack(spacing: 0) {
+                consoleToolbar
+                detailPane
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            }
+        }
+    }
+
+    private var consoleToolbar: some View {
+        HStack(spacing: 9) {
+            Button {
+                sidebarVisible.toggle()
+            } label: {
+                Image(systemName: "sidebar.left")
+                    .font(.system(size: 16))
+                    .frame(width: 30, height: 30)
+            }
+            .buttonStyle(GoalsButtonStyle(.row))
+            .accessibilityLabel(sidebarVisible ? "收起侧栏" : "展开侧栏")
+            .help(sidebarVisible ? "收起侧栏" : "展开侧栏")
+
+            Divider().frame(height: 17)
+
+            Text(consoleContextTitle)
+                .foregroundStyle(StudyTheme.mutedInk)
+                .lineLimit(1)
+            Image(systemName: "chevron.right")
+                .font(.system(size: 8, weight: .medium))
+                .foregroundStyle(StudyTheme.mutedInk)
+                .accessibilityHidden(true)
+            Text(selectedCategory.title)
+                .fontWeight(.medium)
+                .lineLimit(1)
+
+            Spacer(minLength: 12)
+
+            Button {
+                showConsoleOverlay(.search)
+            } label: {
+                HStack(spacing: 7) {
+                    Image(systemName: "magnifyingglass")
+                    Text("快速搜索")
+                    Spacer(minLength: 8)
+                    ConsoleKeycap("⌘K")
+                        .accessibilityHidden(true)
+                }
+                .padding(.horizontal, 9)
+                .frame(width: 180, height: 30)
+            }
+            .buttonStyle(GoalsButtonStyle(.icon))
+            .keyboardShortcut("k", modifiers: .command)
+
+            if !sidebarVisible {
+                Button {
+                    settingsPane = .general
+                } label: {
+                    Image(systemName: "gearshape").frame(width: 30, height: 30)
+                }
+                .buttonStyle(GoalsButtonStyle(.row))
+                .keyboardShortcut(",", modifiers: .command)
+                .accessibilityLabel("设置")
+                .help("设置")
+            }
+        }
+        .font(.system(size: 13))
+        .padding(.horizontal, 15)
+        .frame(height: 51)
+        .background(StudyTheme.paper)
+        .overlay(alignment: .bottom) { Rectangle().fill(StudyTheme.hairline).frame(height: 1) }
+    }
+
+    private var consoleContextTitle: String {
+        if selectedCategory == .plan, !goals.isEmpty { return currentGoal.title }
+        if selectedCategory == .today, let todayGoalID,
+           let goal = goals.first(where: { $0.id == todayGoalID }) { return goal.title }
+        return "Goals"
+    }
+
     private var sidebar: some View {
-        VStack(alignment: .leading, spacing: 20) {
-            VStack(alignment: .leading, spacing: 8) {
-                HStack(alignment: .top, spacing: 12) {
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text("Goals")
-                            .font(StudyTheme.songti(size: 31, weight: .semibold))
+        VStack(alignment: .leading, spacing: 13) {
+            Button {
+                showConsoleOverlay(.goals)
+            } label: {
+                HStack(spacing: 10) {
+                    Image(nsImage: NSApplication.shared.applicationIconImage)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 38, height: 38)
+                        .frame(width: 32, height: 32)
+                        .accessibilityHidden(true)
+
+                    VStack(alignment: .leading, spacing: 3) {
+                        Text(goals.isEmpty ? "Goals" : currentGoal.title)
+                            .font(.system(size: 13, weight: .semibold))
                             .foregroundStyle(StudyTheme.ink)
-                        Text("Life Desk")
-                            .font(.system(size: 11, weight: .semibold))
+                        Text(goals.isEmpty ? "暂无目标" : currentGoal.mode)
+                            .font(.system(size: 11))
                             .foregroundStyle(StudyTheme.mutedInk)
                     }
-                    Spacer(minLength: 0)
-                    Toggle(isOn: $widgetVisibility.isVisible) {}
-                        .labelsHidden()
-                        .toggleStyle(FloatingWindowSwitchStyle())
-                        .help(widgetVisibility.isVisible ? "关闭悬浮窗" : "打开悬浮窗")
+                    .lineLimit(1)
+                    Spacer(minLength: 4)
+                    Image(systemName: "chevron.up.chevron.down")
+                        .font(.system(size: 9, weight: .medium))
+                        .foregroundStyle(StudyTheme.mutedInk)
                 }
-                Text("目标 · 计划 · 执行 · 复盘")
-                    .font(.system(size: 12, weight: .semibold))
-                    .foregroundStyle(StudyTheme.secondaryInk)
+                .padding(.horizontal, 7)
+                .padding(.vertical, 6)
             }
-            .padding(.top, 28)
-            .padding(.horizontal, 20)
+            .buttonStyle(GoalsButtonStyle(.row))
+            .accessibilityLabel(goals.isEmpty ? "选择目标，暂无目标" : "切换目标，当前为 \(currentGoal.title)")
 
             ScrollView {
-                VStack(spacing: 4) {
-                    ForEach(availableCategories) { category in
-                        sidebarButton(for: category)
+                VStack(alignment: .leading, spacing: 13) {
+                    VStack(spacing: 2) {
+                        sidebarButton(for: .goals)
+                        sidebarButton(for: .today)
+                    }
+
+                    VStack(alignment: .leading, spacing: 3) {
+                        sidebarHeading("工作区")
+                        sidebarButton(for: .plan)
+                        if !goals.isEmpty {
+                            sidebarDisclosure("计划表", icon: "folder", expanded: $plansExpanded) {
+                                ForEach(currentGoal.plans) { plan in
+                                    sidebarRow(plan.title, icon: "number", isSelected: selectedCategory == .plan && selectedPlanID == plan.id) {
+                                        openConsolePlan(plan, in: currentGoal)
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    VStack(alignment: .leading, spacing: 3) {
+                        sidebarHeading("英语学习")
+                        sidebarDisclosure("词汇", icon: "books.vertical", expanded: $vocabularyExpanded) {
+                            ForEach([StudyCategory.words, .flashcards, .mistakes], content: sidebarButton)
+                        }
+                        sidebarDisclosure("语言练习", icon: "character.bubble", expanded: $practiceExpanded) {
+                            ForEach([StudyCategory.translation, .writing, .roots], content: sidebarButton)
+                        }
                     }
                 }
-                .padding(.horizontal, 10)
             }
+            .scrollIndicators(.never)
 
-            Spacer()
-
-            progressSummary
-                .padding(.horizontal, 16)
-                .padding(.bottom, 18)
-        }
-        .background {
-            ZStack {
-                Rectangle().fill(.thinMaterial)
-                StudyTheme.sidebarBase
-                HStack {
-                    Rectangle().fill(Color.white.opacity(0.42)).frame(width: 1)
-                    Spacer()
+            VStack(alignment: .leading, spacing: 7) {
+                progressSummary.padding(.horizontal, 8)
+                Rectangle().fill(StudyTheme.hairline).frame(height: 1)
+                sidebarRow("设置", icon: "gearshape", shortcut: "⌘,") {
+                    settingsPane = .general
                 }
+                .keyboardShortcut(",", modifiers: .command)
             }
         }
+        .padding(12)
+        .background(StudyTheme.sidebarBase)
+        .overlay(alignment: .trailing) { Rectangle().fill(StudyTheme.hairline).frame(width: 1) }
+    }
+
+    private func sidebarHeading(_ title: String) -> some View {
+        Text(title)
+            .font(.system(size: 11, weight: .semibold))
+            .foregroundStyle(StudyTheme.mutedInk)
+            .padding(.leading, 9)
+            .padding(.bottom, 3)
+            .accessibilityAddTraits(.isHeader)
+    }
+
+    private func sidebarDisclosure<Content: View>(
+        _ title: String, icon: String, expanded: Binding<Bool>, @ViewBuilder content: () -> Content
+    ) -> some View {
+        VStack(spacing: 2) {
+            Button {
+                withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.3)) {
+                    expanded.wrappedValue.toggle()
+                }
+            } label: {
+                HStack(spacing: 9) {
+                    Image(systemName: icon).frame(width: 16)
+                    Text(title)
+                    Spacer()
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 9, weight: .semibold))
+                        .rotationEffect(.degrees(expanded.wrappedValue ? 90 : 0))
+                        .accessibilityHidden(true)
+                }
+                .font(.system(size: 13))
+                .padding(.horizontal, 9)
+                .frame(height: 30)
+            }
+            .buttonStyle(GoalsButtonStyle(.row))
+            .accessibilityValue(expanded.wrappedValue ? "已展开" : "已折叠")
+
+            if expanded.wrappedValue {
+                VStack(spacing: 2, content: content)
+                    .padding(.leading, 16)
+                    .overlay(alignment: .leading) {
+                        Rectangle().fill(StudyTheme.hairline).frame(width: 1).padding(.leading, 16)
+                    }
+                    .padding(.leading, 1)
+                    .transition(.opacity)
+            }
+        }
+    }
+
+    private var consoleGoalMenu: some View {
+        VStack(alignment: .leading, spacing: 3) {
+            if !goals.isEmpty {
+                ScrollView {
+                    VStack(spacing: 2) {
+                        ForEach(goals) { goal in
+                            sidebarRow(goal.title, icon: goal.id == selectedGoalID ? "checkmark" : "target", isSelected: goal.id == selectedGoalID) {
+                                showConsoleOverlay(nil)
+                                selectedGoalID = goal.id
+                                if selectedCategory == .today { todayGoalID = goal.id }
+                            }
+                        }
+                    }
+                }
+                .frame(height: min(CGFloat(goals.count) * 32, 224))
+
+                Rectangle().fill(StudyTheme.hairline).frame(height: 1).padding(.vertical, 2)
+            }
+
+            sidebarRow("新建目标", icon: "plus") {
+                showConsoleOverlay(nil)
+                openNewGoalForm()
+            }
+            Button("关闭", action: { showConsoleOverlay(nil) })
+                .keyboardShortcut(.cancelAction)
+                .frame(width: 0, height: 0)
+                .opacity(0)
+                .accessibilityHidden(true)
+        }
+        .padding(6)
+        .frame(width: Self.sidebarWidth - 24)
+        .background(StudyTheme.paper, in: .rect(cornerRadius: 8))
+        .overlay { RoundedRectangle(cornerRadius: 8).strokeBorder(StudyTheme.hairline) }
+        .shadow(color: .black.opacity(0.16), radius: 14, x: 0, y: 7)
+    }
+
+    private func showConsoleOverlay(_ overlay: ConsoleOverlay?) {
+        let isSearch = (overlay ?? consoleOverlay) == .search
+        withAnimation(reduceMotion ? nil : .easeOut(duration: isSearch ? 0.2 : 0.1)) {
+            consoleOverlay = overlay
+        }
+    }
+
+    private func consoleCommands(_ query: String) -> [ConsoleCommand] {
+        let query = query.trimmingCharacters(in: .whitespacesAndNewlines)
+        let pages: [StudyCategory] = [.goals, .today, .plan, .words, .flashcards, .mistakes, .translation, .writing, .roots]
+        let pageCommands = pages.compactMap { page -> ConsoleCommand? in
+            guard query.isEmpty || page.title.localizedStandardContains(query) else { return nil }
+            return ConsoleCommand(id: "page-\(page.id)", title: page.title, detail: "页面", icon: page.icon) {
+                selectedCategory = page
+            }
+        }
+        let actions = [
+            ConsoleCommand(id: "settings", title: "设置", detail: "操作", icon: "gearshape") { settingsPane = .general },
+            ConsoleCommand(id: "deepseek", title: "DeepSeek 设置", detail: "操作", icon: "terminal") { settingsPane = .deepSeek },
+            ConsoleCommand(id: "create-goal", title: "新建目标", detail: "操作", icon: "plus", action: openNewGoalForm)
+        ].filter { query.isEmpty || $0.title.localizedStandardContains(query) }
+        guard !query.isEmpty else { return pageCommands + actions }
+
+        var matches = pageCommands + actions
+        for goal in goals {
+            let matchesGoal = goal.title.localizedStandardContains(query)
+            if matchesGoal {
+                matches.append(ConsoleCommand(id: "goal-\(goal.id)", title: goal.title, detail: "目标", icon: "target") {
+                    selectedGoalID = goal.id
+                    selectedCategory = .goals
+                })
+            }
+            for plan in goal.plans where matchesGoal || plan.title.localizedStandardContains(query) {
+                matches.append(ConsoleCommand(id: "plan-\(goal.id)-\(plan.id)", title: plan.title, detail: goal.title, icon: "doc.text") {
+                    openConsolePlan(plan, in: goal)
+                })
+            }
+        }
+        for word in allWords.lazy.filter({
+            $0.word.localizedStandardContains(query) || $0.meaning.localizedStandardContains(query)
+        }).prefix(12) {
+            matches.append(ConsoleCommand(id: "word-\(word.id)", title: word.word, detail: "单词本", icon: "book.closed") {
+                wordSearch = word.word
+                selectedCategory = .words
+            })
+        }
+        return matches
+    }
+
+    private func openNewGoalForm() {
+        newGoalError = nil
+        showsNewGoal = true
+    }
+
+    private func openConsolePlan(_ plan: GoalPlanSheet, in goal: GoalPlan) {
+        selectedGoalID = goal.id
+        selectedPlanID = plan.id
+        planWorkspaceMode = .manual
+        selectedCategory = .plan
     }
 
     private var detailPane: some View {
         VStack(alignment: .leading, spacing: 0) {
-            HStack(alignment: .center) {
-                VStack(alignment: .leading, spacing: 5) {
-                    Text(selectedCategory.title)
-                        .font(StudyTheme.songti(size: 29, weight: .semibold))
-                    Text(selectedCategory.subtitle)
-                        .font(.system(size: 13, weight: .semibold))
-                        .foregroundStyle(StudyTheme.secondaryInk)
-                }
+            HStack(alignment: .center, spacing: 16) {
+                Text(selectedCategory.title)
+                    .font(StudyTheme.heading(size: 28, weight: .semibold))
+                    .accessibilityAddTraits(.isHeader)
                 Spacer()
-                currentTargetPicker
-                statusPill
+
+                if selectedCategory == .plan && !goals.isEmpty {
+                    currentTargetPicker
+                }
+                if selectedCategory == .goals && !goals.isEmpty {
+                    Button(action: openNewGoalForm) {
+                        Label("新建目标", systemImage: "plus")
+                    }
+                    .buttonStyle(GoalsButtonStyle(.primary))
+                }
+                if selectedCategory == .flashcards {
+                    Button {
+                        settingsPane = .speech
+                    } label: {
+                        Label("朗读设置", systemImage: "speaker.wave.2")
+                    }
+                    .buttonStyle(GoalsButtonStyle())
+                }
             }
-            .padding(.horizontal, 28)
-            .padding(.top, 24)
+            .padding(.horizontal, 26)
+            .padding(.top, 22)
             .padding(.bottom, 18)
 
-            Group {
-                switch selectedCategory {
-                case .goals:
-                    goalsWorkspace
-                case .plan:
-                    combinedPlanWorkspace
-                case .today:
-                    todayWorkspace
-                case .words:
-                    wordBankWorkspace
-                case .translation:
-                    translationWorkspace
-                case .writing:
-                    writingWorkspace
-                case .roots:
-                    rootsWorkspace
-                case .flashcards:
-                    flashcardWorkspace
-                case .mistakes:
-                    mistakeWorkspace
+            ZStack {
+                Group {
+                    switch selectedCategory {
+                    case .goals: goalsWorkspace
+                    case .plan: combinedPlanWorkspace
+                    case .today: todayWorkspace
+                    case .words: wordBankWorkspace
+                    case .translation: translationWorkspace
+                    case .writing: writingWorkspace
+                    case .roots: rootsWorkspace
+                    case .flashcards: flashcardWorkspace
+                    case .mistakes: mistakeWorkspace
+                    }
                 }
+                .id(selectedCategory)
+                .transition(workspaceTransition)
             }
-            .padding(.horizontal, 28)
-            .padding(.bottom, 28)
+            .animation(reduceMotion ? nil : .easeInOut(duration: 0.22), value: selectedCategory)
+            .padding(.horizontal, 26)
+            .padding(.bottom, 22)
         }
     }
 
+    private var workspaceTransition: AnyTransition {
+        reduceMotion ? .identity : .asymmetric(
+            insertion: .opacity.combined(with: .offset(y: 5)),
+            removal: .opacity
+        )
+    }
+
     private var currentGoal: GoalPlan {
-        goals.first { $0.id == selectedGoalID } ?? goals.first ?? Self.emergencyGoal
+        goals.first { $0.id == selectedGoalID } ?? goals.first ?? Self.emptyGoal
     }
 
     private var currentPlan: GoalPlanSheet {
-        currentGoal.plans.first { $0.id == selectedPlanID } ?? currentGoal.plans.first ?? Self.emergencyPlan
+        currentGoal.plans.first { $0.id == selectedPlanID } ?? currentGoal.plans.first ?? Self.emptyPlan
     }
 
     private func resolvedScheduleBlocks(from text: String) -> [ScheduleBlock] {
@@ -985,307 +1296,250 @@ struct StudyWindowView: View {
         )
     }
 
-    private var availableCategories: [StudyCategory] {
-        categories(for: currentGoal)
-    }
-
-    private func categories(for goal: GoalPlan) -> [StudyCategory] {
-        let goalCategories: [StudyCategory] = [.goals, .plan, .today]
-        let englishCategories: [StudyCategory] = [.words, .translation, .writing, .roots, .flashcards, .mistakes]
-
-        return goalUsesEnglishTools(goal) ? goalCategories + englishCategories : goalCategories
-    }
-
-    private func goalUsesEnglishTools(_ goal: GoalPlan) -> Bool {
-        let text = "\(goal.title) \(goal.mode) \(goal.focus)".lowercased()
-        let keywords = ["cet", "六级", "英语", "英文", "单词", "词汇", "听力", "阅读", "翻译", "写作", "作文", "词根"]
-        return keywords.contains { text.contains($0) }
-    }
-
-    private func ensureSelectedCategoryVisible(for goal: GoalPlan) {
-        if !categories(for: goal).contains(selectedCategory) {
-            selectedCategory = .goals
-        }
-    }
-
     private var currentTargetPicker: some View {
         HStack(spacing: 8) {
-            Picker("当前目标", selection: $selectedGoalID) {
-                ForEach(goals) { goal in
-                    Text(goal.title).tag(goal.id)
-                }
-            }
-            .labelsHidden()
+            GoalsMenuPicker(title: "当前目标", selection: $selectedGoalID, options: goals.map { ($0.id, $0.title) })
             .frame(width: 170)
 
-            Picker("当前计划表", selection: $selectedPlanID) {
-                ForEach(currentGoal.plans) { plan in
-                    Text(plan.title).tag(plan.id)
-                }
-            }
-            .labelsHidden()
+            GoalsMenuPicker(title: "当前计划表", selection: $selectedPlanID, options: currentGoal.plans.map { ($0.id, $0.title) })
             .frame(width: 150)
         }
     }
 
-    @ViewBuilder
-    private func segmentedCapsule<T: Hashable>(
-        selection: Binding<T>,
-        options: [(T, String)]
-    ) -> some View {
-        HStack(spacing: 0) {
-            ForEach(options, id: \.0) { option in
-                Button {
-                    selection.wrappedValue = option.0
-                } label: {
-                    Text(option.1)
-                        .font(StudyTheme.songti(size: 13, weight: selection.wrappedValue == option.0 ? .semibold : .regular))
-                        .foregroundStyle(selection.wrappedValue == option.0 ? StudyTheme.ink : StudyTheme.secondaryInk)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 5)
-                        .background(
-                            Capsule()
-                                .fill(selection.wrappedValue == option.0 ? StudyTheme.paper : Color.clear)
-                                .shadow(color: selection.wrappedValue == option.0 ? Color.black.opacity(0.06) : Color.clear, radius: 2, x: 0, y: 1)
-                        )
-                }
-                .buttonStyle(.plain)
-            }
-        }
-        .padding(3)
-        .background(Capsule().fill(StudyTheme.sidebarBase))
-        .overlay(Capsule().stroke(StudyTheme.hairline, lineWidth: 1))
-    }
-
-    private var shellBackground: some View {
-        ZStack {
-            StudyTheme.windowBase
-            LinearGradient(
-                colors: [
-                    StudyTheme.paper.opacity(0.96),
-                    StudyTheme.windowBase,
-                    selectedCategory.tint.opacity(0.045)
-                ],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-            VStack(spacing: 0) {
-                Rectangle().fill(Color.white.opacity(0.52)).frame(height: 1)
-                Spacer()
-            }
-        }
-    }
-
     private var progressSummary: some View {
-        let tasks = store.todayTasks(for: currentGoal.id)
-        let total = max(tasks.count, 1)
+        let tasks = store.todayTasks
         let done = tasks.filter(\.isDone).count
 
-        return VStack(alignment: .leading, spacing: 10) {
-            HStack {
-                Text("今日完成")
-                    .font(.system(size: 13, weight: .semibold))
-                Spacer()
-                Text("\(done)/\(tasks.count)")
-                    .font(.system(size: 13, weight: .bold))
-                    .foregroundStyle(StudyTheme.secondaryInk)
-            }
-
-            GeometryReader { proxy in
-                ZStack(alignment: .leading) {
-                    Capsule().fill(Color.black.opacity(0.12))
-                    Capsule()
-                        .fill(StudyTheme.quietGreen)
-                        .frame(width: proxy.size.width * CGFloat(done) / CGFloat(total))
+        return Button {
+            selectedCategory = .today
+        } label: {
+            VStack(alignment: .leading, spacing: 7) {
+                HStack {
+                    Text("今日完成")
+                    Spacer()
+                    Text("\(done) / \(tasks.count)")
+                        .monospacedDigit()
                 }
+                .font(.system(size: 12, weight: .medium))
+                ProgressView(value: Double(done), total: Double(max(tasks.count, 1)))
+                    .tint(StudyTheme.blue)
+                    .labelsHidden()
             }
-            .frame(height: 7)
+            .foregroundStyle(StudyTheme.secondaryInk)
+            .padding(.horizontal, 6)
+            .padding(.vertical, 4)
         }
-        .padding(13)
-        .background(StudyTheme.panelBase)
-        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-        .overlay {
-            RoundedRectangle(cornerRadius: 12, style: .continuous)
-                .stroke(StudyTheme.hairline, lineWidth: 1)
-        }
-    }
-
-    private var statusPill: some View {
-        HStack(spacing: 8) {
-            Circle()
-                .fill(selectedCategory.tint)
-                .frame(width: 8, height: 8)
-            Text(DateKey.today())
-                .font(.system(size: 13, weight: .semibold))
-        }
-        .padding(.horizontal, 12)
-        .padding(.vertical, 8)
-        .foregroundStyle(StudyTheme.ink)
-        .background(StudyTheme.paper)
-        .clipShape(Capsule())
-        .overlay {
-            Capsule().stroke(StudyTheme.hairline, lineWidth: 1)
-        }
+        .buttonStyle(GoalsButtonStyle(.row))
+        .accessibilityLabel("今日完成 \(done) 项，共 \(tasks.count) 项")
     }
 
     private func sidebarButton(for category: StudyCategory) -> some View {
-        let isSelected = selectedCategory == category
-
-        return Button {
+        let pending = category == .today ? store.todayTasks.filter { !$0.isDone }.count : 0
+        return sidebarRow(category.title, icon: category.icon, isSelected: selectedCategory == category, badge: pending) {
             selectedCategory = category
-        } label: {
-            HStack(spacing: 11) {
-                ZStack {
-                    RoundedRectangle(cornerRadius: 3, style: .continuous)
-                        .fill(isSelected ? category.tint.opacity(0.12) : Color.white.opacity(0.001))
-                        .frame(width: 34, height: 34)
-                    Image(systemName: category.icon)
-                        .font(.system(size: 15, weight: .semibold))
-                        .foregroundStyle(isSelected ? category.tint : StudyTheme.mutedInk)
-                }
-
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(category.title)
-                        .font(.system(size: 14, weight: .semibold))
-                        .foregroundStyle(isSelected ? StudyTheme.ink : StudyTheme.sidebarInk)
-                    Text(category.subtitle)
-                        .font(.system(size: 11, weight: .medium))
-                        .foregroundStyle(isSelected ? StudyTheme.secondaryInk : StudyTheme.sidebarInk.opacity(0.74))
-                }
-
-                Spacer(minLength: 0)
-            }
-            .frame(maxWidth: .infinity, minHeight: 52, alignment: .leading)
-            .padding(.horizontal, 10)
-            .background(isSelected ? StudyTheme.panelStrong : Color.white.opacity(0.001))
-            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-            .contentShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-            .overlay {
-                if isSelected {
-                    RoundedRectangle(cornerRadius: 12, style: .continuous)
-                        .stroke(StudyTheme.hairline, lineWidth: 1)
-                }
-            }
-            .overlay(alignment: .trailing) {
-                if isSelected {
-                    RoundedRectangle(cornerRadius: 2, style: .continuous)
-                        .fill(category.tint)
-                        .frame(width: 3, height: 24)
-                        .padding(.trailing, 1)
-                }
-            }
         }
-        .buttonStyle(.plain)
+    }
+
+    private func sidebarRow(
+        _ title: String, icon: String, isSelected: Bool = false, badge: Int = 0,
+        shortcut: String? = nil, action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
+            HStack(spacing: 9) {
+                Image(systemName: icon).frame(width: 16)
+                Text(title)
+                    .fontWeight(isSelected ? .semibold : .regular)
+                    .lineLimit(1)
+                Spacer(minLength: 4)
+                if badge > 0 {
+                    Text("\(badge)")
+                        .font(.system(size: 10, weight: .semibold, design: .monospaced))
+                        .foregroundStyle(StudyTheme.blue)
+                        .padding(.horizontal, 5)
+                        .frame(minWidth: 20, minHeight: 18)
+                        .background(StudyTheme.selection, in: .capsule)
+                        .accessibilityLabel("\(badge) 项待完成")
+                }
+                if let shortcut {
+                    ConsoleKeycap(shortcut).accessibilityHidden(true)
+                }
+            }
+            .font(.system(size: 13))
+            .padding(.horizontal, 9)
+            .frame(height: 30)
+        }
+        .buttonStyle(GoalsButtonStyle(.row, selected: isSelected))
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 
     private var goalsWorkspace: some View {
-        HStack(alignment: .top, spacing: 18) {
-            VStack(alignment: .leading, spacing: 12) {
-                HStack {
-                    Text("目标")
-                        .font(.system(size: 16, weight: .bold))
-                    Spacer()
-                    Text("\(goals.count) 个")
-                        .font(.system(size: 12, weight: .bold))
-                        .foregroundStyle(StudyTheme.secondaryInk)
-                }
+        let tasks = store.todayTasks
+        let complete = tasks.filter(\.isDone).count
 
-                ScrollView {
-                    LazyVStack(spacing: 10) {
-                        ForEach(goals) { goal in
-                            goalCard(goal)
-                        }
-                    }
+        return VStack(spacing: 16) {
+            HStack(spacing: 14) {
+                consoleOverviewCard("今日任务", value: "\(complete) / \(tasks.count)", icon: "calendar") {
+                    todayGoalID = nil
+                    selectedCategory = .today
                 }
-
-                VStack(alignment: .leading, spacing: 9) {
-                    Text("新建目标")
-                        .font(.system(size: 14, weight: .bold))
-                    TextField("例如：考研、健身、读书、项目作品集", text: $newGoalTitle)
-                        .textFieldStyle(.plain)
-                        .font(.system(size: 14))
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 9)
-                        .background(StudyTheme.panelStrong)
-                        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-                    TextField("模式，例如：考试冲刺 / 习惯养成 / 长期项目", text: $newGoalMode)
-                        .textFieldStyle(.plain)
-                        .font(.system(size: 14))
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 9)
-                        .background(StudyTheme.panelStrong)
-                        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-                    TextField("这个目标最重要的执行原则", text: $newGoalFocus)
-                        .textFieldStyle(.plain)
-                        .font(.system(size: 14))
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 9)
-                        .background(StudyTheme.panelStrong)
-                        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-                        .onSubmit(addGoal)
-                    Button {
-                        addGoal()
-                    } label: {
-                        Label("新增目标", systemImage: "plus")
-                    }
-                    .buttonStyle(SealButtonStyle())
-                    .tint(StudyCategory.goals.tint)
-                }
-                .padding(13)
-                .background(StudyTheme.panelBase)
-                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-                .overlay {
-                    RoundedRectangle(cornerRadius: 12, style: .continuous)
-                        .stroke(StudyTheme.hairline, lineWidth: 1)
+                consoleOverviewCard("单词本", value: "\(allWords.count) 个单词", icon: "book.closed") {
+                    wordSearch = ""
+                    selectedCategory = .words
                 }
             }
-            .frame(width: 330)
+            goalDirectory
+        }
+    }
 
-            VStack(alignment: .leading, spacing: 14) {
-                HStack(alignment: .top) {
-                    VStack(alignment: .leading, spacing: 5) {
-                        Text(currentGoal.title)
-                            .font(StudyTheme.songti(size: 24, weight: .semibold))
-                        Text("\(currentGoal.mode) · \(currentGoal.focus)")
-                            .font(.system(size: 13, weight: .semibold))
-                            .foregroundStyle(StudyTheme.secondaryInk)
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
+    private func consoleOverviewCard(_ title: String, value: String, icon: String, open: @escaping () -> Void) -> some View {
+        Button(action: open) {
+            VStack(alignment: .leading, spacing: 9) {
+                HStack(spacing: 7) {
+                    Image(systemName: icon).accessibilityHidden(true)
+                    Text(title)
                     Spacer()
-                    Text(goalStatus)
-                        .font(.system(size: 12, weight: .semibold))
-                        .foregroundStyle(StudyTheme.secondaryInk)
-                        .frame(maxWidth: 260, alignment: .trailing)
+                    Image(systemName: "arrow.up.right").accessibilityHidden(true)
                 }
+                .font(.system(size: 12, weight: .medium))
+                .foregroundStyle(StudyTheme.secondaryInk)
+                Text(value)
+                    .font(.system(size: 22, weight: .semibold))
+                    .monospacedDigit()
+                    .foregroundStyle(StudyTheme.ink)
+            }
+            .padding(15)
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .buttonStyle(GoalsButtonStyle(.card))
+    }
 
-                HStack(spacing: 10) {
-                    TextField("新计划表名称", text: $newPlanTitle)
-                        .textFieldStyle(.plain)
-                        .font(.system(size: 14))
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 9)
-                        .background(StudyTheme.panelStrong)
-                        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-                        .onSubmit(addPlanToCurrentGoal)
-
-                    Button {
-                        addPlanToCurrentGoal()
-                    } label: {
-                        Label("新计划表", systemImage: "doc.badge.plus")
+    private var goalDirectory: some View {
+        Group {
+            if goals.isEmpty {
+                ContentUnavailableView {
+                    Label("暂无目标", systemImage: "target")
+                } description: {
+                    Text("新建目标后，就可以在里面编辑计划表和安排任务。")
+                } actions: {
+                    Button(action: openNewGoalForm) {
+                        Label("新建目标", systemImage: "plus")
                     }
-                    .buttonStyle(SealButtonStyle())
-                    .tint(StudyCategory.goals.tint)
+                    .buttonStyle(GoalsButtonStyle(.primary))
                 }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background(StudyTheme.paper, in: .rect(cornerRadius: 14))
+                .overlay { RoundedRectangle(cornerRadius: 14).strokeBorder(StudyTheme.hairline) }
+            } else {
+                HStack(alignment: .top, spacing: 18) {
+                    VStack(alignment: .leading, spacing: 10) {
+                        HStack {
+                            Text("我的目标").font(.headline)
+                            Spacer()
+                            Text("\(goals.count)").monospacedDigit()
+                                .foregroundStyle(StudyTheme.secondaryInk)
+                        }
 
-                ScrollView {
-                    LazyVStack(spacing: 10) {
-                        ForEach(currentGoal.plans) { plan in
-                            planSheetCard(plan)
+                        ScrollView {
+                            LazyVStack(spacing: 8) {
+                                ForEach(goals, content: goalCard)
+                            }
                         }
                     }
+                    .frame(width: 218)
+
+                    VStack(alignment: .leading, spacing: 16) {
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text(currentGoal.title)
+                                .font(.system(size: 25, weight: .semibold))
+                            Text([currentGoal.mode, currentGoal.focus].filter { !$0.isEmpty }.joined(separator: " · "))
+                                .font(.callout)
+                                .foregroundStyle(StudyTheme.secondaryInk)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                        .padding(18)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .background(StudyTheme.paper, in: .rect(cornerRadius: 12))
+                        .overlay { RoundedRectangle(cornerRadius: 12).strokeBorder(StudyTheme.hairline) }
+
+                        HStack(spacing: 10) {
+                            Text("计划表")
+                                .font(.headline)
+                            Spacer()
+                            TextField("新计划表名称（选填）", text: $newPlanTitle)
+                                .goalsInput()
+                                .frame(maxWidth: 180)
+                                .onSubmit(addPlanToCurrentGoal)
+
+                            Button(action: addPlanToCurrentGoal) {
+                                Label("新建计划表", systemImage: "plus")
+                            }
+                            .buttonStyle(GoalsButtonStyle())
+                        }
+
+                        if !goalStatus.isEmpty {
+                            Text(goalStatus)
+                                .font(.callout)
+                                .foregroundStyle(StudyTheme.secondaryInk)
+                        }
+
+                        ScrollView {
+                            LazyVStack(spacing: 8) {
+                                ForEach(currentGoal.plans, content: planSheetCard)
+                            }
+                        }
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
                 }
             }
         }
+    }
+
+    private var newGoalForm: some View {
+        VStack(alignment: .leading, spacing: 15) {
+            Text("新建目标")
+                .font(.title2.weight(.semibold))
+                .accessibilityAddTraits(.isHeader)
+
+            VStack(alignment: .leading, spacing: 6) {
+                Text("目标名称").font(.headline)
+                TextField("例如：六级备考", text: $newGoalTitle)
+                    .goalsInput()
+                    .accessibilityLabel("目标名称")
+            }
+
+            VStack(alignment: .leading, spacing: 6) {
+                Text("类型").font(.headline)
+                TextField("例如：考试冲刺、长期项目", text: $newGoalMode)
+                    .goalsInput()
+                    .accessibilityLabel("目标类型")
+            }
+
+            VStack(alignment: .leading, spacing: 6) {
+                Text("重点（选填）").font(.headline)
+                TextField("写下这个目标最重要的事", text: $newGoalFocus)
+                    .goalsInput()
+                    .accessibilityLabel("目标重点")
+            }
+
+            if let newGoalError {
+                Text(newGoalError)
+                    .font(.callout)
+                    .foregroundStyle(StudyTheme.cinnabar)
+            }
+
+            HStack {
+                Spacer()
+                Button("取消") { showsNewGoal = false }
+                    .buttonStyle(GoalsButtonStyle())
+                    .keyboardShortcut(.cancelAction)
+                Button("创建", action: addGoal)
+                    .buttonStyle(GoalsButtonStyle(.primary))
+                    .keyboardShortcut(.defaultAction)
+                    .disabled(newGoalTitle.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+            }
+        }
+        .padding(24)
+        .frame(width: 410)
     }
 
     private func goalCard(_ goal: GoalPlan) -> some View {
@@ -1320,14 +1574,9 @@ struct StudyWindowView: View {
             }
             .padding(13)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(isSelected ? StudyTheme.panelStrong : StudyTheme.panelBase)
-            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-            .overlay {
-                RoundedRectangle(cornerRadius: 12, style: .continuous)
-                    .stroke(isSelected ? StudyCategory.goals.tint.opacity(0.45) : StudyTheme.hairline, lineWidth: 1)
-            }
         }
-        .buttonStyle(.plain)
+        .buttonStyle(GoalsButtonStyle(.card, selected: isSelected))
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
         .contextMenu {
             Button(role: .destructive) {
                 deleteGoal(goal)
@@ -1374,20 +1623,37 @@ struct StudyWindowView: View {
             }
             .padding(13)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(isSelected ? StudyTheme.panelStrong : StudyTheme.panelBase)
-            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-            .overlay {
-                RoundedRectangle(cornerRadius: 12, style: .continuous)
-                    .stroke(isSelected ? StudyCategory.plan.tint.opacity(0.45) : StudyTheme.hairline, lineWidth: 1)
-            }
         }
-        .buttonStyle(.plain)
+        .buttonStyle(GoalsButtonStyle(.card, selected: isSelected))
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 
+    @ViewBuilder
     private var combinedPlanWorkspace: some View {
+        if goals.isEmpty {
+            ContentUnavailableView {
+                Label("暂无计划表", systemImage: "doc.text")
+            } description: {
+                Text("先创建目标，再写计划或用 DeepSeek 生成草稿。")
+            } actions: {
+                Button(action: openNewGoalForm) {
+                    Label("新建目标", systemImage: "plus")
+                }
+                .buttonStyle(GoalsButtonStyle(.primary))
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(StudyTheme.paper, in: .rect(cornerRadius: 14))
+            .overlay { RoundedRectangle(cornerRadius: 14).strokeBorder(StudyTheme.hairline) }
+        } else {
+            activePlanWorkspace
+        }
+    }
+
+    private var activePlanWorkspace: some View {
         VStack(alignment: .leading, spacing: 14) {
             HStack {
-                segmentedCapsule(
+                GoalsSegmentedControl(
+                    title: "计划模式",
                     selection: $planWorkspaceMode,
                     options: PlanWorkspaceMode.allCases.map { ($0, $0.title) }
                 )
@@ -1396,21 +1662,24 @@ struct StudyWindowView: View {
                 Spacer()
             }
 
-            Group {
-                switch planWorkspaceMode {
-                case .manual:
-                    planWorkspace
-                case .ai:
-                    aiPlanWorkspace
+            ZStack {
+                Group {
+                    switch planWorkspaceMode {
+                    case .manual: planWorkspace
+                    case .ai: aiPlanWorkspace
+                    }
                 }
+                .id(planWorkspaceMode)
+                .transition(workspaceTransition)
             }
+            .animation(reduceMotion ? nil : .easeInOut(duration: 0.22), value: planWorkspaceMode)
         }
     }
 
     private var planWorkspace: some View {
         HStack(alignment: .top, spacing: 18) {
             planEditorPane
-            .frame(width: 360)
+            .frame(idealWidth: 326, maxWidth: 356)
 
             VStack(alignment: .leading, spacing: 12) {
                 HStack {
@@ -1433,7 +1702,7 @@ struct StudyWindowView: View {
                             .lineLimit(1)
                             .fixedSize(horizontal: true, vertical: false)
                     }
-                    .buttonStyle(SealButtonStyle())
+                    .buttonStyle(GoalsButtonStyle(.primary))
                     .tint(StudyCategory.plan.tint)
                     .disabled(isGeneratingSchedule)
 
@@ -1442,7 +1711,7 @@ struct StudyWindowView: View {
                     } label: {
                         Label("复制", systemImage: "doc.on.doc")
                     }
-                    .buttonStyle(BookmarkButtonStyle())
+                    .buttonStyle(GoalsButtonStyle())
                     .disabled(scheduleBlocks.isEmpty)
 
                     Button {
@@ -1450,8 +1719,7 @@ struct StudyWindowView: View {
                     } label: {
                         Label("同步到任务库", systemImage: "arrow.triangle.2.circlepath")
                     }
-                    .buttonStyle(.borderless)
-                    .foregroundStyle(StudyCategory.plan.tint)
+                    .buttonStyle(GoalsButtonStyle(tint: StudyCategory.plan.tint))
                     .disabled(scheduleBlocks.isEmpty)
                 }
 
@@ -1495,27 +1763,21 @@ struct StudyWindowView: View {
                 } label: {
                     Label("粘贴", systemImage: "doc.on.clipboard")
                 }
-                .buttonStyle(BookmarkButtonStyle())
+                .buttonStyle(GoalsButtonStyle())
 
                 Button {
                     savePlan()
                 } label: {
                     Label("保存计划书", systemImage: "square.and.arrow.down")
                 }
-                .buttonStyle(SealButtonStyle())
+                .buttonStyle(GoalsButtonStyle(.primary))
                 .tint(StudyCategory.plan.tint)
             }
             TextEditor(text: $planText)
-                .font(StudyTheme.songti(size: 14))
+                .font(StudyTheme.heading(size: 14))
                 .foregroundStyle(StudyTheme.ink)
                 .scrollContentBackground(.hidden)
-                .padding(12)
-                .background(StudyTheme.panelStrong)
-                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-                .overlay {
-                    RoundedRectangle(cornerRadius: 12, style: .continuous)
-                        .stroke(StudyTheme.hairline, lineWidth: 1)
-                }
+                .goalsInput(vertical: 10, radius: 12)
         }
     }
 
@@ -1547,7 +1809,7 @@ struct StudyWindowView: View {
                 Label("显示/编辑原文", systemImage: "pencil")
                     .padding(.horizontal, 6)
             }
-            .buttonStyle(SealButtonStyle())
+            .buttonStyle(GoalsButtonStyle(.primary))
             .tint(StudyCategory.plan.tint)
         }
         .padding(14)
@@ -1703,18 +1965,19 @@ struct StudyWindowView: View {
             } label: {
                 Image(systemName: isDone ? "checkmark.circle.fill" : "circle")
                     .font(.system(size: 22, weight: .semibold))
-                    .foregroundStyle(isDone ? StudyCategory.today.tint : StudyTheme.mutedInk)
+                    .foregroundStyle(isDone ? StudyTheme.quietGreen : StudyTheme.mutedInk)
                     .frame(width: 28, height: 28)
             }
-            .buttonStyle(.plain)
+            .buttonStyle(GoalsButtonStyle(.icon))
+            .accessibilityLabel(isDone ? "标记为未完成" : "标记完成")
             .help(isDone ? "标记为未完成" : "标记完成")
 
             VStack {
                 Text(block.dateLabel)
                     .font(.system(size: 12, weight: .bold))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(StudyTheme.blue)
                     .frame(width: 104, height: 28)
-                    .background(StudyCategory.plan.tint)
+                    .background(StudyTheme.selection)
                     .clipShape(Capsule())
             }
 
@@ -1762,13 +2025,7 @@ struct StudyWindowView: View {
                     .foregroundStyle(StudyTheme.ink)
                     .scrollContentBackground(.hidden)
                     .frame(minHeight: 230)
-                    .padding(10)
-                    .background(StudyTheme.panelStrong)
-                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-                    .overlay {
-                        RoundedRectangle(cornerRadius: 12, style: .continuous)
-                            .stroke(StudyTheme.hairline, lineWidth: 1)
-                    }
+                    .goalsInput(vertical: 10, radius: 12)
 
                 HStack {
                     Text(aiPlanStatus)
@@ -1780,12 +2037,12 @@ struct StudyWindowView: View {
                     } label: {
                         Label(isRevisingPlan ? "定制中" : "AI 定计划", systemImage: isRevisingPlan ? "hourglass" : "sparkles")
                     }
-                    .buttonStyle(SealButtonStyle())
+                    .buttonStyle(GoalsButtonStyle(.primary))
                     .tint(StudyCategory.plan.tint)
                     .disabled(isRevisingPlan)
                 }
             }
-            .frame(width: 360)
+            .frame(idealWidth: 326, maxWidth: 356)
 
             VStack(alignment: .leading, spacing: 12) {
                 HStack {
@@ -1803,7 +2060,7 @@ struct StudyWindowView: View {
                     } label: {
                         Label("保存到计划书", systemImage: "square.and.arrow.down")
                     }
-                    .buttonStyle(BookmarkButtonStyle())
+                    .buttonStyle(GoalsButtonStyle())
                     .disabled(aiPlanDraft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
 
                     Button {
@@ -1811,7 +2068,7 @@ struct StudyWindowView: View {
                     } label: {
                         Label("同步任务", systemImage: "arrow.triangle.2.circlepath")
                     }
-                    .buttonStyle(SealButtonStyle())
+                    .buttonStyle(GoalsButtonStyle(.primary))
                     .tint(StudyCategory.plan.tint)
                     .disabled(aiPlanDraft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                 }
@@ -1822,7 +2079,7 @@ struct StudyWindowView: View {
                     ScrollView {
                         VStack(alignment: .leading, spacing: 12) {
                             Text(aiPlanDraft)
-                                .font(StudyTheme.songti(size: 13))
+                                .font(StudyTheme.heading(size: 13))
                                 .foregroundStyle(StudyTheme.ink)
                                 .textSelection(.enabled)
                                 .padding(12)
@@ -1856,6 +2113,11 @@ struct StudyWindowView: View {
             .textSelection(.enabled)
     }
 
+    private var aiPlanDraft: String {
+        guard generatedAIPlan?.planID == currentPlan.id else { return "" }
+        return generatedAIPlan?.text ?? ""
+    }
+
     private func generateAIStudyPlan() {
         let request = aiPlanPrompt.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !request.isEmpty else {
@@ -1863,6 +2125,8 @@ struct StudyWindowView: View {
             return
         }
 
+        let targetGoal = currentGoal
+        let targetPlanID = currentPlan.id
         isRevisingPlan = true
         aiPlanStatus = "AI 正在定制计划..."
 
@@ -1870,16 +2134,16 @@ struct StudyWindowView: View {
             do {
                 let service = try DeepSeekPlanService()
                 let goalContext = """
-                当前目标：\(currentGoal.title)
-                当前模式：\(currentGoal.mode)
-                执行重点：\(currentGoal.focus)
+                当前目标：\(targetGoal.title)
+                当前模式：\(targetGoal.mode)
+                执行重点：\(targetGoal.focus)
                 用户补充：\(request)
                 """
                 let generated = try await service.createStudyPlan(userProfile: goalContext)
 
                 await MainActor.run {
-                    aiPlanDraft = generated.planText
-                    aiPlanStatus = generated.reply
+                    generatedAIPlan = (targetPlanID, generated.planText)
+                    aiPlanStatus = currentPlan.id == targetPlanID ? generated.reply : "草稿已生成，可切回原计划表查看。"
                     isRevisingPlan = false
                 }
             } catch {
@@ -1929,152 +2193,179 @@ struct StudyWindowView: View {
     }
 
     private var todayWorkspace: some View {
-        let selectedTasks = store.todayTasks(for: currentGoal.id)
+        let tasks = todayGoalID.map { store.todayTasks(for: $0) } ?? store.todayTasks
 
-        return VStack(alignment: .leading, spacing: 14) {
-            HStack {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(currentGoal.title)
-                        .font(.system(size: 16, weight: .bold))
-                    Text("只显示这个目标今天要做的事。切换右上角目标即可查看其它计划表。")
-                        .font(.system(size: 12, weight: .semibold))
-                        .foregroundStyle(StudyTheme.secondaryInk)
+        return HStack(alignment: .top, spacing: 18) {
+            VStack(alignment: .leading, spacing: 12) {
+                HStack {
+                    Text("任务")
+                        .font(.headline)
+                    Spacer()
+                    if !goals.isEmpty {
+                        GoalsMenuPicker(
+                            title: "任务范围",
+                            selection: $todayGoalID,
+                            options: [(nil, "所有目标")] + goals.map { (Optional($0.id), $0.title) }
+                        )
+                        .frame(width: 155)
+                    }
                 }
-                Spacer()
-                Text("\(selectedTasks.filter(\.isDone).count)/\(selectedTasks.count)")
-                    .font(.system(size: 13, weight: .bold))
-                    .foregroundStyle(StudyTheme.secondaryInk)
-            }
 
-            HStack(spacing: 10) {
-                TextField("添加今日任务", text: $quickTaskTitle)
-                    .textFieldStyle(.plain)
-                    .font(.system(size: 15))
-                    .foregroundStyle(StudyTheme.ink)
-                    .padding(.horizontal, 14)
-                    .padding(.vertical, 10)
-                    .background(StudyTheme.panelStrong)
-                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-                    .overlay {
-                        RoundedRectangle(cornerRadius: 12, style: .continuous)
-                            .stroke(StudyTheme.hairline, lineWidth: 1)
+                HStack(spacing: 8) {
+                    TextField(todayTaskPlaceholder, text: $quickTaskTitle)
+                        .goalsInput()
+                        .onSubmit(addQuickTask)
+                    Button(action: addQuickTask) {
+                        Label("添加", systemImage: "plus")
                     }
-                    .onSubmit(addQuickTask)
-
-                Button(action: addQuickTask) {
-                    Label("添加", systemImage: "plus")
-                        .padding(.horizontal, 6)
+                    .buttonStyle(GoalsButtonStyle(.primary))
+                    .disabled(quickTaskTitle.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                 }
-                .buttonStyle(SealButtonStyle())
-                .tint(StudyCategory.today.tint)
-            }
 
-            ScrollView {
-                if selectedTasks.isEmpty {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("这个目标今天还没有同步到任务库的计划。")
-                            .font(.system(size: 15, weight: .bold))
-                            .foregroundStyle(StudyTheme.ink)
-                        Text("如果计划书里有今天的日期，请回到“计划书”页点“同步到任务库”。")
-                            .font(.system(size: 13, weight: .semibold))
-                            .foregroundStyle(StudyTheme.secondaryInk)
-                    }
-                    .padding(16)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(StudyTheme.panelStrong)
-                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-                    .overlay {
-                        RoundedRectangle(cornerRadius: 12, style: .continuous)
-                            .stroke(StudyTheme.hairline, lineWidth: 1)
-                    }
+                if tasks.isEmpty {
+                    ContentUnavailableView("暂无今日任务", systemImage: "checklist", description: Text("可以直接添加，也可以从计划表同步。"))
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else {
-                    LazyVStack(spacing: 9) {
-                        ForEach(selectedTasks) { task in
-                            Button {
-                                store.toggleDone(task)
-                            } label: {
-                                HStack(spacing: 12) {
-                                    Image(systemName: task.isDone ? "checkmark.circle.fill" : "circle")
-                                        .font(.system(size: 18, weight: .semibold))
-                                        .foregroundStyle(task.isDone ? StudyCategory.today.tint : StudyTheme.mutedInk)
-                                    Text(task.title)
-                                        .font(.system(size: 15, weight: .medium))
-                                        .strikethrough(task.isDone)
-                                        .foregroundStyle(task.isDone ? StudyTheme.mutedInk : StudyTheme.ink)
-                                    Spacer()
+                    ScrollView {
+                        LazyVStack(spacing: 0) {
+                            ForEach(tasks) { task in
+                                Button {
+                                    store.toggleDone(task)
+                                } label: {
+                                    HStack(spacing: 11) {
+                                        Image(systemName: task.isDone ? "checkmark.circle.fill" : "circle")
+                                            .font(.system(size: 17))
+                                            .foregroundStyle(task.isDone ? StudyTheme.quietGreen : StudyTheme.mutedInk)
+                                        Text(task.title)
+                                            .multilineTextAlignment(.leading)
+                                            .strikethrough(task.isDone)
+                                            .foregroundStyle(task.isDone ? StudyTheme.secondaryInk : StudyTheme.ink)
+                                        Spacer(minLength: 8)
+                                        if todayGoalID == nil {
+                                            Text(task.goalTitle)
+                                                .font(.caption)
+                                                .foregroundStyle(StudyTheme.secondaryInk)
+                                                .lineLimit(1)
+                                        }
+                                    }
+                                    .padding(.horizontal, 7)
+                                    .padding(.vertical, 11)
                                 }
-                                .padding(13)
-                                .background(StudyTheme.panelStrong)
-                                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-                                .overlay {
-                                    RoundedRectangle(cornerRadius: 12, style: .continuous)
-                                        .stroke(StudyTheme.hairline, lineWidth: 1)
-                                }
+                                .buttonStyle(GoalsButtonStyle(.row))
+                                .accessibilityValue(task.isDone ? "已完成" : "待完成")
+                                Divider()
                             }
-                            .buttonStyle(.plain)
                         }
                     }
                 }
             }
+            .padding(18)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+            .background(StudyTheme.paper, in: .rect(cornerRadius: 14))
+            .overlay { RoundedRectangle(cornerRadius: 14).strokeBorder(StudyTheme.hairline) }
+
+            todayOverview(tasks)
+                .frame(width: 196)
         }
     }
 
+    private var todayTaskGoal: GoalPlan? {
+        let goalID = todayGoalID ?? selectedGoalID
+        return goals.first { $0.id == goalID }
+    }
+
+    private var todayTaskPlaceholder: String {
+        todayTaskGoal.map { "添加任务到\($0.title)" } ?? "添加今日任务"
+    }
+
+    private func todayOverview(_ tasks: [StudyTask]) -> some View {
+        let done = tasks.filter(\.isDone).count
+        return VStack(alignment: .leading, spacing: 14) {
+            Label(DateKey.today(), systemImage: "calendar")
+                .font(.callout)
+                .foregroundStyle(StudyTheme.secondaryInk)
+
+            Text("\(done) / \(tasks.count)")
+                .font(.system(size: 29, weight: .semibold))
+                .monospacedDigit()
+                .contentTransition(.numericText())
+                .accessibilityLabel("已完成 \(done) 项，共 \(tasks.count) 项")
+
+            ProgressView(value: Double(done), total: Double(max(tasks.count, 1)))
+                .labelsHidden()
+            Text("\(tasks.count - done) 项待完成")
+                .font(.callout)
+                .foregroundStyle(StudyTheme.secondaryInk)
+        }
+        .padding(18)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(StudyTheme.paper, in: .rect(cornerRadius: 14))
+        .overlay { RoundedRectangle(cornerRadius: 14).strokeBorder(StudyTheme.hairline) }
+    }
+
     private var wordBankWorkspace: some View {
-        VStack(alignment: .leading, spacing: 14) {
+        let missingMeanings = allWords.filter(\.needsMeaning)
+        return VStack(alignment: .leading, spacing: 12) {
             HStack(spacing: 10) {
-                TextField("输入新单词，回车加入单词本", text: $newWordText)
-                    .textFieldStyle(.plain)
-                    .font(.system(size: 15))
-                    .foregroundStyle(StudyTheme.ink)
-                    .padding(.horizontal, 14)
-                    .padding(.vertical, 10)
-                    .background(StudyTheme.panelStrong)
-                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-                    .overlay {
-                        RoundedRectangle(cornerRadius: 12, style: .continuous)
-                            .stroke(StudyTheme.hairline, lineWidth: 1)
-                    }
+                TextField("输入新单词", text: $newWordText)
+                    .font(.system(size: 16))
+                    .goalsInput(minHeight: 46, radius: 9)
                     .onSubmit(addCustomWord)
 
                 Button(action: addCustomWord) {
-                    Label(isCompletingWord ? "补全中" : "加入", systemImage: isCompletingWord ? "hourglass" : "plus")
-                        .padding(.horizontal, 6)
+                    Label(isCompletingWord ? "补全中" : "添加单词", systemImage: isCompletingWord ? "hourglass" : "plus")
+                        .font(.system(size: 14, weight: .semibold))
+                        .frame(minWidth: 95, minHeight: 30)
                 }
-                .buttonStyle(SealButtonStyle())
-                .tint(StudyCategory.words.tint)
-                .disabled(isCompletingWord)
+                .buttonStyle(GoalsButtonStyle(.primary))
+                .disabled(isCompletingWord || !completingMeaningIDs.isEmpty
+                          || newWordText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+
+                Button("图片导词", systemImage: "text.viewfinder") {
+                    showsImageWordImport = true
+                }
+                .buttonStyle(GoalsButtonStyle())
             }
 
-            HStack(spacing: 10) {
+            HStack(spacing: 8) {
+                Image(systemName: "magnifyingglass")
+                    .foregroundStyle(StudyTheme.mutedInk)
+                    .accessibilityHidden(true)
                 TextField("搜索单词、释义或标签", text: $wordSearch)
-                    .textFieldStyle(.plain)
-                    .font(.system(size: 15))
-                    .foregroundStyle(StudyTheme.ink)
-                    .padding(.horizontal, 14)
-                    .padding(.vertical, 10)
-                    .background(StudyTheme.panelStrong)
-                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-                    .overlay {
-                        RoundedRectangle(cornerRadius: 12, style: .continuous)
-                            .stroke(StudyTheme.hairline, lineWidth: 1)
-                    }
-                Text("\(filteredWords.count) 词")
-                    .font(.system(size: 13, weight: .bold))
-                    .foregroundStyle(StudyTheme.secondaryInk)
+                    .focusEffectDisabled()
+                    .focused($isWordSearchFocused)
             }
+            .font(.system(size: 13))
+            .goalsInput(horizontal: 11, vertical: 6, minHeight: 34, focused: isWordSearchFocused)
 
-            Text(wordBankStatus)
-                .font(.system(size: 12, weight: .semibold))
-                .foregroundStyle(StudyTheme.secondaryInk)
+            HStack {
+                Text("\(filteredWords.count) 个单词")
+                    .font(.headline)
+                Spacer()
+                if !wordBankStatus.isEmpty {
+                    Text(wordBankStatus)
+                        .font(.callout)
+                        .foregroundStyle(StudyTheme.secondaryInk)
+                }
+                if !missingMeanings.isEmpty {
+                    Button("补全缺失释义（\(missingMeanings.count)）", systemImage: "sparkles") {
+                        completeMissingMeanings(missingMeanings)
+                    }
+                    .buttonStyle(GoalsButtonStyle())
+                    .disabled(isCompletingWord || !completingMeaningIDs.isEmpty)
+                    .help("将缺少释义的词分批发送给 DeepSeek")
+                }
+            }
 
             ScrollView {
                 if filteredWords.isEmpty {
-                    emptyPanel("没有匹配的单词")
+                    emptyPanel(
+                        allWords.isEmpty ? "还没有单词" : "没有匹配的单词",
+                        hint: allWords.isEmpty ? "输入一个英文单词开始收集。" : "试试其他单词、释义或标签。"
+                    )
                 } else {
                     LazyVStack(spacing: 10) {
-                        ForEach(filteredWords) { word in
-                            wordRow(word)
-                        }
+                        ForEach(filteredWords, content: wordRow)
                     }
                 }
             }
@@ -2083,46 +2374,83 @@ struct StudyWindowView: View {
 
     private func wordRow(_ word: VocabularyWord) -> some View {
         let isRevealed = revealedDeleteWordID == word.id
+        let isExpanded = expandedWordIDs.contains(word.id)
+        let hasTag = !word.tag.isEmpty && word.tag != "自定义"
+        let hasDetails = !word.phrases.isEmpty || !word.example.isEmpty || !word.mnemonic.isEmpty || hasTag
 
         return HStack(spacing: 8) {
             HStack(alignment: .top, spacing: 14) {
-                VStack(alignment: .leading, spacing: 5) {
-                    HStack(spacing: 8) {
+                VStack(alignment: .leading, spacing: 11) {
+                    HStack(alignment: .firstTextBaseline, spacing: 9) {
                         Text(word.word)
-                            .font(StudyTheme.songti(size: 20, weight: .bold))
+                            .font(.system(size: 22, weight: .semibold))
                             .foregroundStyle(StudyTheme.ink)
                         if !word.phonetic.isEmpty {
                             Text(word.phonetic)
-                                .font(.system(size: 12, weight: .semibold))
+                                .font(.system(size: 13))
                                 .foregroundStyle(StudyTheme.secondaryInk)
                         }
-                        Text(word.partOfSpeech)
-                            .font(.system(size: 11, weight: .bold))
-                            .foregroundStyle(StudyTheme.secondaryInk)
-                        Text(word.tag)
-                            .font(.system(size: 11, weight: .bold))
-                            .foregroundStyle(StudyCategory.words.tint)
+                        if word.partOfSpeech != "未标注" {
+                            Text(word.partOfSpeech)
+                                .font(.system(size: 12))
+                                .foregroundStyle(StudyTheme.secondaryInk)
+                        }
                     }
 
                     Text(word.meaning)
-                        .font(.system(size: 14, weight: .semibold))
+                        .font(.system(size: 15, weight: .medium))
                         .foregroundStyle(StudyTheme.ink)
-                    if !word.phrases.isEmpty {
-                        Text(word.phrases.joined(separator: " · "))
-                            .font(.system(size: 12, weight: .semibold))
-                            .foregroundStyle(StudyCategory.words.tint)
-                    }
-                    Text(word.example)
-                        .font(StudyTheme.songti(size: 13))
-                        .foregroundStyle(StudyTheme.secondaryInk)
-                    if !word.mnemonic.isEmpty {
-                        Text(word.mnemonic)
-                            .font(.system(size: 12))
-                            .foregroundStyle(StudyTheme.secondaryInk)
+                        .fixedSize(horizontal: false, vertical: true)
+
+                    if isExpanded {
+                        VStack(alignment: .leading, spacing: 13) {
+                            Divider()
+                            if !word.phrases.isEmpty {
+                                wordDetail("搭配", text: word.phrases.joined(separator: " · "), note: word.phraseTranslationLine)
+                            }
+                            if !word.example.isEmpty {
+                                wordDetail("例句", text: word.example, note: word.exampleTranslation)
+                            }
+                            if !word.mnemonic.isEmpty {
+                                wordDetail("助记", text: word.mnemonic)
+                            }
+                            if hasTag {
+                                Text(word.tag)
+                                    .font(.caption)
+                                    .foregroundStyle(StudyTheme.mutedInk)
+                            }
+                        }
+                        .transition(.opacity)
                     }
                 }
+                .frame(maxWidth: .infinity, alignment: .leading)
 
-                Spacer()
+                if word.needsMeaning {
+                    let working = completingMeaningIDs.contains(word.id)
+                    Button(working ? "补全中" : "补全释义", systemImage: working ? "hourglass" : "sparkles") {
+                        completeMissingMeanings([word])
+                    }
+                    .buttonStyle(GoalsButtonStyle(.compact))
+                    .disabled(isCompletingWord || !completingMeaningIDs.isEmpty)
+                    .accessibilityLabel(working ? "正在补全 \(word.word)" : "补全 \(word.word) 的释义")
+                }
+
+                if hasDetails {
+                    Button {
+                        withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.2)) {
+                            if isExpanded { expandedWordIDs.remove(word.id) }
+                            else { expandedWordIDs.insert(word.id) }
+                        }
+                    } label: {
+                        Image(systemName: "chevron.down")
+                            .font(.system(size: 12, weight: .semibold))
+                            .rotationEffect(.degrees(isExpanded ? 180 : 0))
+                            .frame(width: 30, height: 30)
+                    }
+                    .buttonStyle(GoalsButtonStyle(.row))
+                    .accessibilityLabel(isExpanded ? "收起词条详情" : "展开词条详情")
+                    .help(isExpanded ? "收起词条详情" : "展开词条详情")
+                }
 
                 Button {
                     toggleFavorite(word)
@@ -2132,10 +2460,12 @@ struct StudyWindowView: View {
                         .foregroundStyle(StudyCategory.words.tint)
                         .frame(width: 32, height: 32)
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(GoalsButtonStyle(.icon))
+                .accessibilityLabel(favoriteWordIDs.contains(word.id) ? "从错词收藏移除" : "加入错词收藏")
                 .help(favoriteWordIDs.contains(word.id) ? "从错词收藏移除" : "加入错词收藏")
             }
-            .padding(14)
+            .padding(.horizontal, 18)
+            .padding(.vertical, 16)
             .frame(maxWidth: .infinity, minHeight: 86, alignment: .leading)
             .background(StudyTheme.panelStrong)
             .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
@@ -2174,13 +2504,10 @@ struct StudyWindowView: View {
                         Text("删除")
                             .font(.system(size: 12, weight: .bold))
                     }
-                    .foregroundStyle(.white)
                     .frame(width: 78)
                     .frame(minHeight: 86)
-                    .background(StudyTheme.cinnabar)
-                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(GoalsButtonStyle(.card))
                 .transition(.move(edge: .trailing).combined(with: .opacity))
             }
         }
@@ -2197,49 +2524,81 @@ struct StudyWindowView: View {
         .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
     }
 
-    private var translationWorkspace: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            VStack(alignment: .leading, spacing: 10) {
-                TextField("输入一句中文回车生成译法；输入一句英文回车润色", text: $translationInput)
-                    .textFieldStyle(.plain)
-                    .font(.system(size: 15))
-                    .foregroundStyle(StudyTheme.ink)
-                    .frame(minHeight: 44)
-                    .padding(12)
-                    .background(StudyTheme.panelStrong)
-                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-                    .overlay {
-                        RoundedRectangle(cornerRadius: 12, style: .continuous)
-                            .stroke(StudyTheme.hairline, lineWidth: 1)
-                    }
-                    .onSubmit(generateTranslationPractice)
-
-                HStack {
-                    Text(translationStatus)
-                        .font(.system(size: 12, weight: .semibold))
-                        .foregroundStyle(StudyTheme.secondaryInk)
-                    Spacer()
-                    Button {
-                        generateTranslationPractice()
-                    } label: {
-                        Label(isGeneratingTranslation ? "生成中" : "生成表达", systemImage: isGeneratingTranslation ? "hourglass" : "sparkles")
-                            .padding(.horizontal, 6)
-                    }
-                    .buttonStyle(SealButtonStyle())
-                    .tint(StudyCategory.translation.tint)
-                    .disabled(isGeneratingTranslation)
-                    .keyboardShortcut(.return, modifiers: [.command])
-                }
+    private func wordDetail(_ title: String, text: String, note: String = "") -> some View {
+        VStack(alignment: .leading, spacing: 5) {
+            Text(title)
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(StudyTheme.secondaryInk)
+            Text(text)
+                .font(.system(size: 14))
+                .foregroundStyle(StudyTheme.ink)
+                .lineSpacing(3)
+            if !note.isEmpty {
+                Text(note)
+                    .font(.system(size: 13))
+                    .foregroundStyle(StudyTheme.secondaryInk)
+                    .lineSpacing(3)
             }
+        }
+        .fixedSize(horizontal: false, vertical: true)
+    }
+
+    private func practiceComposer(
+        input: Binding<String>,
+        placeholder: String,
+        status: String,
+        actionTitle: String,
+        actionIcon: String,
+        isWorking: Bool,
+        perform: @escaping () -> Void
+    ) -> some View {
+        VStack(alignment: .leading, spacing: 11) {
+            TextField(placeholder, text: input)
+                .font(.system(size: 15))
+                .foregroundStyle(StudyTheme.ink)
+                .goalsInput(minHeight: 36)
+                .onSubmit(perform)
+
+            HStack {
+                Text(status)
+                    .font(.callout)
+                    .foregroundStyle(StudyTheme.secondaryInk)
+                Spacer()
+                Button(action: perform) {
+                    Label(isWorking ? "生成中" : actionTitle, systemImage: isWorking ? "hourglass" : actionIcon)
+                }
+                .buttonStyle(GoalsButtonStyle(.primary))
+                .disabled(isWorking || input.wrappedValue.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                .keyboardShortcut(.return, modifiers: .command)
+            }
+        }
+        .padding(14)
+        .background(StudyTheme.paper, in: .rect(cornerRadius: 12))
+        .overlay { RoundedRectangle(cornerRadius: 12).strokeBorder(StudyTheme.hairline) }
+    }
+
+    private var translationWorkspace: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            practiceComposer(
+                input: $translationInput,
+                placeholder: "输入中文或英文句子",
+                status: translationStatus,
+                actionTitle: "生成表达",
+                actionIcon: "sparkles",
+                isWorking: isGeneratingTranslation,
+                perform: generateTranslationPractice
+            )
+
+            Text("练习记录（\(translationRecords.count)）")
+                .font(.headline)
+                .accessibilityAddTraits(.isHeader)
 
             ScrollView {
                 if translationRecords.isEmpty {
-                    emptyPanel("还没有翻译或润色记录", hint: "输入一句中文或英文，回车后会自动保存训练记录。")
+                    emptyPanel("还没有翻译或润色记录", hint: "生成的译文和润色结果会自动保存在这里。")
                 } else {
                     LazyVStack(spacing: 10) {
-                        ForEach(translationRecords) { record in
-                            translationRecordRow(record)
-                        }
+                        ForEach(translationRecords, content: translationRecordRow)
                     }
                 }
             }
@@ -2279,7 +2638,7 @@ struct StudyWindowView: View {
                             .font(.system(size: 12, weight: .bold))
                             .foregroundStyle(StudyCategory.translation.tint)
                         Text(version.text)
-                            .font(StudyTheme.songti(size: 15, weight: .semibold))
+                            .font(StudyTheme.heading(size: 15, weight: .semibold))
                             .foregroundStyle(StudyTheme.ink)
                             .textSelection(.enabled)
                         if !version.reason.isEmpty {
@@ -2290,7 +2649,7 @@ struct StudyWindowView: View {
                     }
                     .padding(10)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(Color.white.opacity(0.48))
+                    .background(StudyTheme.field)
                     .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
                 }
 
@@ -2312,48 +2671,27 @@ struct StudyWindowView: View {
     }
 
     private var writingWorkspace: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            VStack(alignment: .leading, spacing: 10) {
-                TextField("输入作文主题、提示句或六级原题，回车生成范文", text: $writingPrompt)
-                    .textFieldStyle(.plain)
-                    .font(.system(size: 15))
-                    .foregroundStyle(StudyTheme.ink)
-                    .frame(minHeight: 44)
-                    .padding(12)
-                    .background(StudyTheme.panelStrong)
-                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-                    .overlay {
-                        RoundedRectangle(cornerRadius: 12, style: .continuous)
-                            .stroke(StudyTheme.hairline, lineWidth: 1)
-                    }
-                    .onSubmit(generateWritingPractice)
+        VStack(alignment: .leading, spacing: 16) {
+            practiceComposer(
+                input: $writingPrompt,
+                placeholder: "输入作文主题、提示句或六级原题",
+                status: writingStatus,
+                actionTitle: "生成作文",
+                actionIcon: "doc.text",
+                isWorking: isGeneratingWriting,
+                perform: generateWritingPractice
+            )
 
-                HStack {
-                    Text(writingStatus)
-                        .font(.system(size: 12, weight: .semibold))
-                        .foregroundStyle(StudyTheme.secondaryInk)
-                    Spacer()
-                    Button {
-                        generateWritingPractice()
-                    } label: {
-                        Label(isGeneratingWriting ? "生成中" : "生成作文", systemImage: isGeneratingWriting ? "hourglass" : "doc.text")
-                            .padding(.horizontal, 6)
-                    }
-                    .buttonStyle(SealButtonStyle())
-                    .tint(StudyCategory.writing.tint)
-                    .disabled(isGeneratingWriting)
-                    .keyboardShortcut(.return, modifiers: [.command])
-                }
-            }
+            Text("练习记录（\(writingRecords.count)）")
+                .font(.headline)
+                .accessibilityAddTraits(.isHeader)
 
             ScrollView {
                 if writingRecords.isEmpty {
-                    emptyPanel("还没有写作记录", hint: "输入主题、提示句或六级原题，回车后会自动保存作文和注释。")
+                    emptyPanel("还没有写作记录", hint: "生成的作文和注释会自动保存在这里。")
                 } else {
                     LazyVStack(spacing: 10) {
-                        ForEach(writingRecords) { record in
-                            writingRecordRow(record)
-                        }
+                        ForEach(writingRecords, content: writingRecordRow)
                     }
                 }
             }
@@ -2373,7 +2711,7 @@ struct StudyWindowView: View {
             VStack(alignment: .leading, spacing: 10) {
                 HStack(alignment: .firstTextBaseline) {
                     Text(record.title)
-                        .font(StudyTheme.songti(size: 18, weight: .bold))
+                        .font(StudyTheme.heading(size: 18, weight: .bold))
                         .foregroundStyle(StudyTheme.ink)
                     Text("\(record.wordCount) words")
                         .font(.system(size: 11, weight: .bold))
@@ -2388,8 +2726,7 @@ struct StudyWindowView: View {
                         Label(isCollapsed ? "展开" : "收起", systemImage: isCollapsed ? "chevron.down.circle" : "chevron.up.circle")
                     }
                     .font(.system(size: 12, weight: .bold))
-                    .buttonStyle(.borderless)
-                    .foregroundStyle(StudyCategory.writing.tint)
+                    .buttonStyle(GoalsButtonStyle(.compact, tint: StudyCategory.writing.tint))
                 }
 
                 Text("题目：\(record.prompt)")
@@ -2398,7 +2735,7 @@ struct StudyWindowView: View {
 
                 if isCollapsed {
                     Text(Self.essayPreview(record.essay))
-                        .font(StudyTheme.songti(size: 13, weight: .medium))
+                        .font(StudyTheme.heading(size: 13, weight: .medium))
                         .foregroundStyle(StudyTheme.secondaryInk)
                         .lineLimit(2)
                 } else {
@@ -2436,15 +2773,14 @@ struct StudyWindowView: View {
                                                 .labelStyle(.titleAndIcon)
                                         }
                                         .font(.system(size: 11, weight: .bold))
-                                        .buttonStyle(.borderless)
-                                        .foregroundStyle(StudyCategory.writing.tint)
+                                        .buttonStyle(GoalsButtonStyle(.compact, tint: StudyCategory.writing.tint))
                                     }
                                 }
                             }
                         }
                         .padding(10)
                         .frame(maxWidth: .infinity, alignment: .leading)
-                        .background(Color.white.opacity(0.48))
+                        .background(StudyTheme.field)
                         .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
                     }
                 }
@@ -2467,7 +2803,7 @@ struct StudyWindowView: View {
                     .font(.system(size: 12, weight: .bold))
                     .foregroundStyle(StudyTheme.secondaryInk)
                 Text(selectedEssayText)
-                    .font(StudyTheme.songti(size: 13, weight: .semibold))
+                    .font(StudyTheme.heading(size: 13, weight: .semibold))
                     .lineLimit(2)
                     .foregroundStyle(StudyTheme.ink)
                 Spacer()
@@ -2477,7 +2813,7 @@ struct StudyWindowView: View {
                     } label: {
                         Label("加入单词本", systemImage: "plus.circle")
                     }
-                    .buttonStyle(BookmarkButtonStyle())
+                    .buttonStyle(GoalsButtonStyle())
                     .tint(StudyCategory.writing.tint)
                 }
             }
@@ -2543,13 +2879,10 @@ struct StudyWindowView: View {
                         Text("删除")
                             .font(.system(size: 12, weight: .bold))
                     }
-                    .foregroundStyle(.white)
                     .frame(width: 78)
                     .frame(maxHeight: .infinity)
-                    .background(StudyTheme.cinnabar)
-                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(GoalsButtonStyle(.card))
                 .transition(.move(edge: .trailing).combined(with: .opacity))
             }
         }
@@ -2568,17 +2901,9 @@ struct StudyWindowView: View {
     private var rootsWorkspace: some View {
         VStack(alignment: .leading, spacing: 14) {
             TextField("搜索词根、含义或例词", text: $rootSearch)
-                .textFieldStyle(.plain)
                 .font(.system(size: 15))
                 .foregroundStyle(StudyTheme.ink)
-                .padding(.horizontal, 14)
-                .padding(.vertical, 10)
-                .background(StudyTheme.panelStrong)
-                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-                .overlay {
-                    RoundedRectangle(cornerRadius: 12, style: .continuous)
-                        .stroke(StudyTheme.hairline, lineWidth: 1)
-                }
+                .goalsInput(minHeight: 36)
 
             ScrollView {
                 if filteredRoots.isEmpty {
@@ -2598,7 +2923,7 @@ struct StudyWindowView: View {
         VStack(alignment: .leading, spacing: 10) {
             HStack(alignment: .firstTextBaseline) {
                 Text(root.root)
-                    .font(StudyTheme.songti(size: 22, weight: .bold))
+                    .font(StudyTheme.heading(size: 22, weight: .bold))
                     .foregroundStyle(StudyCategory.roots.tint)
                 Spacer()
                 Text(root.pattern)
@@ -2630,43 +2955,115 @@ struct StudyWindowView: View {
 
     private var flashcardWorkspace: some View {
         let words = reviewWords
+        let word = activeReviewWord
 
-        return AnyView(VStack(spacing: 18) {
-            segmentedCapsule(
-                selection: $reviewMode,
-                options: WordReviewMode.allCases.map { ($0, $0.title) }
-            )
-            .frame(maxWidth: 360)
+        return AnyView(ScrollView {
+            VStack(spacing: 14) {
+                HStack(alignment: .center, spacing: 18) {
+                    GoalsSegmentedControl(
+                        title: "复习模式",
+                        selection: $reviewMode,
+                        options: WordReviewMode.allCases.map { ($0, $0.title) }
+                    )
+                    .frame(maxWidth: 420)
 
-            if words.isEmpty {
-                Spacer(minLength: 10)
-                emptyPanel("当前模式没有可复习的单词")
-                Spacer()
-            } else {
-                let word = words[reviewIndex % words.count]
+                    Spacer(minLength: 10)
 
-            Text("\(reviewIndex % words.count + 1) / \(words.count) · \(word.tag)")
-                .font(.system(size: 12, weight: .bold))
-                .foregroundStyle(StudyTheme.secondaryInk)
-
-            Spacer(minLength: 10)
-
-            Button {
-                withAnimation(.spring(response: 0.42, dampingFraction: 0.82)) {
-                    showsCardBack.toggle()
+                    HStack(spacing: 12) {
+                        reviewMetric(title: "待复习", value: dueReviewCount)
+                        reviewMetric(title: "已开始", value: startedReviewCount)
+                        reviewMetric(title: "已掌握", value: masteredReviewCount)
+                    }
                 }
-            } label: {
-                VStack(spacing: 14) {
-                    Text(showsCardBack ? word.meaning : word.word)
-                        .font(StudyTheme.songti(size: showsCardBack ? 28 : 50, weight: .bold))
-                        .foregroundStyle(StudyTheme.ink)
-                        .multilineTextAlignment(.center)
-                    Text(showsCardBack ? word.example : (frontCardMeta(for: word).isEmpty ? "点击翻面" : frontCardMeta(for: word)))
-                        .font(StudyTheme.songti(size: 16, weight: .medium))
+
+                if word == nil {
+                    emptyPanel(
+                        reviewMode == .due ? "当前没有到期单词" : "当前模式没有可复习的单词",
+                        hint: reviewMode == .due ? "完成得很好；新词加入单词本后会自动进入学习队列。" : "可以换个筛选条件，或先在单词本里添加新词。"
+                    )
+                    .padding(.top, 12)
+                } else if let word {
+                    let progress = reviewProgressByWordID[word.id]
+
+                    HStack(spacing: 12) {
+                        HStack(spacing: 8) {
+                            Text(reviewQueueLabel(for: word, queue: words))
+                            Text("·")
+                            Text(word.tag)
+                            Text("·")
+                            Text("等级 \(progress?.level ?? 0)/5")
+                        }
+                        .font(.system(size: 12, weight: .bold))
                         .foregroundStyle(StudyTheme.secondaryInk)
-                        .multilineTextAlignment(.center)
-                        .padding(.horizontal, 26)
-                    if showsCardBack {
+
+                        Spacer(minLength: 12)
+
+                        }
+
+                    VStack(spacing: 12) {
+                        HStack(spacing: 10) {
+                            Text(word.word)
+                                .font(StudyTheme.heading(size: 42, weight: .bold))
+                                .foregroundStyle(StudyTheme.ink)
+                                .multilineTextAlignment(.center)
+
+                            Button {
+                                vocabularySpeech.speak(word.word)
+                            } label: {
+                                Image(systemName: "speaker.wave.2.fill")
+                                    .font(.system(size: 18, weight: .semibold))
+                                    .foregroundStyle(StudyCategory.flashcards.tint)
+                                    .frame(width: 34, height: 34)
+                            }
+                            .buttonStyle(GoalsButtonStyle(.icon))
+                            .help("重播单词发音")
+                            .accessibilityLabel("重播 \(word.word) 的发音")
+                        }
+                        Text(frontCardMeta(for: word).isEmpty ? "写出一个核心中文含义" : frontCardMeta(for: word))
+                            .font(StudyTheme.heading(size: 22, weight: .semibold))
+                            .foregroundStyle(StudyTheme.ink.opacity(0.76))
+                            .multilineTextAlignment(.center)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.82)
+                            .padding(.horizontal, 22)
+
+                        if FlashcardMnemonic.shouldShow(level: progress?.level ?? 0, showingAnswer: showsCardBack) {
+                            flashcardFrontMnemonic(for: word)
+                        }
+
+                    if let judgment = reviewJudgment, showsCardBack {
+                        Label(
+                            judgment.isCorrect ? "回答正确" : "回答错误",
+                            systemImage: judgment.isCorrect ? "checkmark.circle.fill" : "xmark.circle.fill"
+                        )
+                        .font(.system(size: 14, weight: .bold))
+                        .foregroundStyle(judgment.isCorrect ? StudyCategory.today.tint : StudyCategory.words.tint)
+
+                        Text(word.meaning)
+                            .font(StudyTheme.heading(size: 25, weight: .bold))
+                            .foregroundStyle(StudyTheme.ink)
+                            .multilineTextAlignment(.center)
+
+                        Text(judgment.reason)
+                            .font(.system(size: 12, weight: .semibold))
+                            .foregroundStyle(StudyTheme.secondaryInk)
+
+                        if !word.mnemonic.isEmpty {
+                            Text("助记：\(word.mnemonic)")
+                                .font(.system(size: 13))
+                                .foregroundStyle(StudyTheme.secondaryInk)
+                                .multilineTextAlignment(.center)
+                                .padding(.horizontal, 26)
+                        }
+
+                        if !word.example.isEmpty {
+                            Text(word.example)
+                                .font(StudyTheme.heading(size: 15, weight: .medium))
+                                .foregroundStyle(StudyTheme.secondaryInk)
+                                .multilineTextAlignment(.center)
+                                .padding(.horizontal, 26)
+                        }
+
                         if !word.trimmedExampleTranslation.isEmpty {
                             Text(word.trimmedExampleTranslation)
                                 .font(.system(size: 13, weight: .semibold))
@@ -2688,95 +3085,277 @@ struct StudyWindowView: View {
                                 .multilineTextAlignment(.center)
                                 .padding(.horizontal, 26)
                         }
-                        if !word.mnemonic.isEmpty {
-                            Text(word.mnemonic)
-                                .font(.system(size: 13))
-                                .foregroundStyle(StudyTheme.secondaryInk)
-                                .multilineTextAlignment(.center)
-                                .padding(.horizontal, 26)
-                        }
-                        Text("难度 \(word.difficulty)")
+                        Text(reviewStatus)
                             .font(.system(size: 12, weight: .bold))
                             .foregroundStyle(StudyCategory.flashcards.tint)
                     }
-                }
-                .frame(maxWidth: 560, minHeight: 300)
-                .background(StudyTheme.panelStrong)
-                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-                .overlay {
-                    RoundedRectangle(cornerRadius: 12, style: .continuous)
-                        .stroke(StudyTheme.hairline, lineWidth: 1)
-                }
-            }
-            .buttonStyle(.plain)
-
-            HStack(spacing: 12) {
-                Button {
-                    previousCard()
-                } label: {
-                    Label("上一个", systemImage: "chevron.left")
-                }
-                .buttonStyle(BookmarkButtonStyle())
-
-                Button {
-                    toggleCardFavorite(word)
-                } label: {
-                    Label(favoriteWordIDs.contains(word.id) ? "取消收藏" : "不熟收藏", systemImage: "bookmark")
-                }
-                .buttonStyle(BookmarkButtonStyle())
-                .tint(StudyCategory.flashcards.tint)
-
-                Button {
-                    nextCard()
-                } label: {
-                    Label("认识", systemImage: "checkmark")
-                }
-                .buttonStyle(BookmarkButtonStyle())
-
-                Button {
-                    nextCard()
-                } label: {
-                    Label("下一个", systemImage: "chevron.right")
-                }
-                .buttonStyle(SealButtonStyle())
-                .tint(StudyCategory.flashcards.tint)
-            }
-
-            Spacer()
-            }
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .onChange(of: reviewMode) { _, _ in
-            reviewIndex = 0
-            showsCardBack = false
-        })
-    }
-
-    private var mistakeWorkspace: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            HStack(spacing: 12) {
-                segmentedCapsule(
-                    selection: $mistakeMode,
-                    options: MistakeMode.allCases.map { ($0, $0.title) }
-                )
-                .frame(width: 230)
-
-                TextField("搜索错词", text: $mistakeSearch)
-                    .textFieldStyle(.plain)
-                    .font(.system(size: 15))
-                    .foregroundStyle(StudyTheme.ink)
-                    .padding(.horizontal, 14)
-                    .padding(.vertical, 10)
+                    }
+                    .frame(maxWidth: 620, minHeight: 210)
+                    .padding(.vertical, 14)
                     .background(StudyTheme.panelStrong)
                     .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                     .overlay {
                         RoundedRectangle(cornerRadius: 12, style: .continuous)
                             .stroke(StudyTheme.hairline, lineWidth: 1)
                     }
+
+                if reviewJudgment == nil {
+                    HStack(spacing: 10) {
+                        TextField("输入中文含义；、 表示不认识", text: $reviewAnswer)
+                            .font(.system(size: 15))
+                            .focused($flashcardReviewFocus, equals: .answer)
+                            .goalsInput(minHeight: 38, focused: flashcardReviewFocus == .answer)
+                            .onSubmit { advanceFlashcardReviewStep() }
+                            .onKeyPress(keys: Self.flashcardDirectionKeys, phases: .down) { _ in
+                                advanceFlashcardReviewStep() ? .handled : .ignored
+                            }
+
+                        Button {
+                            advanceFlashcardReviewStep()
+                        } label: {
+                            Label(isJudgingReviewAnswer ? "判分中" : "提交判分", systemImage: isJudgingReviewAnswer ? "hourglass" : "paperplane")
+                        }
+                        .buttonStyle(GoalsButtonStyle(.primary))
+                        .tint(StudyCategory.flashcards.tint)
+                        .disabled(isJudgingReviewAnswer || reviewAnswer.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                    }
+                    .frame(maxWidth: 620)
+
+                    Text(reviewStatus)
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundStyle(StudyTheme.secondaryInk)
+                } else if reviewJudgment?.isCorrect == false, !hasCompletedReviewCorrection {
+                    HStack(spacing: 10) {
+                        TextField("复述卡片中的一个正确含义", text: $reviewCorrectionAnswer)
+                            .font(.system(size: 15))
+                            .focused($flashcardReviewFocus, equals: .correction)
+                            .goalsInput(minHeight: 38, focused: flashcardReviewFocus == .correction)
+                            .onSubmit { advanceFlashcardReviewStep() }
+                            .onKeyPress(keys: Self.flashcardDirectionKeys, phases: .down) { _ in
+                                advanceFlashcardReviewStep() ? .handled : .ignored
+                            }
+
+                        Button("确认复述") {
+                            advanceFlashcardReviewStep()
+                        }
+                        .buttonStyle(GoalsButtonStyle(.primary))
+                        .tint(StudyCategory.flashcards.tint)
+                        .disabled(reviewCorrectionAnswer.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                    }
+                    .frame(maxWidth: 620)
+                }
+
+                HStack(spacing: 12) {
+                    Button {
+                        previousCard()
+                    } label: {
+                        Label("上一个", systemImage: "chevron.left")
+                    }
+                    .buttonStyle(GoalsButtonStyle())
+                    .disabled(isJudgingReviewAnswer)
+
+                    Button {
+                        toggleCardFavorite(word)
+                    } label: {
+                        Label(favoriteWordIDs.contains(word.id) ? "取消收藏" : "不熟收藏", systemImage: "bookmark")
+                    }
+                    .buttonStyle(GoalsButtonStyle())
+                    .tint(StudyCategory.flashcards.tint)
+
+                    Button {
+                        banishWord(word)
+                    } label: {
+                        Label("斩", systemImage: "scissors")
+                    }
+                    .buttonStyle(GoalsButtonStyle(tint: StudyTheme.cinnabar))
+                    .disabled(isJudgingReviewAnswer)
+                    .help("从词书和全部复习界面永久移除此词")
+
+                    Button {
+                        advanceFlashcardReviewStep()
+                    } label: {
+                        Label(reviewAdvanceButtonTitle, systemImage: "chevron.right")
+                    }
+                    .buttonStyle(GoalsButtonStyle(.primary))
+                    .tint(StudyCategory.flashcards.tint)
+                    .disabled(isJudgingReviewAnswer || (reviewJudgment?.isCorrect == false && !hasCompletedReviewCorrection))
+                }
+
+                if let lastBanishedRecord {
+                    HStack(spacing: 8) {
+                        Image(systemName: "scissors")
+                            .foregroundStyle(StudyTheme.cinnabar)
+                        Text("已斩 \(lastBanishedRecord.word.word)")
+                            .font(.system(size: 12, weight: .bold))
+                            .foregroundStyle(StudyTheme.secondaryInk)
+                        Button("撤销") {
+                            restoreBanishedWord(lastBanishedRecord)
+                        }
+                        .font(.system(size: 12, weight: .bold))
+                        .buttonStyle(GoalsButtonStyle(.compact, tint: StudyCategory.flashcards.tint))
+                    }
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 7)
+                    .background(StudyTheme.panelStrong)
+                    .clipShape(Capsule())
+                    .overlay {
+                        Capsule()
+                            .stroke(StudyTheme.hairline, lineWidth: 1)
+                    }
+                }
+
+                Text("快捷键：回车或任一方向键进入下一步")
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundStyle(StudyTheme.mutedInk)
+
+                }
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 2)
+        }
+        .scrollIndicators(.automatic)
+        .focusable()
+        .focusEffectDisabled()
+        .focused($flashcardReviewFocus, equals: .workspace)
+        .onKeyPress(keys: Self.flashcardAdvanceKeys, phases: .down) { _ in
+            advanceFlashcardReviewStep() ? .handled : .ignored
+        }
+        .onAppear {
+            focusCurrentFlashcardReviewStep()
+            scheduleAutomaticVocabularySpeech(force: true)
+            prepareFlashcardMnemonics()
+        }
+        .onDisappear {
+            pendingVocabularySpeechTask?.cancel()
+            pendingVocabularySpeechTask = nil
+            vocabularySpeech.stop()
+            lastAutoSpokenWordID = nil
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .onChange(of: reviewMode) { _, _ in
+            resetReviewCard(index: 0)
+        }
+        .onChange(of: activeReviewWord?.id) { _, _ in
+            scheduleAutomaticVocabularySpeech()
+            prepareFlashcardMnemonics()
+        }
+        .onChange(of: showsCardBack) { _, _ in prepareFlashcardMnemonics() }
+        .onChange(of: vocabularySpeech.isAutoPlayEnabled) { _, isEnabled in
+            if isEnabled {
+                scheduleAutomaticVocabularySpeech(force: true)
+            } else {
+                pendingVocabularySpeechTask?.cancel()
+                pendingVocabularySpeechTask = nil
+                vocabularySpeech.stop()
+            }
+        })
+    }
+
+    @ViewBuilder
+    private func flashcardFrontMnemonic(for word: VocabularyWord) -> some View {
+        let key = VocabularyBanishment01.key(for: word.word)
+        if let hint = verifiedFrontMnemonic(for: word) {
+            Text("助记  \(hint)")
+                .font(.system(size: 13, weight: .medium))
+                .foregroundStyle(StudyTheme.secondaryInk)
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
+                .padding(.horizontal, 22)
+        } else if let error = failedFrontMnemonics[key] {
+            Button("重试生成助记", systemImage: "arrow.clockwise") {
+                failedFrontMnemonics.removeValue(forKey: key)
+                prepareFlashcardMnemonics(preferScene: true)
+            }
+            .buttonStyle(GoalsButtonStyle(.compact))
+            .disabled(isGeneratingFrontMnemonics)
+            .help(error)
+        } else {
+            Text("正在生成助记…")
+                .font(.system(size: 13))
+                .foregroundStyle(StudyTheme.secondaryInk)
+        }
+    }
+
+    private func verifiedFrontMnemonic(for word: VocabularyWord) -> String? {
+        let key = VocabularyBanishment01.key(for: word.word)
+        guard let hint = frontMnemonics[key] else { return nil }
+        return FlashcardMnemonic.validated(hint, meaning: word.needsMeaning ? "" : word.meaning)
+    }
+
+    private func prepareFlashcardMnemonics(preferScene: Bool = false) {
+        guard selectedCategory == .flashcards, !isGeneratingFrontMnemonics,
+              let active = activeReviewWord, verifiedFrontMnemonic(for: active) == nil,
+              failedFrontMnemonics[VocabularyBanishment01.key(for: active.word)] == nil,
+              FlashcardMnemonic.shouldShow(level: reviewProgressByWordID[active.id]?.level ?? 0, showingAnswer: showsCardBack) else {
+            return
+        }
+        let upcoming = reviewWords.drop(while: { $0.id != active.id }).dropFirst()
+        let batch = (preferScene ? [active] : [active] + upcoming.prefix(16))
+            .filter { word in
+                (reviewProgressByWordID[word.id]?.level ?? 0) <= 4
+                    && verifiedFrontMnemonic(for: word) == nil
+                    && failedFrontMnemonics[VocabularyBanishment01.key(for: word.word)] == nil
+            }
+            .prefix(FlashcardMnemonic.batchSize)
+            .map(FlashcardMnemonic.Input.init)
+        isGeneratingFrontMnemonics = true
+        Task {
+            defer {
+                isGeneratingFrontMnemonics = false
+                prepareFlashcardMnemonics()
+            }
+            do {
+                let hints = try await DeepSeekPlanService().generateFlashcardMnemonics(batch, preferScene: preferScene)
+                frontMnemonics.merge(hints) { _, new in new }
+                if !hints.isEmpty { FlashcardMnemonicStore.save(frontMnemonics) }
+                for word in batch where hints[word.word] == nil {
+                    failedFrontMnemonics[word.word] = "这条助记没有通过检查，可以重试。"
+                }
+            } catch {
+                for word in batch {
+                    failedFrontMnemonics[word.word] = error.localizedDescription
+                }
+            }
+        }
+    }
+
+    private var mistakeWorkspace: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            HStack(spacing: 12) {
+                GoalsSegmentedControl(
+                    title: "错词分类",
+                    selection: $mistakeMode,
+                    options: MistakeMode.allCases.map { ($0, $0.title) }
+                )
+                .frame(width: 330)
+
+                TextField("搜索错词", text: $mistakeSearch)
+                    .font(.system(size: 15))
+                    .foregroundStyle(StudyTheme.ink)
+                    .goalsInput(minHeight: 36)
+
+                if mistakeMode == .banished {
+                    Text("\(banishedWordRecords.count) 个已斩词")
+                        .font(.system(size: 12, weight: .bold))
+                        .foregroundStyle(StudyTheme.secondaryInk)
+                }
             }
 
             ScrollView {
-                if mistakeWords.isEmpty {
+                if mistakeMode == .banished {
+                    if filteredBanishedWordRecords.isEmpty {
+                        emptyPanel(
+                            banishedWordRecords.isEmpty ? "还没有已斩词" : "没有匹配的已斩词",
+                            hint: banishedWordRecords.isEmpty ? "在闪卡中点击“斩”后，单词会保存在这里，随时可以恢复学习。" : "可以换个关键词搜索。"
+                        )
+                    } else {
+                        LazyVStack(spacing: 10) {
+                            ForEach(filteredBanishedWordRecords) { record in
+                                banishedWordRow(record)
+                            }
+                        }
+                    }
+                } else if mistakeWords.isEmpty {
                     emptyPanel(mistakeMode == .favorites ? "还没有收藏错词" : "没有匹配的高难词")
                 } else {
                     LazyVStack(spacing: 10) {
@@ -2786,6 +3365,71 @@ struct StudyWindowView: View {
                     }
                 }
             }
+        }
+    }
+
+    private var filteredBanishedWordRecords: [BanishedVocabularyRecord01] {
+        let query = mistakeSearch.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        guard !query.isEmpty else { return banishedWordRecords }
+
+        return banishedWordRecords.filter { record in
+            record.word.word.lowercased().contains(query)
+                || record.word.meaning.lowercased().contains(query)
+                || record.word.partOfSpeech.lowercased().contains(query)
+                || record.word.tag.lowercased().contains(query)
+        }
+    }
+
+    private func banishedWordRow(_ record: BanishedVocabularyRecord01) -> some View {
+        HStack(alignment: .top, spacing: 12) {
+            Image(systemName: "scissors")
+                .font(.system(size: 17, weight: .semibold))
+                .foregroundStyle(StudyTheme.cinnabar)
+                .frame(width: 24, height: 24)
+
+            VStack(alignment: .leading, spacing: 5) {
+                HStack(spacing: 8) {
+                    Text(record.word.word)
+                        .font(StudyTheme.heading(size: 18, weight: .bold))
+                        .foregroundStyle(StudyTheme.ink)
+                    if !record.word.phonetic.isEmpty {
+                        Text(record.word.phonetic)
+                            .font(.system(size: 12, weight: .semibold))
+                            .foregroundStyle(StudyTheme.secondaryInk)
+                    }
+                    Text(record.word.tag)
+                        .font(.system(size: 11, weight: .bold))
+                        .foregroundStyle(StudyTheme.secondaryInk)
+                }
+                Text(record.word.meaning)
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundStyle(StudyTheme.ink)
+                Text(record.isLegacyFallback ? "旧记录：斩除时间未保留" : "斩除于 \(Self.displayDate(record.banishedAt))")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(StudyTheme.secondaryInk)
+                if record.isLegacyFallback {
+                    Text("旧记录未保留原释义；恢复后将作为新词加入词书。")
+                        .font(.system(size: 11, weight: .semibold))
+                        .foregroundStyle(StudyTheme.secondaryInk)
+                }
+            }
+
+            Spacer()
+
+            Button {
+                restoreBanishedWord(record)
+            } label: {
+                Label("恢复学习", systemImage: "arrow.uturn.backward")
+            }
+            .buttonStyle(GoalsButtonStyle(tint: StudyCategory.mistakes.tint))
+            .help("恢复到斩除前的学习状态；旧记录会作为新词恢复")
+        }
+        .padding(14)
+        .background(StudyTheme.panelStrong)
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .overlay {
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .stroke(StudyTheme.hairline, lineWidth: 1)
         }
     }
 
@@ -2799,7 +3443,7 @@ struct StudyWindowView: View {
             VStack(alignment: .leading, spacing: 5) {
                 HStack(spacing: 8) {
                     Text(word.word)
-                        .font(StudyTheme.songti(size: 18, weight: .bold))
+                        .font(StudyTheme.heading(size: 18, weight: .bold))
                         .foregroundStyle(StudyTheme.ink)
                     Text(word.tag)
                         .font(.system(size: 11, weight: .bold))
@@ -2809,7 +3453,7 @@ struct StudyWindowView: View {
                     .font(.system(size: 14, weight: .semibold))
                     .foregroundStyle(StudyTheme.ink)
                 Text(word.example)
-                    .font(StudyTheme.songti(size: 13))
+                    .font(StudyTheme.heading(size: 13))
                     .foregroundStyle(StudyTheme.secondaryInk)
             }
 
@@ -2825,8 +3469,10 @@ struct StudyWindowView: View {
                     Image(systemName: favoriteWordIDs.contains(word.id) ? "xmark.circle" : "plus.circle")
                         .font(.system(size: 18, weight: .semibold))
                         .foregroundStyle(StudyCategory.mistakes.tint)
+                        .frame(width: 28, height: 28)
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(GoalsButtonStyle(.icon))
+                .accessibilityLabel(favoriteWordIDs.contains(word.id) ? "移出错词收藏" : "加入错词收藏")
                 .help(favoriteWordIDs.contains(word.id) ? "移出错词收藏" : "加入错词收藏")
             }
         }
@@ -2854,11 +3500,34 @@ struct StudyWindowView: View {
     }
 
     private var allWords: [VocabularyWord] {
-        (customWords + Self.words).filter { !deletedWordIDs.contains($0.id) }
+        customWords.filter {
+            !deletedWordIDs.contains($0.id)
+                && !VocabularyBanishment01.isBanished($0.word, banishedKeys: banishedWordKeys)
+        }
     }
 
     private var reviewWords: [VocabularyWord] {
         switch reviewMode {
+        case .due:
+            let now = Date()
+            let due = allWords
+                .filter {
+                    reviewProgressByWordID[$0.id] != nil
+                        && FlashcardReviewQueue01.isEligibleForDueReview(
+                            progress: reviewProgressByWordID[$0.id],
+                            isDismissed: reviewDismissedWordIDs.contains($0.id),
+                            now: now
+                        )
+                }
+                .sorted {
+                    (reviewProgressByWordID[$0.id]?.nextReview ?? .distantPast)
+                        < (reviewProgressByWordID[$1.id]?.nextReview ?? .distantPast)
+                }
+            let newWords = allWords.filter {
+                reviewProgressByWordID[$0.id] == nil
+                    && !reviewDismissedWordIDs.contains($0.id)
+            }
+            return due + newWords
         case .all:
             return allWords
         case .favorites:
@@ -2866,6 +3535,34 @@ struct StudyWindowView: View {
         case .hard:
             return allWords.filter { $0.difficulty >= 4 }
         }
+    }
+
+    private var activeReviewWord: VocabularyWord? {
+        if let reviewedWordID, reviewJudgment != nil,
+           let reviewedWord = allWords.first(where: { $0.id == reviewedWordID }) {
+            return reviewedWord
+        }
+        guard !reviewWords.isEmpty else { return nil }
+        return reviewWords[reviewIndex % reviewWords.count]
+    }
+
+    private var dueReviewCount: Int {
+        let now = Date()
+        return allWords.filter {
+            FlashcardReviewQueue01.isEligibleForDueReview(
+                progress: reviewProgressByWordID[$0.id],
+                isDismissed: reviewDismissedWordIDs.contains($0.id),
+                now: now
+            )
+        }.count
+    }
+
+    private var startedReviewCount: Int {
+        allWords.filter { reviewProgressByWordID[$0.id] != nil }.count
+    }
+
+    private var masteredReviewCount: Int {
+        allWords.filter { (reviewProgressByWordID[$0.id]?.level ?? 0) >= 5 }.count
     }
 
     private var filteredRoots: [RootItem] {
@@ -2888,6 +3585,8 @@ struct StudyWindowView: View {
             source = allWords.filter { favoriteWordIDs.contains($0.id) }
         case .hard:
             source = allWords.filter { $0.difficulty >= 4 }
+        case .banished:
+            source = []
         }
 
         let query = mistakeSearch.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
@@ -2916,7 +3615,6 @@ struct StudyWindowView: View {
         guard let plan = goal.plans.first(where: { $0.id == selectedPlanID }) ?? goal.plans.first else { return }
         selectedPlanID = plan.id
         loadPlan(plan)
-        ensureSelectedCategoryVisible(for: goal)
         goalStatus = "已切换到 \(goal.title)"
     }
 
@@ -2989,36 +3687,29 @@ struct StudyWindowView: View {
 
     private func addGoal() {
         let title = newGoalTitle.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !title.isEmpty else {
-            goalStatus = "请先输入目标名称"
-            return
-        }
+        guard !title.isEmpty else { return }
 
-        let mode = newGoalMode.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "生活目标" : newGoalMode.trimmingCharacters(in: .whitespacesAndNewlines)
-        let focus = newGoalFocus.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "把目标拆成每天可执行、可勾选、可复盘的任务。" : newGoalFocus.trimmingCharacters(in: .whitespacesAndNewlines)
-        let plan = GoalPlanSheet(
-            title: "计划表01",
-            planText: """
-            第1天 08:00-08:30 明确 \(title) 的本周重点
-            第1天 20:00-20:40 完成一个最小行动并记录结果
-            第2天 20:00-20:45 继续推进，复盘阻力和调整方法
-            """
-        )
-        let goal = GoalPlan(title: title, mode: mode, focus: focus, plans: [plan])
-
-        goals.append(goal)
+        let mode = newGoalMode.trimmingCharacters(in: .whitespacesAndNewlines)
+        let focus = newGoalFocus.trimmingCharacters(in: .whitespacesAndNewlines)
+        let plan = GoalPlanSheet(title: "计划表01", planText: "")
+        let goal = GoalPlan(title: title, mode: mode.isEmpty ? "生活目标" : mode, focus: focus, plans: [plan])
+        let updatedGoals = goals + [goal]
 
         do {
-            try saveGoals()
+            try GoalPlanStore01.save(updatedGoals)
+            goals = updatedGoals
             newGoalTitle = ""
             newGoalMode = "生活目标"
             newGoalFocus = ""
+            newGoalError = nil
+            showsNewGoal = false
             selectedGoalID = goal.id
             selectedPlanID = plan.id
+            planWorkspaceMode = .manual
             selectedCategory = .plan
-            goalStatus = "已新增 \(title)"
+            goalStatus = ""
         } catch {
-            goalStatus = "新增失败：\(error.localizedDescription)"
+            newGoalError = "创建失败：\(error.localizedDescription)"
         }
     }
 
@@ -3037,7 +3728,6 @@ struct StudyWindowView: View {
             selectedGoalID = fallback.id
             selectedPlanID = fallbackPlan.id
             loadPlan(fallbackPlan)
-            ensureSelectedCategoryVisible(for: fallback)
         }
 
         do {
@@ -3052,19 +3742,13 @@ struct StudyWindowView: View {
         let title = newPlanTitle.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nextPlanTitle(for: currentGoal) : newPlanTitle.trimmingCharacters(in: .whitespacesAndNewlines)
         guard let goalIndex = goals.firstIndex(where: { $0.id == selectedGoalID }) else { return }
 
-        let plan = GoalPlanSheet(
-            title: title,
-            planText: """
-            第1天 08:00-08:30 \(currentGoal.title) 第一项行动
-            第1天 20:00-20:30 记录今天完成情况
-            第2天 20:00-20:45 根据反馈继续推进
-            """
-        )
-
-        goals[goalIndex].plans.append(plan)
+        let plan = GoalPlanSheet(title: title, planText: "")
+        var updatedGoals = goals
+        updatedGoals[goalIndex].plans.append(plan)
 
         do {
-            try saveGoals()
+            try GoalPlanStore01.save(updatedGoals)
+            goals = updatedGoals
             newPlanTitle = ""
             selectedPlanID = plan.id
             selectedCategory = .plan
@@ -3087,19 +3771,110 @@ struct StudyWindowView: View {
     }
 
     private func addQuickTask() {
-        store.addTaskForToday(quickTaskTitle, goalID: currentGoal.id, goalTitle: currentGoal.title)
+        if let goal = todayTaskGoal {
+            store.addTaskForToday(quickTaskTitle, goalID: goal.id, goalTitle: goal.title)
+        } else {
+            store.addTaskForToday(quickTaskTitle, goalID: "unassigned", goalTitle: "未归类")
+        }
         quickTaskTitle = ""
     }
 
+    private func importImageWords(_ rawWords: [String]) {
+        let library = Self.mergeWords(customWords + Self.loadCustomWords())
+        var existing = Set(library.filter { !deletedWordIDs.contains($0.id) }
+            .map { VocabularyBanishment01.key(for: $0.word) })
+        let previousWords = Dictionary(library.map {
+            (VocabularyBanishment01.key(for: $0.word), $0)
+        }, uniquingKeysWith: { first, _ in first })
+        let additions: [VocabularyWord] = rawWords.compactMap { raw in
+            guard let literal = MarkedVocabularyImage.cleanWord(raw),
+                  let word = Self.customWord(from: literal),
+                  !banishedWordKeys.contains(literal),
+                  !banishedWordKeys.contains(word.word),
+                  existing.insert(word.word).inserted else { return nil }
+            return previousWords[word.word] ?? word
+        }
+
+        if !additions.isEmpty {
+            let addedKeys = Set(additions.map { VocabularyBanishment01.key(for: $0.word) })
+            customWordsLoadGeneration += 1
+            isLoadingCustomWords = false
+            deletedWordIDs.subtract(additions.map(\.id))
+            customWords = additions + library.filter { !addedKeys.contains(VocabularyBanishment01.key(for: $0.word)) }
+            wordSearch = ""
+        }
+        let skipped = rawWords.count - additions.count
+        wordBankStatus = "已从图片加入 \(additions.count) 个单词"
+        if skipped > 0 { wordBankStatus += "，跳过 \(skipped) 个重复或已斩词" }
+    }
+
+    private func completeMissingMeanings(_ words: [VocabularyWord]) {
+        guard completingMeaningIDs.isEmpty, !isCompletingWord else { return }
+        let requested = words.filter(\.needsMeaning)
+        guard !requested.isEmpty else { return }
+        completingMeaningIDs = Set(requested.map(\.id))
+        wordBankStatus = "正在补全 \(requested.count) 个词的释义…"
+
+        Task {
+            var completed = 0
+            defer { completingMeaningIDs = [] }
+            do {
+                let service = try DeepSeekPlanService()
+                let batchSize = DeepSeekPlanService.vocabularyBatchSize
+                for start in stride(from: 0, to: requested.count, by: batchSize) {
+                    let stillMissing = Set(allWords.filter(\.needsMeaning).map(\.id))
+                    let batch = requested[start..<min(start + batchSize, requested.count)]
+                        .filter { stillMissing.contains($0.id) }
+                    guard !batch.isEmpty else { continue }
+                    let results = try await service.completeExistingVocabulary(batch.map(\.word))
+                    completed += applyCompletedMeanings(results, to: Set(batch.map(\.id)))
+                }
+                let remaining = requested.count - completed
+                wordBankStatus = remaining == 0
+                    ? "已补全 \(completed) 个词的释义"
+                    : "已补全 \(completed) 个词，还有 \(remaining) 个未补全"
+            } catch {
+                wordBankStatus = "已补全 \(completed) 个词。补全中断：\(error.localizedDescription)"
+            }
+        }
+    }
+
+    private func applyCompletedMeanings(_ results: [String: WordLookupResult], to requestedIDs: Set<String>) -> Int {
+        guard !results.isEmpty else { return 0 }
+        let library = Self.mergeWords(Self.loadCustomWords() + customWords)
+        var completed = 0
+        let updated = library.map { word in
+            let key = VocabularyBanishment01.key(for: word.word)
+            guard requestedIDs.contains(word.id), word.needsMeaning,
+                  !deletedWordIDs.contains(word.id), !banishedWordKeys.contains(key),
+                  let result = results[key] else { return word }
+            completed += 1
+            return word.fillingMeaning(from: result)
+        }
+        if completed > 0 {
+            customWordsLoadGeneration += 1
+            isLoadingCustomWords = false
+            customWords = updated
+        }
+        return completed
+    }
+
     private func addCustomWord() {
+        guard !isCompletingWord, completingMeaningIDs.isEmpty else { return }
         guard let newWord = Self.customWord(from: newWordText) else {
             wordBankStatus = "请输入一个英文单词"
             return
         }
 
-        guard !allWords.contains(where: { $0.id == newWord.id || $0.word.caseInsensitiveCompare(newWord.word) == .orderedSame }) else {
-            wordBankStatus = "\(newWord.word) 已在单词本里"
+        if let existing = allWords.first(where: {
+            $0.id == newWord.id || $0.word.caseInsensitiveCompare(newWord.word) == .orderedSame
+        }) {
             newWordText = ""
+            if existing.needsMeaning {
+                completeMissingMeanings([existing])
+            } else {
+                wordBankStatus = "\(newWord.word) 已在单词本里"
+            }
             return
         }
 
@@ -3115,14 +3890,16 @@ struct StudyWindowView: View {
                 let completedWord = Self.customWord(from: result)
 
                 await MainActor.run {
-                    insertCustomWord(completedWord)
-                    wordBankStatus = "已补全并加入 \(completedWord.word)"
+                    if insertCustomWord(completedWord) {
+                        wordBankStatus = "已补全并加入 \(completedWord.word)"
+                    }
                     isCompletingWord = false
                 }
             } catch {
                 await MainActor.run {
-                    insertCustomWord(newWord)
-                    wordBankStatus = "API 补全失败，已先加入 \(newWord.word)：\(error.localizedDescription)"
+                    if insertCustomWord(newWord) {
+                        wordBankStatus = "API 补全失败，已先加入 \(newWord.word)：\(error.localizedDescription)"
+                    }
                     isCompletingWord = false
                 }
             }
@@ -3247,36 +4024,144 @@ struct StudyWindowView: View {
                 let completedWord = Self.customWord(from: result)
 
                 await MainActor.run {
-                    insertCustomWord(completedWord)
-                    writingStatus = "已加入单词本：\(completedWord.word)"
-                    wordBankStatus = "已补全并加入 \(completedWord.word)"
+                    if insertCustomWord(completedWord) {
+                        wordBankStatus = "已补全并加入 \(completedWord.word)"
+                    }
+                    writingStatus = wordBankStatus
                 }
             } catch {
                 await MainActor.run {
-                    insertCustomWord(newWord)
-                    writingStatus = "已先加入单词本：\(newWord.word)"
-                    wordBankStatus = "API 补全失败，已先加入 \(newWord.word)：\(error.localizedDescription)"
+                    if insertCustomWord(newWord) {
+                        wordBankStatus = "API 补全失败，已先加入 \(newWord.word)：\(error.localizedDescription)"
+                    }
+                    writingStatus = wordBankStatus
                 }
             }
         }
     }
 
-    private func insertCustomWord(_ word: VocabularyWord) {
+    private func insertCustomWord(_ word: VocabularyWord) -> Bool {
+        guard !VocabularyBanishment01.isBanished(word.word, banishedKeys: banishedWordKeys) else {
+            wordBankStatus = "\(word.word) 已被斩，不会重新加入词书"
+            return false
+        }
         guard !allWords.contains(where: { $0.id == word.id || $0.word.caseInsensitiveCompare(word.word) == .orderedSame }) else {
             wordBankStatus = "\(word.word) 已在单词本里"
-            return
+            return false
         }
 
         deletedWordIDs.remove(word.id)
         customWords.insert(word, at: 0)
+        return true
     }
 
     private func deleteWord(_ word: VocabularyWord) {
+        expandedWordIDs.remove(word.id)
         customWords.removeAll { $0.id == word.id }
         favoriteWordIDs.remove(word.id)
+        reviewProgressByWordID.removeValue(forKey: word.id)
+        reviewDismissedWordIDs.remove(word.id)
+        Self.saveReviewDismissedWordIDs(reviewDismissedWordIDs)
         deletedWordIDs.insert(word.id)
         reviewIndex = min(reviewIndex, max(reviewWords.count - 1, 0))
         wordBankStatus = "已删除 \(word.word)"
+    }
+
+    private func banishWord(_ word: VocabularyWord) {
+        guard !isJudgingReviewAnswer else { return }
+
+        let banishedKey = VocabularyBanishment01.key(for: word.word)
+        guard !banishedKey.isEmpty else { return }
+        let matchingWords = customWords.filter { candidate in
+            VocabularyBanishment01.key(for: candidate.word) == banishedKey
+        }
+        let matchingIDs = Set(matchingWords.map(\.id)).union([word.id])
+        let matchingCustomWords = customWords.filter {
+            VocabularyBanishment01.key(for: $0.word) == banishedKey
+        }
+        let record = BanishedVocabularyRecord01(
+            key: banishedKey,
+            word: matchingCustomWords.first ?? matchingWords.first ?? word,
+            customSnapshots: matchingCustomWords,
+            originalWordIDs: Array(matchingIDs),
+            previousProgress: matchingIDs.compactMap { reviewProgressByWordID[$0] },
+            favoriteWordIDs: matchingIDs.filter { favoriteWordIDs.contains($0) },
+            dismissedWordIDs: matchingIDs.filter { reviewDismissedWordIDs.contains($0) }
+        )
+        var updatedRecords = banishedWordRecords.filter { $0.key != banishedKey }
+        updatedRecords.append(record)
+
+        do {
+            try BanishedVocabularyStore01.save(updatedRecords)
+        } catch {
+            reviewStatus = "斩除失败：无法保存恢复记录。"
+            return
+        }
+
+        banishedWordKeys.insert(banishedKey)
+        Self.saveBanishedWordKeys(banishedWordKeys)
+        banishedWordRecords = updatedRecords.sorted { $0.banishedAt > $1.banishedAt }
+        customWords.removeAll { VocabularyBanishment01.key(for: $0.word) == banishedKey }
+        favoriteWordIDs.subtract(matchingIDs)
+        reviewDismissedWordIDs.subtract(matchingIDs)
+        Self.saveReviewDismissedWordIDs(reviewDismissedWordIDs)
+        for wordID in matchingIDs {
+            reviewProgressByWordID.removeValue(forKey: wordID)
+        }
+        deletedWordIDs.formUnion(matchingIDs)
+
+        let nextIndex = min(reviewIndex, max(reviewWords.count - 1, 0))
+        resetReviewCard(index: nextIndex)
+        reviewStatus = "已斩 \(word.word)：已移入“已斩”词库，可随时恢复。"
+        wordBankStatus = "已斩 \(word.word)"
+        offerBanishUndo(for: record)
+    }
+
+    private func restoreBanishedWord(_ record: BanishedVocabularyRecord01) {
+        guard banishedWordRecords.contains(where: { $0.key == record.key }) else { return }
+        let updatedRecords = banishedWordRecords.filter { $0.key != record.key }
+
+        do {
+            try BanishedVocabularyStore01.save(updatedRecords)
+        } catch {
+            reviewStatus = "恢复失败：无法更新已斩词库。"
+            return
+        }
+
+        banishedWordRecords = updatedRecords
+        banishedWordKeys.remove(record.key)
+        Self.saveBanishedWordKeys(banishedWordKeys)
+        let restoredCustomWords = record.customSnapshots.isEmpty ? [record.word] : record.customSnapshots
+        customWords = Self.mergeWords(restoredCustomWords + customWords)
+
+        let restoredIDs = Set(record.originalWordIDs + restoredCustomWords.map(\.id) + [record.word.id])
+        deletedWordIDs.subtract(restoredIDs)
+        favoriteWordIDs.formUnion(record.favoriteWordIDs)
+        reviewDismissedWordIDs.formUnion(record.dismissedWordIDs)
+        Self.saveReviewDismissedWordIDs(reviewDismissedWordIDs)
+        for progress in record.previousProgress {
+            reviewProgressByWordID[progress.wordID] = progress
+        }
+
+        banishUndoTask?.cancel()
+        lastBanishedRecord = nil
+        reviewIndex = min(reviewIndex, max(reviewWords.count - 1, 0))
+        if selectedCategory == .flashcards {
+            resetReviewCard(index: reviewIndex)
+        }
+        let restoreHint = record.previousProgress.isEmpty ? "已作为新词恢复到待复习。" : "已恢复斩除前的学习状态。"
+        reviewStatus = "已恢复 \(record.word.word)：\(restoreHint)"
+        wordBankStatus = "已恢复 \(record.word.word)"
+    }
+
+    private func offerBanishUndo(for record: BanishedVocabularyRecord01) {
+        banishUndoTask?.cancel()
+        lastBanishedRecord = record
+        banishUndoTask = Task { @MainActor in
+            try? await Task.sleep(for: .seconds(10))
+            guard !Task.isCancelled, lastBanishedRecord?.key == record.key else { return }
+            lastBanishedRecord = nil
+        }
     }
 
     private func deleteTranslationRecord(_ record: TranslationPracticeRecord) {
@@ -3316,27 +4201,279 @@ struct StudyWindowView: View {
     private func toggleFavorite(_ word: VocabularyWord) {
         if favoriteWordIDs.contains(word.id) {
             favoriteWordIDs.remove(word.id)
+            reviewDismissedWordIDs.insert(word.id)
         } else {
             favoriteWordIDs.insert(word.id)
+            reviewDismissedWordIDs.remove(word.id)
         }
+        Self.saveReviewDismissedWordIDs(reviewDismissedWordIDs)
     }
 
     private func nextCard() {
-        let total = max(reviewWords.count, 1)
-        reviewIndex = (reviewIndex + 1) % total
-        showsCardBack = false
+        let nextIndex: Int
+        if reviewMode == .due {
+            nextIndex = 0
+        } else {
+            let total = max(reviewWords.count, 1)
+            nextIndex = (reviewIndex + 1) % total
+        }
+        resetReviewCard(index: nextIndex)
     }
 
     private func previousCard() {
         let total = max(reviewWords.count, 1)
-        reviewIndex = (reviewIndex - 1 + total) % total
+        resetReviewCard(index: (reviewIndex - 1 + total) % total)
+    }
+
+    private func skipCurrentCard() {
+        let total = max(reviewWords.count, 1)
+        resetReviewCard(index: (reviewIndex + 1) % total)
+    }
+
+    private func scheduleAutomaticVocabularySpeech(force: Bool = false) {
+        pendingVocabularySpeechTask?.cancel()
+        pendingVocabularySpeechTask = nil
+
+        guard let word = activeReviewWord else { return }
+        let previousWordID = force ? nil : lastAutoSpokenWordID
+        guard VocabularyAutoSpeechGate01.shouldSpeak(
+            wordID: word.id,
+            lastSpokenWordID: previousWordID,
+            isEnabled: vocabularySpeech.isAutoPlayEnabled
+        ) else { return }
+
+        let wordID = word.id
+        let spokenWord = word.word
+        pendingVocabularySpeechTask = Task { @MainActor in
+            try? await Task.sleep(for: .milliseconds(160))
+            guard !Task.isCancelled,
+                  selectedCategory == .flashcards,
+                  activeReviewWord?.id == wordID,
+                  vocabularySpeech.isAutoPlayEnabled else { return }
+
+            vocabularySpeech.speak(spokenWord)
+            lastAutoSpokenWordID = wordID
+            pendingVocabularySpeechTask = nil
+        }
+    }
+
+    private func resetReviewCard(index: Int) {
+        reviewIndex = index
         showsCardBack = false
+        reviewAnswer = ""
+        reviewJudgment = nil
+        reviewedWordID = nil
+        reviewCorrectionAnswer = ""
+        hasCompletedReviewCorrection = false
+        reviewStatus = "输入一个核心中文含义；输入 、 可直接标记为不认识。"
+        isJudgingReviewAnswer = false
+        focusCurrentFlashcardReviewStep()
     }
 
     private func toggleCardFavorite(_ word: VocabularyWord) {
+        let wasFavorite = favoriteWordIDs.contains(word.id)
         toggleFavorite(word)
-        nextCard()
+        if wasFavorite, reviewJudgment == nil {
+            resetReviewCard(index: reviewIndex)
+        }
     }
+
+    private func submitReviewAnswer(for word: VocabularyWord) {
+        let answer = reviewAnswer.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !answer.isEmpty, !isJudgingReviewAnswer, reviewJudgment == nil else { return }
+
+        if FlashcardReviewFlow01.isUnknownAnswer(answer) {
+            applyReviewJudgment(
+                VocabularyAnswerJudgment(isCorrect: false, reason: "你已用 、 标记为不认识，本次未调用 AI 判分。"),
+                to: word
+            )
+            return
+        }
+
+        isJudgingReviewAnswer = true
+        reviewStatus = "正在按核心义项判分..."
+
+        if Self.localVocabularyAnswerMatches(answer, expectedMeaning: word.meaning) {
+            applyReviewJudgment(
+                VocabularyAnswerJudgment(isCorrect: true, reason: "已命中标准释义中的核心义项。"),
+                to: word
+            )
+            return
+        }
+
+        Task {
+            do {
+                let service = try DeepSeekPlanService()
+                let judgment = try await service.judgeVocabularyAnswer(
+                    word: word.word,
+                    expectedMeaning: word.meaning,
+                    userAnswer: answer
+                )
+                await MainActor.run {
+                    applyReviewJudgment(judgment, to: word)
+                }
+            } catch {
+                await MainActor.run {
+                    applyReviewJudgment(
+                        VocabularyAnswerJudgment(
+                            isCorrect: false,
+                            reason: "AI 判分不可用，本地也未匹配到核心义项；本词已按不熟处理。"
+                        ),
+                        to: word
+                    )
+                }
+            }
+        }
+    }
+
+    private func applyReviewJudgment(_ judgment: VocabularyAnswerJudgment, to word: VocabularyWord) {
+        let now = Date()
+        reviewedWordID = word.id
+        reviewDismissedWordIDs.remove(word.id)
+        Self.saveReviewDismissedWordIDs(reviewDismissedWordIDs)
+        reviewProgressByWordID[word.id] = FlashcardReviewScheduler01.record(
+            wordID: word.id,
+            existing: reviewProgressByWordID[word.id],
+            isCorrect: judgment.isCorrect,
+            now: now
+        )
+        if !judgment.isCorrect {
+            favoriteWordIDs.insert(word.id)
+        }
+        reviewJudgment = judgment
+        showsCardBack = true
+        isJudgingReviewAnswer = false
+        reviewCorrectionAnswer = ""
+        hasCompletedReviewCorrection = judgment.isCorrect
+
+        if judgment.isCorrect, let nextReview = reviewProgressByWordID[word.id]?.nextReview {
+            reviewStatus = "下次复习：\(Self.displayReviewDate(nextReview))"
+        } else {
+            reviewStatus = "等级已重置为 0，并加入错词收藏；先复述一个正确含义，再立即回炉。"
+        }
+        focusCurrentFlashcardReviewStep()
+    }
+
+    private func confirmReviewCorrection(for word: VocabularyWord) {
+        guard Self.localVocabularyAnswerMatches(reviewCorrectionAnswer, expectedMeaning: word.meaning) else {
+            reviewStatus = "还没有命中卡片中的核心含义，请再看一遍后复述。"
+            flashcardReviewFocus = .correction
+            return
+        }
+        hasCompletedReviewCorrection = true
+        reviewStatus = "复述完成；点击继续后，这个词会立即回炉。"
+        focusCurrentFlashcardReviewStep()
+    }
+
+    @discardableResult
+    private func advanceFlashcardReviewStep() -> Bool {
+        guard let word = activeReviewWord else { return false }
+
+        let action = FlashcardReviewFlow01.advanceAction(
+            isBusy: isJudgingReviewAnswer,
+            hasJudgment: reviewJudgment != nil,
+            isCorrect: reviewJudgment?.isCorrect,
+            hasCompletedCorrection: hasCompletedReviewCorrection,
+            answer: reviewAnswer,
+            correction: reviewCorrectionAnswer
+        )
+
+        switch action {
+        case .none:
+            focusCurrentFlashcardReviewStep()
+            return false
+        case .skipCard:
+            skipCurrentCard()
+        case .submitAnswer:
+            submitReviewAnswer(for: word)
+        case .confirmCorrection:
+            confirmReviewCorrection(for: word)
+        case .nextCard:
+            nextCard()
+        }
+        return true
+    }
+
+    private func focusCurrentFlashcardReviewStep() {
+        let target: FlashcardReviewFocus01
+        if reviewJudgment == nil {
+            target = .answer
+        } else if reviewJudgment?.isCorrect == false, !hasCompletedReviewCorrection {
+            target = .correction
+        } else {
+            target = .workspace
+        }
+
+        Task { @MainActor in
+            await Task.yield()
+            flashcardReviewFocus = target
+        }
+    }
+
+    private var reviewAdvanceButtonTitle: String {
+        if reviewJudgment == nil { return "跳过" }
+        if reviewJudgment?.isCorrect == false, !hasCompletedReviewCorrection { return "先复述" }
+        return "继续"
+    }
+
+    private func reviewMetric(title: String, value: Int) -> some View {
+        VStack(spacing: 2) {
+            Text("\(value)")
+                .font(StudyTheme.heading(size: 18, weight: .bold))
+                .foregroundStyle(StudyCategory.flashcards.tint)
+            Text(title)
+                .font(.system(size: 10, weight: .semibold))
+                .foregroundStyle(StudyTheme.secondaryInk)
+        }
+        .frame(minWidth: 58)
+    }
+
+    private func reviewQueueLabel(for word: VocabularyWord, queue: [VocabularyWord]) -> String {
+        if reviewJudgment != nil, reviewedWordID == word.id, !queue.contains(where: { $0.id == word.id }) {
+            return "本词已完成"
+        }
+        guard !queue.isEmpty else { return "0 / 0" }
+        return "\(reviewIndex % queue.count + 1) / \(queue.count)"
+    }
+
+    nonisolated static func localVocabularyAnswerMatches(_ answer: String, expectedMeaning: String) -> Bool {
+        let normalizedAnswer = normalizedVocabularyMeaning(answer)
+        guard !normalizedAnswer.isEmpty else { return false }
+
+        let meanings = expectedMeaning
+            .components(separatedBy: CharacterSet(charactersIn: "；;、,，/|"))
+            .map(normalizedVocabularyMeaning)
+            .filter { !$0.isEmpty }
+
+        return meanings.contains { meaning in
+            meaning == normalizedAnswer
+                || (normalizedAnswer.count >= 2 && meaning.contains(normalizedAnswer))
+                || (meaning.count >= 2 && normalizedAnswer.contains(meaning))
+        }
+    }
+
+    nonisolated private static func normalizedVocabularyMeaning(_ text: String) -> String {
+        text
+            .lowercased()
+            .replacingOccurrences(of: #"[\s。.!！?？:：\-—_()（）\[\]【】\"“”'‘’]"#, with: "", options: .regularExpression)
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    private static func displayReviewDate(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "zh_CN")
+        formatter.dateFormat = Calendar.current.isDateInToday(date) ? "今天 HH:mm" : "M月d日 HH:mm"
+        return formatter.string(from: date)
+    }
+
+    private static let flashcardDirectionKeys: Set<KeyEquivalent> = [
+        .upArrow,
+        .downArrow,
+        .leftArrow,
+        .rightArrow
+    ]
+
+    private static let flashcardAdvanceKeys: Set<KeyEquivalent> = flashcardDirectionKeys.union([.return])
 
     private func frontCardMeta(for word: VocabularyWord) -> String {
         [word.phonetic, word.partOfSpeech]
@@ -3369,21 +4506,19 @@ struct StudyWindowView: View {
 
         let parts = trimmed.split(maxSplits: 1, whereSeparator: { $0.isWhitespace })
         guard let first = parts.first else { return nil }
-        let word = String(first).trimmingCharacters(in: .whitespacesAndNewlines)
-        guard word.range(of: #"[A-Za-z]"#, options: .regularExpression) != nil else { return nil }
-
-        let normalized = word.lowercased()
+        guard let word = extractSingleEnglishWord(from: String(first)) else { return nil }
+        let normalized = EnglishHeadword.baseForm(word)
         let meaning = parts.count > 1
             ? String(parts[1]).trimmingCharacters(in: .whitespacesAndNewlines)
-            : "自定义词，待补充释义"
+            : VocabularyWord.pendingMeaning
 
         return VocabularyWord(
             id: "custom-\(normalized)",
             word: normalized,
             phonetic: "",
             partOfSpeech: "未标注",
-            meaning: meaning.isEmpty ? "自定义词，待补充释义" : meaning,
-            example: "Write your own sentence with \(normalized).",
+            meaning: meaning.isEmpty ? VocabularyWord.pendingMeaning : meaning,
+            example: VocabularyWord.starterExample(for: normalized),
             exampleTranslation: "",
             phrases: [],
             phraseTranslations: [],
@@ -3519,6 +4654,50 @@ struct StudyWindowView: View {
         return folderURL.appendingPathComponent("custom_words01.json")
     }
 
+    private static func loadBanishmentMigrationCatalog() -> [VocabularyWord] {
+        let folderURL = FileManager.default.homeDirectoryForCurrentUser
+            .appendingPathComponent("Documents", isDirectory: true)
+            .appendingPathComponent("CET-6", isDirectory: true)
+            .appendingPathComponent("CET6DesktopWidget01", isDirectory: true)
+            .appendingPathComponent("Data", isDirectory: true)
+        let files = ((try? FileManager.default.contentsOfDirectory(
+            at: folderURL,
+            includingPropertiesForKeys: nil
+        )) ?? [])
+            .filter { $0.lastPathComponent.range(of: #"^custom_words\d+\.json$"#, options: .regularExpression) != nil }
+            .sorted(by: numberedFileSort)
+
+        var catalog = files.flatMap { fileURL -> [VocabularyWord] in
+            guard let data = try? Data(contentsOf: fileURL),
+                  let words = try? JSONDecoder().decode([VocabularyWord].self, from: data) else {
+                return []
+            }
+            return words
+        }
+        if let defaultsData = UserDefaults.standard.data(forKey: customWordsKey),
+           let defaultsWords = try? JSONDecoder().decode([VocabularyWord].self, from: defaultsData) {
+            catalog.append(contentsOf: defaultsWords)
+        }
+        return mergeWords(catalog)
+    }
+
+    static func prepareBanishedVocabularyLibrary() -> (
+        records: [BanishedVocabularyRecord01],
+        keys: Set<String>
+    ) {
+        let legacyBanishedKeys = loadBanishedWordKeys()
+        let records = BanishedVocabularyStore01.migratingLegacyKeys(
+            existingRecords: BanishedVocabularyStore01.load(),
+            legacyKeys: legacyBanishedKeys,
+            customCatalog: loadBanishmentMigrationCatalog(),
+            standardCatalog: []
+        )
+        try? BanishedVocabularyStore01.save(records)
+        let keys = Set(records.map(\.key)).union(legacyBanishedKeys)
+        saveBanishedWordKeys(keys)
+        return (records, keys)
+    }
+
     private static func loadTranslationRecords() -> [TranslationPracticeRecord] {
         loadRecords(
             defaultsKey: translationRecordsKey,
@@ -3620,12 +4799,28 @@ struct StudyWindowView: View {
         UserDefaults.standard.set(Array(ids).sorted(), forKey: favoriteWordsKey)
     }
 
+    private static func loadReviewDismissedWordIDs() -> Set<String> {
+        Set(UserDefaults.standard.stringArray(forKey: reviewDismissedWordsKey) ?? [])
+    }
+
+    private static func saveReviewDismissedWordIDs(_ ids: Set<String>) {
+        UserDefaults.standard.set(Array(ids).sorted(), forKey: reviewDismissedWordsKey)
+    }
+
     private static func loadDeletedWordIDs() -> Set<String> {
         Set(UserDefaults.standard.stringArray(forKey: deletedWordsKey) ?? [])
     }
 
     private static func saveDeletedWordIDs(_ ids: Set<String>) {
         UserDefaults.standard.set(Array(ids).sorted(), forKey: deletedWordsKey)
+    }
+
+    private static func loadBanishedWordKeys() -> Set<String> {
+        Set(UserDefaults.standard.stringArray(forKey: banishedWordsKey) ?? [])
+    }
+
+    private static func saveBanishedWordKeys(_ keys: Set<String>) {
+        UserDefaults.standard.set(Array(keys).sorted(), forKey: banishedWordsKey)
     }
 
     private static func displayDate(_ date: Date) -> String {
@@ -3637,41 +4832,14 @@ struct StudyWindowView: View {
 
     nonisolated private static let customWordsKey = "CET6DesktopWidget.customWords"
     private static let favoriteWordsKey = "CET6DesktopWidget.favoriteWordIDs"
+    private static let reviewDismissedWordsKey = "CET6DesktopWidget.reviewDismissedWordIDs"
     private static let deletedWordsKey = "CET6DesktopWidget.deletedWordIDs"
+    private static let banishedWordsKey = "CET6DesktopWidget.banishedVocabularyKeys01"
     private static let translationRecordsKey = "CET6DesktopWidget.translationRecords"
     private static let writingRecordsKey = "CET6DesktopWidget.writingRecords"
 
-    static let defaultPlanText = """
-    第1天 08:00-08:40 高频词 60 个，重点看同义替换
-    第1天 20:30-21:10 听力 Section A 精听 2 篇
-    第2天 08:00-08:45 词根词缀复盘，整理错词
-    第2天 20:00-21:00 阅读长篇匹配 1 套并复盘
-    第3天 19:30-20:30 翻译与写作模板各 1 组
-    """
-
-    private static let words: [VocabularyWord] = [
-        VocabularyWord(id: "adequate", word: "adequate", phonetic: "/ˈædɪkwət/", meaning: "足够的；合格的", example: "The evidence is adequate to support the conclusion.", tag: "写作替换", difficulty: 3),
-        VocabularyWord(id: "allocate", word: "allocate", phonetic: "/ˈæləkeɪt/", meaning: "分配；拨出", example: "Students should allocate time for vocabulary review.", tag: "计划表达", difficulty: 4),
-        VocabularyWord(id: "consequence", word: "consequence", phonetic: "/ˈkɒnsɪkwəns/", meaning: "结果；后果", example: "Every decision has a long-term consequence.", tag: "阅读高频", difficulty: 4),
-        VocabularyWord(id: "derive", word: "derive", phonetic: "/dɪˈraɪv/", meaning: "获得；源自", example: "Many English words derive from Latin roots.", tag: "词根", difficulty: 3),
-        VocabularyWord(id: "eliminate", word: "eliminate", phonetic: "/ɪˈlɪmɪneɪt/", meaning: "消除；淘汰", example: "Good notes help eliminate repeated mistakes.", tag: "错题", difficulty: 4),
-        VocabularyWord(id: "notion", word: "notion", phonetic: "/ˈnəʊʃn/", meaning: "概念；看法", example: "The passage challenges the common notion of success.", tag: "阅读观点", difficulty: 3),
-        VocabularyWord(id: "substantial", word: "substantial", phonetic: "/səbˈstænʃl/", meaning: "大量的；实质性的", example: "A substantial improvement requires consistent practice.", tag: "写作升级", difficulty: 5),
-        VocabularyWord(id: "transition", word: "transition", phonetic: "/trænˈzɪʃn/", meaning: "转变；过渡", example: "The transition from input to output matters in language learning.", tag: "综合", difficulty: 4)
-    ]
-
-    private static let roots: [RootItem] = [
-        RootItem(root: "spect / spic", meaning: "看", pattern: "词根", examples: "inspect 检查 · perspective 视角 · conspicuous 显眼的", cue: "遇到 spect 先想“看见、观察、视角”。"),
-        RootItem(root: "duc / duct", meaning: "引导；带来", pattern: "词根", examples: "conduct 执行 · reduce 减少 · introduce 介绍", cue: "duce/duct 常和“带、引、导向某结果”有关。"),
-        RootItem(root: "form", meaning: "形状；形成", pattern: "词根", examples: "transform 转变 · uniform 统一的 · reform 改革", cue: "form 相关词优先抓“形态变化”。"),
-        RootItem(root: "ject", meaning: "投掷；抛出", pattern: "词根", examples: "project 项目 · reject 拒绝 · objective 客观的", cue: "ject 像把东西抛出去：投射、拒出、目标物。"),
-        RootItem(root: "port", meaning: "携带；运输", pattern: "词根", examples: "transport 运输 · import 进口 · portable 便携的", cue: "port 常指“带着走”或跨区域移动。"),
-        RootItem(root: "scrib / script", meaning: "写", pattern: "词根", examples: "describe 描述 · manuscript 手稿 · prescription 处方", cue: "script 看到就联想文字、记录、书写。"),
-        RootItem(root: "pre-", meaning: "在前；预先", pattern: "前缀", examples: "predict 预测 · preview 预览 · prejudice 偏见", cue: "pre- 先发生，常表示提前判断或预先处理。"),
-        RootItem(root: "sub-", meaning: "在下；次级；接近", pattern: "前缀", examples: "subway 地铁 · subconscious 潜意识 · substantial 实质性的", cue: "sub- 往下看：下面、隐藏、基础层。"),
-        RootItem(root: "-tion / -sion", meaning: "行为；状态；结果", pattern: "后缀", examples: "transition 转变 · conclusion 结论 · expansion 扩张", cue: "名词后缀，阅读里常是抽象概念或过程结果。"),
-        RootItem(root: "-ive", meaning: "具有某种倾向的", pattern: "后缀", examples: "effective 有效的 · objective 客观的 · productive 高产的", cue: "-ive 多把动词/名词变成形容词，表示属性。")
-    ]
+    static let defaultPlanText = ""
+    private static let roots: [RootItem] = []
 
     static func generateSchedule(from text: String, anchorDateKey: String = DateKey.today()) -> [ScheduleBlock] {
         let dayBlocks = scheduleBlocksFromDayHeadings(text, anchorDateKey: anchorDateKey)

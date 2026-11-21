@@ -142,4 +142,284 @@ final class LogicRegressionTests01: XCTestCase {
 
         XCTAssertEqual([file9, file10].sorted(by: StudyWindowView.numberedFileSort), [file10, file9])
     }
+
+    func testFlashcardCorrectAnswersFollowSRSIntervals() {
+        let start = Date(timeIntervalSince1970: 1_700_000_000)
+        var progress: FlashcardReviewProgress01?
+        let expectedIntervals: [TimeInterval] = [
+            30 * 60,
+            12 * 60 * 60,
+            3 * 24 * 60 * 60,
+            7 * 24 * 60 * 60,
+            15 * 24 * 60 * 60
+        ]
+
+        for (index, interval) in expectedIntervals.enumerated() {
+            progress = FlashcardReviewScheduler01.record(
+                wordID: "allocate",
+                existing: progress,
+                isCorrect: true,
+                now: start
+            )
+            XCTAssertEqual(progress?.level, index + 1)
+            XCTAssertEqual(try XCTUnwrap(progress?.nextReview).timeIntervalSince(start), interval, accuracy: 0.1)
+        }
+    }
+
+    func testFlashcardWrongAnswerResetsLevelAndIsDueImmediately() {
+        let now = Date(timeIntervalSince1970: 1_700_000_000)
+        let learned = FlashcardReviewProgress01(
+            wordID: "allocate",
+            level: 4,
+            nextReview: now.addingTimeInterval(86_400),
+            correctCount: 4
+        )
+
+        let reset = FlashcardReviewScheduler01.record(
+            wordID: learned.wordID,
+            existing: learned,
+            isCorrect: false,
+            now: now
+        )
+
+        XCTAssertEqual(reset.level, 0)
+        XCTAssertEqual(reset.incorrectCount, 1)
+        XCTAssertTrue(FlashcardReviewScheduler01.isDue(reset, now: now))
+    }
+
+    func testCancelledFavoriteIsRemovedFromDueReviewForEveryWord() {
+        let now = Date(timeIntervalSince1970: 1_700_000_000)
+        let wrongProgress = FlashcardReviewProgress01(
+            wordID: "custom-prevent",
+            level: 0,
+            lastReview: now,
+            nextReview: now,
+            correctCount: 1,
+            incorrectCount: 1
+        )
+
+        XCTAssertFalse(
+            FlashcardReviewQueue01.isEligibleForDueReview(
+                progress: wrongProgress,
+                isDismissed: true,
+                now: now
+            )
+        )
+        XCTAssertTrue(
+            FlashcardReviewQueue01.isEligibleForDueReview(
+                progress: wrongProgress,
+                isDismissed: false,
+                now: now
+            )
+        )
+        XCTAssertEqual(
+            FlashcardReviewQueue01.inferredDismissedWordIDs(
+                progressByWordID: [wrongProgress.wordID: wrongProgress],
+                favoriteWordIDs: []
+            ),
+            Set([wrongProgress.wordID])
+        )
+        XCTAssertTrue(
+            FlashcardReviewQueue01.inferredDismissedWordIDs(
+                progressByWordID: [wrongProgress.wordID: wrongProgress],
+                favoriteWordIDs: [wrongProgress.wordID]
+            ).isEmpty
+        )
+    }
+
+    func testBanishedVocabularyMatchesTheWordAcrossEverySourceID() {
+        let banishedKeys: Set<String> = [VocabularyBanishment01.key(for: "prevent")]
+
+        XCTAssertEqual(VocabularyBanishment01.key(for: "  PREVENT  "), "prevent")
+        XCTAssertTrue(VocabularyBanishment01.isBanished("prevent", banishedKeys: banishedKeys))
+        XCTAssertTrue(VocabularyBanishment01.isBanished("Prevent", banishedKeys: banishedKeys))
+        XCTAssertFalse(VocabularyBanishment01.isBanished("prevention", banishedKeys: banishedKeys))
+    }
+
+    func testBanishedVocabularyRecordPersistsRecoveryState() throws {
+        let directory = FileManager.default.temporaryDirectory
+            .appendingPathComponent(UUID().uuidString, isDirectory: true)
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: directory) }
+
+        let word = VocabularyWord(
+            id: "custom-prevent",
+            word: "prevent",
+            phonetic: "/prɪˈvent/",
+            partOfSpeech: "v.",
+            meaning: "阻止；预防",
+            example: "Regular exercise can help prevent disease.",
+            tag: "阅读高频",
+            difficulty: 4
+        )
+        let progress = FlashcardReviewProgress01(
+            wordID: word.id,
+            level: 2,
+            lastReview: Date(timeIntervalSince1970: 1_700_000_000),
+            nextReview: Date(timeIntervalSince1970: 1_700_086_400),
+            correctCount: 2,
+            incorrectCount: 1
+        )
+        let record = BanishedVocabularyRecord01(
+            key: "prevent",
+            word: word,
+            customSnapshots: [word],
+            originalWordIDs: [word.id],
+            previousProgress: [progress],
+            favoriteWordIDs: [word.id],
+            dismissedWordIDs: [],
+            banishedAt: Date(timeIntervalSince1970: 1_700_000_100)
+        )
+        let fileURL = directory.appendingPathComponent("banished_words01.json")
+
+        try BanishedVocabularyStore01.save([record], fileURL: fileURL)
+
+        XCTAssertEqual(BanishedVocabularyStore01.load(fileURL: fileURL), [record])
+    }
+
+    func testLegacyBanishedKeyMigratesToRecoverableRecord() {
+        let customWord = VocabularyWord(
+            id: "custom-urgency",
+            word: "urgency",
+            phonetic: "/ˈɜːrdʒənsi/",
+            partOfSpeech: "n.",
+            meaning: "紧急；紧迫",
+            example: "The issue requires urgency.",
+            tag: "自定义",
+            difficulty: 3
+        )
+
+        let migrated = BanishedVocabularyStore01.migratingLegacyKeys(
+            existingRecords: [],
+            legacyKeys: ["urgency", "unknownword"],
+            customCatalog: [customWord],
+            standardCatalog: []
+        )
+
+        XCTAssertEqual(migrated.map(\.key).sorted(), ["unknownword", "urgency"])
+        XCTAssertEqual(migrated.first(where: { $0.key == "urgency" })?.word, customWord)
+        XCTAssertEqual(migrated.first(where: { $0.key == "urgency" })?.customSnapshots, [customWord])
+        XCTAssertFalse(migrated.first(where: { $0.key == "urgency" })?.isLegacyFallback ?? true)
+        XCTAssertTrue(migrated.first(where: { $0.key == "unknownword" })?.isLegacyFallback ?? false)
+    }
+
+    func testLocalVocabularyAnswerAcceptsAnyCoreMeaning() {
+        XCTAssertTrue(
+            StudyWindowView.localVocabularyAnswerMatches("实质", expectedMeaning: "大量的；实质性的")
+        )
+        XCTAssertTrue(
+            StudyWindowView.localVocabularyAnswerMatches("分配时间", expectedMeaning: "分配；拨出")
+        )
+        XCTAssertFalse(
+            StudyWindowView.localVocabularyAnswerMatches("取消", expectedMeaning: "分配；拨出")
+        )
+    }
+
+    func testFlashcardAdvanceFlowUsesOneActionForButtonsAndKeys() {
+        XCTAssertEqual(
+            FlashcardReviewFlow01.advanceAction(
+                isBusy: false,
+                hasJudgment: false,
+                isCorrect: nil,
+                hasCompletedCorrection: false,
+                answer: "混乱",
+                correction: ""
+            ),
+            .submitAnswer
+        )
+        XCTAssertEqual(
+            FlashcardReviewFlow01.advanceAction(
+                isBusy: false,
+                hasJudgment: true,
+                isCorrect: false,
+                hasCompletedCorrection: false,
+                answer: "",
+                correction: "混乱"
+            ),
+            .confirmCorrection
+        )
+        XCTAssertEqual(
+            FlashcardReviewFlow01.advanceAction(
+                isBusy: false,
+                hasJudgment: true,
+                isCorrect: true,
+                hasCompletedCorrection: true,
+                answer: "",
+                correction: ""
+            ),
+            .nextCard
+        )
+    }
+
+    func testFlashcardAdvanceFlowSkipsEmptyAnswerButBlocksBusySteps() {
+        XCTAssertEqual(
+            FlashcardReviewFlow01.advanceAction(
+                isBusy: false,
+                hasJudgment: false,
+                isCorrect: nil,
+                hasCompletedCorrection: false,
+                answer: "  ",
+                correction: ""
+            ),
+            .skipCard
+        )
+        XCTAssertEqual(
+            FlashcardReviewFlow01.advanceAction(
+                isBusy: true,
+                hasJudgment: true,
+                isCorrect: true,
+                hasCompletedCorrection: true,
+                answer: "",
+                correction: ""
+            ),
+            .none
+        )
+    }
+
+    func testEnumerationCommaAloneMarksWordAsUnknown() {
+        XCTAssertTrue(FlashcardReviewFlow01.isUnknownAnswer("、"))
+        XCTAssertTrue(FlashcardReviewFlow01.isUnknownAnswer("  、  "))
+        XCTAssertFalse(FlashcardReviewFlow01.isUnknownAnswer("/"))
+        XCTAssertFalse(FlashcardReviewFlow01.isUnknownAnswer("、、"))
+        XCTAssertFalse(FlashcardReviewFlow01.isUnknownAnswer("混乱、混沌"))
+    }
+
+    func testVocabularySpeechUsesExpectedEnglishVoicesAndSafeRates() {
+        XCTAssertEqual(VocabularySpeechAccent01.british.languageCode, "en-GB")
+        XCTAssertEqual(VocabularySpeechAccent01.british.preferredVoiceName, "Daniel")
+        XCTAssertEqual(VocabularySpeechAccent01.american.languageCode, "en-US")
+        XCTAssertEqual(VocabularySpeechAccent01.american.preferredVoiceName, "Samantha")
+        XCTAssertEqual(
+            VocabularySpeechService01.normalizedRate(0),
+            VocabularySpeechService01.minimumRate
+        )
+        XCTAssertEqual(
+            VocabularySpeechService01.normalizedRate(1),
+            VocabularySpeechService01.maximumRate
+        )
+    }
+
+    func testVocabularyAutoSpeechOnlyRunsOnceForCurrentWord() {
+        XCTAssertTrue(
+            VocabularyAutoSpeechGate01.shouldSpeak(
+                wordID: "chaos",
+                lastSpokenWordID: nil,
+                isEnabled: true
+            )
+        )
+        XCTAssertFalse(
+            VocabularyAutoSpeechGate01.shouldSpeak(
+                wordID: "chaos",
+                lastSpokenWordID: "chaos",
+                isEnabled: true
+            )
+        )
+        XCTAssertFalse(
+            VocabularyAutoSpeechGate01.shouldSpeak(
+                wordID: "referee",
+                lastSpokenWordID: "chaos",
+                isEnabled: false
+            )
+        )
+    }
 }

@@ -74,7 +74,9 @@ final class DailyVocabularyImporter01 {
     }
 
     private func importDailyWords() async throws -> ImportResult {
-        let service = try DeepSeekPlanService()
+        guard FileManager.default.fileExists(atPath: Self.vocabFileURL.path) else {
+            return ImportResult(addedWords: [])
+        }
         let sourceWords = try loadSourceWords()
         var state = loadState()
         var existingWords = loadStoredWords()
@@ -88,6 +90,7 @@ final class DailyVocabularyImporter01 {
             return ImportResult(addedWords: [])
         }
 
+        let service = try DeepSeekPlanService()
         let selectedWords = Array(candidates.shuffled().prefix(dailyCount))
         var addedEntries: [StoredVocabularyWord01] = []
         var failedWords: [String] = []
@@ -139,7 +142,7 @@ final class DailyVocabularyImporter01 {
         let pattern = #"^[A-Za-z][A-Za-z'-]*$"#
 
         for token in tokens {
-            let word = token.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+            let word = EnglishHeadword.baseForm(token)
             guard word.range(of: pattern, options: .regularExpression) != nil else { continue }
             guard !seen.contains(word) else { continue }
             seen.insert(word)
