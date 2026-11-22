@@ -49,8 +49,13 @@ function morphology(spelling, vocabulary) {
     }
   }
   const ending = word.match(suffix)?.[0];
-  if (ending && word.length - ending.length >= 3) {
-    labels.push(ending.endsWith('tion') ? '-tion' : '-' + ending);
+  if (ending) {
+    const stem = word.slice(0, -ending.length);
+    // A matching ending alone is not enough: family does not have an -ly suffix.
+    const bases = [stem, stem + 'e', stem.replace(/i$/u, 'y')];
+    if (bases.some(base => base.length >= 3 && vocabulary.has(base))) {
+      labels.push(ending.endsWith('tion') ? '-tion' : '-' + ending);
+    }
   }
   return new Set(labels);
 }

@@ -686,11 +686,15 @@ function skipCard() {
   render();
 }
 
-const meaningSeparator = /[；;、,，/|]/u;
+const meaningSeparator = /[；;、,，/|\r\n]/u;
 const normalizeMeaning = text => text.toLowerCase().replace(/[\s。.．…⋯!！?？:：\-—_()（）\[\]【】"'“”‘’]/gu, '');
 
 function meaningParts(text) {
-  return text.split(meaningSeparator).map(normalizeMeaning).filter(Boolean);
+  return text.split(meaningSeparator).map(part => {
+    const normalized = normalizeMeaning(part);
+    // Match a Chinese gloss with or without its final adjectival particle.
+    return normalized.replace(/^(\p{Script=Han}{2,})的$/u, '$1');
+  }).filter(Boolean);
 }
 
 function matches(answer, expected) {
