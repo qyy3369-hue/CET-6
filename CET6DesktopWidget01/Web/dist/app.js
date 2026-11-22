@@ -3,6 +3,7 @@ import { addIcon } from './icons.js';
 import { installButtonMotion } from './button-motion.js';
 import { showVocabularyImport } from './vocabulary-import.js';
 import { createFlashcardMnemonics } from './flashcard-mnemonic.js';
+import { createWordTree } from './word-tree.js';
 
 const [config, starter] = await Promise.all([
   fetch('./GoalsCloud.json').then(response => response.json()).catch(() => ({})),
@@ -21,9 +22,10 @@ const quickResults = document.querySelector('#quick-results');
 document.querySelectorAll('[data-icon]').forEach(item => addIcon(item,item.dataset.icon));
 installButtonMotion();
 const pages = { goals: '目标总览', today: '今日日程', plans: '计划书', words: '单词本',
-  cards: '闪卡复习', favorites: '错词收藏', translation: '翻译训练', writing: '写作训练',
+  cards: '闪卡复习', tree: '词树', favorites: '错词收藏', translation: '翻译训练', writing: '写作训练',
   roots: '词根词缀', friends: '好友与排行', settings: '设置' };
 const workspace = createWorkspace({node, field, group, panel, button, form, run, rpc, ai, content, header, notice, render});
+const wordTree = createWordTree({node, field, group, panel, button, content});
 const starterIDs = new Set(starter.map(word => word.id));
 const reviewModes = [['due','到期优先'],['all','全部'],['favorites','收藏'],['hard','高难']];
 let reviewMode = 'due';
@@ -259,16 +261,22 @@ function render() {
     return;
   }
   if (current === 'words' || current === 'favorites') renderWords(current === 'favorites');
+  if (current === 'tree') wordTree.show(session.user?.id, wordBookWords(), hasMeaning, speak);
   if (current === 'cards') {
     const library = node('select');
-    library.setAttribute('aria-label','闪卡词库');
+    library.setAttribute('aria-label', '闪卡词库');
     for (const [kind, label] of [['mine','我的词库'],['all','全部词库']]) {
       const option = node('option',label);
       option.value = kind;
       library.append(option);
     }
-    library.value = reviewLibrary ?? (syncedWords().some(word => !starterIDs.has(word.id)) ? 'mine' : 'all');
+    const librarySource = reviewLibrary ?? (syncedWords().some(word => !starterIDs.has(word.id)) ? 'mine' : 'all');
+    library.value = librarySource;
     library.addEventListener('change',() => {
+      if (busy) {
+        library.value = librarySource;
+        return;
+      }
       reviewLibrary = library.value;
       queueIndex = 0;
       resetCard();
@@ -350,7 +358,7 @@ function wordValue(spelling,result = {},current) {
   const lists = key => Array.isArray(result[key]) ? result[key].filter(item=>typeof item==='string').slice(0,8) : [];
   const head = current?.word ?? (wordPattern.test(text('word').toLowerCase()) ? text('word').toLowerCase() : spelling);
   return {
-    id:current?.id ?? 'custom-'+head,word:head,meaning:text('meaning') || current?.meaning || pendingMeaning,
+    id:current?.id ?? customWordId(head),word:head,meaning:text('meaning') || current?.meaning || pendingMeaning,
     phonetic:current?.phonetic || text('phonetic'),partOfSpeech:text('partOfSpeech') || current?.partOfSpeech || '未标注',
     example:current?.example || text('example'),exampleTranslation:current?.exampleTranslation || text('exampleTranslation'),
     phrases:current?.phrases?.length ? current.phrases : lists('phrases'),
@@ -358,6 +366,13 @@ function wordValue(spelling,result = {},current) {
     mnemonic:current?.mnemonic || text('mnemonic'),tag:text('tag') || current?.tag || '自定义',
     difficulty:Math.round(Math.max(1,Math.min(5,Number(result.difficulty) || current?.difficulty || 3))),
   };
+}
+
+function customWordId(spelling) {
+  const id = 'custom-' + spelling;
+  const current = get(id, 'word');
+  // Editing a spelling keeps its ID so review progress and favorites follow the word.
+  return current && current.word.toLowerCase() !== spelling ? id + '-' + crypto.randomUUID() : id;
 }
 
 function missingNotice() {
@@ -442,6 +457,101 @@ function removeWord(word) {
     write(word.id,'favorite',false),write(word.id,'dismissed',false)]);
 }
 
+function confirmWordRemoval(word) {
+  const dialog = node('dialog', null, 'word-editor');
+  const heading = node('h2', '删除「' + word.word + '」？');
+  heading.id = 'word-delete-title';
+  const description = node('p', '删除后，该词的收藏和复习进度也会移除。');
+  description.id = 'word-delete-description';
+  dialog.setAttribute('aria-labelledby', heading.id);
+  dialog.setAttribute('aria-describedby', description.id);
+  const cancel = button('取消', () => dialog.close());
+  cancel.autofocus = true;
+  const remove = button('确认删除', () => {
+    dialog.close();
+    run(async () => {
+      await removeWord(word);
+      if (get(word.id, 'word') === null) {
+        expandedWords.delete(word.id);
+        wordBookFeedback = '已删除「' + word.word + '」';
+      }
+    });
+  }, 'danger');
+  dialog.addEventListener('close', () => dialog.remove());
+  dialog.append(heading, group('stack', description, group('controls', cancel, remove)));
+  document.body.append(dialog);
+  dialog.showModal();
+}
+
+function editWord(word) {
+  const dialog = node('dialog', null, 'word-editor');
+  const heading = node('h2', '编辑单词');
+  heading.id = 'word-editor-title';
+  dialog.setAttribute('aria-labelledby', heading.id);
+  const spelling = field('英文单词', {
+    value: word.word, required: true, maxLength: Math.max(256, word.word.length),
+    autocomplete: 'off', spellcheck: false, autofocus: true,
+  });
+  const meaning = field('中文释义', { value: hasMeaning(word) ? word.meaning : '', placeholder: '留空可稍后补充' });
+  const phonetic = field('音标', { value: word.phonetic ?? '' });
+  const partOfSpeech = field('词性', { value: word.partOfSpeech === '未标注' ? '' : word.partOfSpeech ?? '' });
+  const example = field('例句', { value: word.example ?? '' });
+  const exampleTranslation = field('例句翻译', { value: word.exampleTranslation ?? '' });
+  const tag = field('标签', { value: word.tag === '自定义' ? '' : word.tag ?? '' });
+  const error = node('p', '', 'word-editor-error danger');
+  error.setAttribute('role', 'alert');
+  const revision = entries.get(keyFor(word.id, 'word'))?.revision;
+  const editor = form([
+    spelling[0], meaning[0], group('word-editor-pair', phonetic[0], partOfSpeech[0]),
+    example[0], exampleTranslation[0], tag[0], error,
+  ], '保存修改', async () => {
+    error.textContent = '';
+    const nextSpelling = spelling[1].value.trim().toLowerCase();
+    if (!wordPattern.test(nextSpelling)) {
+      spelling[1].focus();
+      error.textContent = '请输入一个有效的英文单词。';
+      return;
+    }
+    if (nextSpelling !== word.word.toLowerCase() &&
+        words().some(item => item.id !== word.id && item.word.toLowerCase() === nextSpelling)) {
+      spelling[1].focus();
+      error.textContent = '「' + nextSpelling + '」已在单词本里。';
+      return;
+    }
+    const next = {
+      ...word,
+      word: nextSpelling,
+      meaning: meaning[1].value.trim() || pendingMeaning,
+      phonetic: phonetic[1].value.trim(),
+      partOfSpeech: partOfSpeech[1].value.trim() || '未标注',
+      example: example[1].value.trim(),
+      exampleTranslation: exampleTranslation[1].value.trim(),
+      tag: tag[1].value.trim() || '自定义',
+    };
+    const change = write(word.id, 'word', next);
+    try {
+      if (change.revision === revision) {
+        await sync([change]);
+        if (JSON.stringify(canonical(get(word.id, 'word'))) === JSON.stringify(canonical(next))) {
+          wordBookFeedback = '已保存「' + next.word + '」的修改';
+          dialog.close();
+          return;
+        }
+      }
+      error.textContent = '词条已在另一端更新。请取消后重新打开词条。';
+    } catch (failure) {
+      error.textContent = failure instanceof TypeError ? '连接失败，请检查网络后重试。' : failure.message;
+    }
+  });
+  const cancel = button('取消', () => { if (!busy) dialog.close(); });
+  editor.lastElementChild.prepend(cancel);
+  dialog.addEventListener('cancel', event => { if (busy) event.preventDefault(); });
+  dialog.addEventListener('close', () => dialog.remove());
+  dialog.append(heading, editor);
+  document.body.append(dialog);
+  dialog.showModal();
+}
+
 function wordCard(word) {
   const expanded=expandedWords.has(word.id);
   const tags=word.tag && word.tag!=='自定义';
@@ -478,7 +588,14 @@ function wordCard(word) {
   bookmark.setAttribute('aria-pressed',String(favorite));
   tools.append(bookmark);
   const card=group('word-card panel',reading,tools);
-  const remove=addIcon(button('删除',()=>run(()=>removeWord(word)),'word-remove danger'),'trash');
+  if (!starterIDs.has(word.id) && get(word.id, 'word')) {
+    card.classList.add('custom-word-card');
+    const edit = addIcon(button('编辑', () => editWord(word)), 'pen');
+    const remove = addIcon(button('删除', () => confirmWordRemoval(word), 'danger'), 'trash');
+    tools.append(edit, remove);
+    return group('word-entry', card);
+  }
+  const remove=addIcon(button('删除',()=>confirmWordRemoval(word),'word-remove danger'),'trash');
   remove.hidden=true;
   const frame=group('word-entry',card,remove);
   let start;
@@ -563,17 +680,27 @@ function resetCard() {
 }
 
 function skipCard() {
+  if (busy) return;
   queueIndex++;
   resetCard();
   render();
 }
 
+const meaningSeparator = /[；;、,，/|\r\n]/u;
+const normalizeMeaning = text => text.toLowerCase().replace(/[\s。.．…⋯!！?？:：\-—_()（）\[\]【】"'“”‘’]/gu, '');
+
+function meaningParts(text) {
+  return text.split(meaningSeparator).map(part => {
+    const normalized = normalizeMeaning(part);
+    // Match a Chinese gloss with or without its final adjectival particle.
+    return normalized.replace(/^(\p{Script=Han}{2,})的$/u, '$1');
+  }).filter(Boolean);
+}
+
 function matches(answer, expected) {
-  const normalize = text => text.toLowerCase().replace(/[\s。.!！?？:：\-—_()（）\[\]【】"'“”‘’]/gu, '');
-  const actual = normalize(answer);
-  return !!actual && expected.split(/[；;、,，/|]/u).map(normalize).filter(Boolean)
-    .some(meaning => meaning === actual || (actual.length >= 2 && meaning.includes(actual))
-      || (meaning.length >= 2 && actual.includes(meaning)));
+  const supplied = meaningParts(answer);
+  const accepted = new Set(meaningParts(expected));
+  return supplied.length > 0 && supplied.every(part => accepted.has(part));
 }
 
 function startTiming() {
@@ -584,7 +711,8 @@ async function submitReview(word, answer) {
   const cleaned = answer.trim();
   if (!cleaned) return;
   const spent = elapsedStudy();
-  if (cleaned === '、') return review(word, false, '已标记为不认识。', spent);
+  if (cleaned === '、') return markUnknown(word, spent);
+  if (!hasMeaning(word)) return review(word, false, '这个单词还缺少释义。可以在单词本补充后再练习。', spent);
   if (matches(cleaned, word.meaning)) return review(word, true, '已命中标准释义中的核心义项。', spent);
   if (!workspace.aiConfigured()) return review(word, false, '未匹配标准释义。可在设置中开启 AI 判分。', spent);
   const judgment = await ai('judge', JSON.stringify({ word: word.word, meaning:word.meaning, answer:cleaned }));
@@ -592,11 +720,25 @@ async function submitReview(word, answer) {
   return review(word, judgment.isCorrect, judgment.reason, spent);
 }
 
+function submitCorrection(word, answer) {
+  if (!matches(answer, word.meaning)) return false;
+  correction = false;
+  cardMessage = '重输正确。';
+  speak(word.word);
+  return true;
+}
+
+function markUnknown(word, duration = elapsedStudy()) {
+  speak(word.word);
+  return review(word, false, '已标记为不认识。', duration);
+}
+
 function elapsedStudy() {
   return cardStartedAt === null ? 0 : Math.min(60, Math.round((performance.now() - cardStartedAt) / 1000));
 }
 
 async function review(word, correct, reason = '', duration = elapsedStudy()) {
+  if (correct) speak(word.word);
   const previous = get(word.id, 'progress');
   const level = correct ? Math.min((previous?.level ?? 0) + 1, 5) : 0;
   const now = Math.floor(Date.now() / 1000);
@@ -610,8 +752,9 @@ async function review(word, correct, reason = '', duration = elapsedStudy()) {
     event_id: crypto.randomUUID(), word_id: word.id, spelling: word.word, level,
     reviewed_at: new Date(now * 1000).toISOString(), active_seconds: duration,
   }]);
+  if (activeId !== word.id) return;
   revealed = true;
-  correction = !correct;
+  correction = !correct && hasMeaning(word);
   cardMessage = typeof reason === 'string' ? reason : '';
 }
 
@@ -625,6 +768,7 @@ function speak(text) {
   utterance.rate = speech.rate;
   speechSynthesis.cancel();
   speechSynthesis.speak(utterance);
+  return true;
 }
 
 function reviewQueue() {
@@ -647,6 +791,7 @@ function renderCard() {
     cardMetric(mine.filter(word => get(word.id,'progress')).length,'已开始'),
     cardMetric(mine.filter(word => get(word.id,'progress')?.level === 5).length,'已掌握'));
   content.append(group('card-toolbar', workspace.tabs(reviewModes, reviewMode, mode => {
+    if (busy) return;
     reviewMode = mode; queueIndex = 0; resetCard(); render();
   }, '复习模式'), metric));
   const position = queue.length ? ((queueIndex % queue.length) + queue.length) % queue.length : 0;
@@ -674,8 +819,9 @@ function renderCard() {
     node('div', [word.phonetic, word.partOfSpeech].filter(item => item && item !== '未标注').join(' '), 'muted')
   ));
   if (revealed) {
-    face.firstElementChild.append(node('p',word.meaning,'answer'),
-      node('p',word.example,'muted answer'),node('p',word.exampleTranslation,'muted'));
+    face.firstElementChild.append(node('p',word.meaning,'answer'));
+    if (!correction) face.firstElementChild.append(node('p',word.example,'muted answer'),
+      node('p',word.exampleTranslation,'muted'));
   }
   const stack = group('stack card-stack', face);
   content.append(stack);
@@ -697,8 +843,13 @@ function renderCard() {
       write(word.id,'favorite',false),write(word.id,'dismissed',false)]);
     resetCard();
   }), 'danger'), 'cut');
-  const controls = group('controls card-actions',
-    button('上一个', () => { queueIndex--; resetCard(); render(); }),favorite,cut);
+  const controls = group('controls card-actions');
+  if (!correction) controls.append(button('上一个', () => {
+    if (busy) return;
+    queueIndex--;
+    resetCard();
+    render();
+  }), favorite, cut);
   let continueButton;
   if (!revealed) {
     const [label, input] = field('中文释义', { placeholder: '输入中文含义，或输入 、 标记不认识', required: true });
@@ -706,16 +857,30 @@ function renderCard() {
     const answer = form([label],'提交判分',() => submitReview(word,input.value));
     answer.classList.add('card-answer-form');
     stack.append(answer, node('p','输入一个核心中文含义。','muted card-note'));
-    controls.append(button('不认识', () => run(() => review(word,false,'已标记为不认识。'))),
+    controls.append(button('不认识', () => run(() => markUnknown(word))),
       button('跳过',skipCard,'primary'));
     startTiming();
     input.focus({preventScroll:true});
   } else if (correction) {
-    const [label, input] = field('复述一个正确含义', {required:true});
-    stack.append(node('p',cardMessage,'muted card-note'),form([label],'确认复述',async () => {
-      if (!matches(input.value,word.meaning)) throw new Error('请再看一遍，并复述一个核心含义。');
-      correction = false;
-    }));
+    const [label, input] = field('重新输入中文释义', {required:true, autocomplete:'off'});
+    const feedback = node('p', '', 'danger card-correction-feedback');
+    feedback.setAttribute('role', 'alert');
+    input.setAttribute('aria-describedby', 'card-correction-help');
+    const help = node('p', '从上方释义中选一个义项，重新输入正确后才能继续。', 'muted');
+    help.id = 'card-correction-help';
+    const retry = node('form', null, 'card-answer-form');
+    retry.append(label, node('button', '检查释义', 'primary'));
+    retry.addEventListener('submit', event => {
+      event.preventDefault();
+      if (busy) return;
+      if (submitCorrection(word, input.value)) render();
+      else {
+        feedback.textContent = '还不正确，请按上方释义再输入一次。';
+        input.focus();
+        input.select();
+      }
+    });
+    stack.append(panel('订正释义', help, retry, feedback));
     input.focus({preventScroll:true});
   } else {
     if (cardMessage) stack.append(node('p',cardMessage,'muted card-note'));
@@ -728,7 +893,7 @@ function renderCard() {
     continueButton.title = '按 Enter 进入下一个单词';
     controls.append(continueButton);
   }
-  stack.append(controls);
+  if (controls.childElementCount) stack.append(controls);
   // The answer field is removed when judgment finishes. Keep the next action reachable by Enter.
   continueButton?.focus({preventScroll:true});
 }
@@ -847,6 +1012,7 @@ function renderSettings() {
       }),'primary'),button('退出登录',() => {
         setSession(null);
         resetCard();
+        wordTree.reset();
         entries.clear();
         wordOrder=[]; expandedWords.clear(); addWordDraft=''; wordBookFeedback=''; wordFilter='';
         ready = false;
@@ -965,8 +1131,8 @@ document.addEventListener('keydown', event => {
   const word = words().find(item => item.id === activeId);
   if (!word) return;
   if (value === shortcuts.skip && !revealed) { event.preventDefault(); skipCard(); }
-  if (value === shortcuts.unknown && !revealed) { event.preventDefault(); run(() => review(word, false)); }
-  if (value === shortcuts.favorite) { event.preventDefault(); run(() => changeFavorite(word)); }
+  if (value === shortcuts.unknown && !revealed) { event.preventDefault(); run(() => markUnknown(word)); }
+  if (value === shortcuts.favorite && !correction) { event.preventDefault(); run(() => changeFavorite(word)); }
 });
 window.addEventListener('hashchange', () => {
   render();
