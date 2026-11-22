@@ -204,7 +204,7 @@ export function createWordTree({node, field, group, panel, button, content}) {
         group('word-tree-edit-fields', wordLabel, kindSelect, wordSelect, addWord),
         node('p', '调整保存在当前浏览器。', 'muted'));
       root.append(button('朗读中心词', () => speak(center.word)));
-      tree.append(root, cards, addControls);
+      tree.append(group('word-tree-map', root, cards), addControls);
     }
 
     function updatePicker() {

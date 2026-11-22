@@ -301,29 +301,44 @@ button:disabled > .goals-button-reveal, [aria-disabled="true"] > .goals-button-r
 .card-correction-feedback:empty { display: none; }
 .word-tree-picker, .word-tree-edit-fields { display: grid; gap: .75rem; align-items: end; }
 .word-tree-picker { grid-template-columns: minmax(0, 1fr) minmax(9rem, .7fr); }
+.word-tree-map {
+  --tree-connector-width: clamp(.65rem, 2.5vw, 1.75rem);
+  --tree-branch-gap: .9rem;
+  display: grid; grid-template-columns: minmax(0, clamp(6rem, 29%, 18rem)) minmax(0, 1fr);
+  align-items: center; gap: calc(2 * var(--tree-connector-width));
+}
 .word-tree-root {
-  display: grid; justify-items: center; justify-self: center; gap: .35rem;
-  max-width: min(32rem, 100%); padding: .8rem 1.15rem; text-align: center;
+  position: relative; display: grid; justify-items: center; gap: .35rem;
+  min-width: 0; padding: .8rem clamp(.4rem, 2vw, 1.15rem); text-align: center;
   border: 1px solid var(--border); border-radius: .75rem; background: var(--selected);
   overflow-wrap: anywhere;
 }
-.word-tree-root strong { font-size: 1.45rem; }
-.word-tree-branches {
-  position: relative; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: .9rem; padding-top: 1rem;
-  background: linear-gradient(var(--border), var(--border)) center top / 1px 9px no-repeat,
-    linear-gradient(var(--border), var(--border)) center 8px / 50% 1px no-repeat;
-}
+.word-tree-root strong { font-size: clamp(1.05rem, 3.5vw, 1.45rem); }
+.word-tree-root button { min-width: 0; max-width: 100%; overflow-wrap: anywhere; }
+.word-tree-branches { display: grid; gap: var(--tree-branch-gap); }
 .word-tree-branch { position: relative; min-width: 0; padding: .85rem; border: 1px solid var(--border); border-radius: .75rem; }
-.word-tree-branch::before {
-  content: ""; position: absolute; left: 50%; top: -.55rem; width: 1px; height: .55rem; background: var(--border);
+.word-tree-root::after, .word-tree-branch::before, .word-tree-branch::after {
+  content: ""; position: absolute; background: var(--border); pointer-events: none;
 }
+.word-tree-root::after, .word-tree-branch::before {
+  inset-block-start: 50%; inline-size: calc(var(--tree-connector-width) + 1px); block-size: 1px;
+}
+.word-tree-root::after { inset-inline-start: 100%; }
+.word-tree-branch::before { inset-inline-end: 100%; }
+.word-tree-branch::after {
+  inset-inline-end: calc(100% + var(--tree-connector-width));
+  inset-block: calc(-.5 * var(--tree-branch-gap) - 1px); inline-size: 1px;
+}
+.word-tree-branch:first-child::after { inset-block-start: 50%; }
+.word-tree-branch:last-child::after { inset-block-end: 50%; }
+.word-tree-branch:only-child::after { display: none; }
 .word-tree-branch h2 { color: var(--blue); }
 .word-tree-leaves { margin: 0; padding-inline-start: .9rem; list-style: none; border-inline-start: 1px solid var(--border); }
 .word-tree-leaves li { position: relative; padding: .55rem 0; overflow-wrap: anywhere; }
 .word-tree-leaves li::before {
   content: ""; position: absolute; inset-inline-start: -.9rem; top: 1.55rem; width: .75rem; height: 1px; background: var(--border);
 }
+.word-tree-leaves .row { flex-wrap: wrap; gap: .4rem; }
 .word-tree-leaves li p { margin: .25rem 0 0; }
 .word-tree-leaves li .chip { text-align: start; font-weight: 650; white-space: normal; overflow-wrap: anywhere; min-width: 0; }
 .word-tree-edit { padding: .75rem; background: var(--paper); border: 1px solid var(--border); border-radius: .75rem; }
@@ -331,7 +346,6 @@ button:disabled > .goals-button-reveal, [aria-disabled="true"] > .goals-button-r
 .word-tree-edit-fields { margin-top: .75rem; grid-template-columns: 1fr 1fr; }
 .word-tree-edit-fields button { justify-self: start; }
 @media (max-width: 540px) {
-  .word-tree-picker, .word-tree-branches, .word-tree-edit-fields { grid-template-columns: minmax(0, 1fr); }
-  .word-tree-branches { background: none; padding-top: 0; padding-inline-start: .8rem; border-inline-start: 1px solid var(--border); }
-  .word-tree-branch::before { top: 1.4rem; left: -.8rem; width: .8rem; height: 1px; }
+  .word-tree-picker, .word-tree-edit-fields { grid-template-columns: minmax(0, 1fr); }
+  .word-tree-branch { padding: .7rem; }
 }
