@@ -260,6 +260,11 @@ button:disabled > .goals-button-reveal, [aria-disabled="true"] > .goals-button-r
 .word-detail strong { font-size:.81rem; }
 .word-detail p { margin:0; }
 .word-remove { flex:0 0 78px; background:var(--paper); justify-content:center; flex-direction:column; animation:enter .23s ease; }
+.word-editor { max-height:85dvh; margin:auto; }
+.word-editor .controls { justify-content:flex-end; }
+.word-editor-pair { display:grid; grid-template-columns:1fr 1fr; gap:.75rem; }
+.word-editor-error { margin:0; }
+.word-editor-error:empty { display:none; }
 
 .vocabulary-import { width:min(780px,94vw); max-height:90dvh; margin:auto; padding:22px; }
 .ocr-title h2 { margin:0; }
@@ -286,7 +291,47 @@ button:disabled > .goals-button-reveal, [aria-disabled="true"] > .goals-button-r
   .word-add-row { flex-wrap:wrap; }
   .word-add-form { flex-basis:100%; }
   .word-card { padding:12px; gap:8px; }
+  .custom-word-card { display:grid; }
   .word-row-tools { flex-wrap:wrap; gap:6px; }
 }
 .flash-mnemonic { margin:.55rem auto 0; padding-inline:12px; font-size:.84rem; line-height:1.5; }
 .flash-mnemonic-text { overflow-wrap:anywhere; }
+
+.card-correction-feedback { margin: 0; }
+.card-correction-feedback:empty { display: none; }
+.word-tree-picker, .word-tree-edit-fields { display: grid; gap: .75rem; align-items: end; }
+.word-tree-picker { grid-template-columns: minmax(0, 1fr) minmax(9rem, .7fr); }
+.word-tree-root {
+  display: grid; justify-items: center; justify-self: center; gap: .35rem;
+  max-width: min(32rem, 100%); padding: .8rem 1.15rem; text-align: center;
+  border: 1px solid var(--border); border-radius: .75rem; background: var(--selected);
+  overflow-wrap: anywhere;
+}
+.word-tree-root strong { font-size: 1.45rem; }
+.word-tree-branches {
+  position: relative; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: .9rem; padding-top: 1rem;
+  background: linear-gradient(var(--border), var(--border)) center top / 1px 9px no-repeat,
+    linear-gradient(var(--border), var(--border)) center 8px / 50% 1px no-repeat;
+}
+.word-tree-branch { position: relative; min-width: 0; padding: .85rem; border: 1px solid var(--border); border-radius: .75rem; }
+.word-tree-branch::before {
+  content: ""; position: absolute; left: 50%; top: -.55rem; width: 1px; height: .55rem; background: var(--border);
+}
+.word-tree-branch h2 { color: var(--blue); }
+.word-tree-leaves { margin: 0; padding-inline-start: .9rem; list-style: none; border-inline-start: 1px solid var(--border); }
+.word-tree-leaves li { position: relative; padding: .55rem 0; overflow-wrap: anywhere; }
+.word-tree-leaves li::before {
+  content: ""; position: absolute; inset-inline-start: -.9rem; top: 1.55rem; width: .75rem; height: 1px; background: var(--border);
+}
+.word-tree-leaves li p { margin: .25rem 0 0; }
+.word-tree-leaves li .chip { text-align: start; font-weight: 650; white-space: normal; overflow-wrap: anywhere; min-width: 0; }
+.word-tree-edit { padding: .75rem; background: var(--paper); border: 1px solid var(--border); border-radius: .75rem; }
+.word-tree-edit summary { cursor: pointer; }
+.word-tree-edit-fields { margin-top: .75rem; grid-template-columns: 1fr 1fr; }
+.word-tree-edit-fields button { justify-self: start; }
+@media (max-width: 540px) {
+  .word-tree-picker, .word-tree-branches, .word-tree-edit-fields { grid-template-columns: minmax(0, 1fr); }
+  .word-tree-branches { background: none; padding-top: 0; padding-inline-start: .8rem; border-inline-start: 1px solid var(--border); }
+  .word-tree-branch::before { top: 1.4rem; left: -.8rem; width: .8rem; height: 1px; }
+}
